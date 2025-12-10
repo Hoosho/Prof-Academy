@@ -3,6 +3,7 @@
   "version": "2.0.0",
   "description": "A full-stack educational platform for teachers, students, and online classes.",
   "main": "index.js",
+  "type": "module",
   "scripts": {
     "test": "echo \"Error: no test specified\" && exit 1"
   },
@@ -10,7 +11,9 @@
   "license": "ISC",
   "dependencies": {
     "bcryptjs": "^3.0.3",
+    "celebrate": "^15.0.3",
     "compression": "^1.8.1",
+    "cookie-parser": "^1.4.7",
     "cors": "^2.8.5",
     "dotenv": "^17.2.3",
     "ejs": "^3.1.10",

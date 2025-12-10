@@ -77,3 +77,23 @@
     - Folder served via express.static().
     - Contains all frontend assets (CSS, JS, images).
     - Keeps frontend organized and easily accessible.
+
+20. cookie-parser
+
+Middleware for parsing cookies from incoming requests.
+
+Provides easy access to cookies via req.cookies and req.signedCookies.
+
+Essential for storing JWTs or small session data in cookies.
+
+Simplifies authentication and session management in Express.
+
+21. celebrate
+
+Middleware for validating request data using Joi directly on routes.
+
+Allows defining schemas for body, query, params, or headers for each route.
+
+Any validation error is automatically passed to the centralized errorHandler.
+
+Keeps controllers clean and reduces repetitive validation code.
