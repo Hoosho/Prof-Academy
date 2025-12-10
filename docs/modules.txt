@@ -1,0 +1,79 @@
+# Prof Academy - Installed Node.js Modules Documentation
+
+1. express
+   - The core framework for building the backend API.
+   - Lightweight, fast, and perfect for scalable REST APIs.
+
+2. mongoose
+   - ORM/ODM for MongoDB.
+   - Helps create schemas, models, validations, and relations easily.
+
+3. dotenv
+   - Loads environment variables from .env file.
+   - Keeps secrets like DB URLs and JWT secrets safe.
+
+4. helmet
+   - Security middleware that sets HTTP headers.
+   - Protects against XSS, clickjacking, and other vulnerabilities.
+
+5. cors
+   - Handles Cross-Origin Resource Sharing.
+   - Allows frontend apps (web/mobile) to communicate with the backend safely.
+
+6. express-rate-limit
+   - Protects API endpoints from brute-force attacks.
+   - Essential for login/signup routes to prevent abuse.
+
+7. xss-clean
+   - Sanitizes user input to prevent XSS attacks.
+   - Ensures that malicious scripts don’t get executed.
+
+8. jsonwebtoken
+   - Handles JWT authentication for secure login.
+   - Easy token creation, verification, and expiry handling.
+
+9. bcryptjs
+   - Hashes passwords securely before storing in database.
+   - Simple and effective way to protect user credentials.
+
+10. joi
+    - Validates request payloads cleanly and reliably.
+    - Makes API input robust and secure against invalid data.
+
+11. nodemailer
+    - Sends emails from backend.
+    - Useful for notifications, password resets, or student/teacher alerts.
+
+12. morgan
+    - HTTP request logger middleware.
+    - Helps track API usage and debug issues during development.
+
+13. uuid
+    - Generates unique IDs.
+    - Useful for session IDs, codes, and device tracking.
+
+14. multer
+    - Handles file uploads (images, PDFs, videos).
+    - Essential for teacher materials and student submissions.
+
+15. compression
+    - Compresses HTTP responses to speed up data transfer.
+    - Improves platform performance, especially for large content.
+
+16. hpp
+    - Protects against HTTP parameter pollution attacks.
+    - Adds an extra layer of security for all API endpoints.
+
+17. ejs
+    - Embedded JavaScript templates for dynamic HTML rendering.
+    - Allows sending backend data directly to HTML pages.
+    - Perfect for Admin / Teacher / User dashboards.
+
+18. path
+    - Node.js core module for handling and transforming file paths.
+    - Ensures cross-platform path compatibility.
+
+19. public / static files
+    - Folder served via express.static().
+    - Contains all frontend assets (CSS, JS, images).
+    - Keeps frontend organized and easily accessible.
