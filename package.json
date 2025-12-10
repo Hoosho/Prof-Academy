@@ -1,0 +1,11 @@
+{
+  "name": "prof-academy",
+  "version": "2.0.0",
+  "description": "A full-stack educational platform for teachers, students, and online classes.",
+  "main": "index.js",
+  "scripts": {
+    "test": "echo \"Error: no test specified\" && exit 1"
+  },
+  "author": "HOOSHO",
+  "license": "ISC"
+}
