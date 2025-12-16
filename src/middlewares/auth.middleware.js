@@ -1,0 +1,92 @@
+// middlewares/auth.middleware.js
+import jwt from 'jsonwebtoken';
+import Student from '../models/Student.model.js';
+import Teacher from '../models/Teacher.model.js';
+import { ErrorResponse } from '../utils/ErrorResponse.util.js';
+
+// Protect Admin Routes And Verify Token
+export const authAdmin = ( req, res, next ) => {
+  let token;
+  try{
+    // Check If Cookies Exists 
+    if( req.cookies && req.cookies.token ) {
+      token = req.cookies.token;
+    };
+    if( !token ) throw new ErrorResponse('❌ انت مش مسجل دخول يا معلم!', 401 );
+
+    // Verify Token
+    const decoded = jwt.verify( token, process.env.ADMIN_JWT_SECRET );
+
+    if( decoded.role !== 'admin' ) throw new ErrorResponse('❌ انت مش ادمن!', 403 ); 
+
+    // Attach Admin Info To Req
+    req.admin = {
+      username: decoded.username,
+      role: decoded.role
+    };
+
+    next();
+  }catch(err){
+    console.log(err);
+    if( err.name === 'JsonWebTokenError' || err.name === 'TokenExpiredError' ){
+      throw new ErrorResponse('❌ التوكن بتاعك مش صحيح او انتهت صلاحيته!', 401 );
+    };
+    next(err);
+  };
+};
+
+// Protect Teacher Routes And Verify Token
+export const authTeacher = async ( req, res, next ) => {
+  let token;
+  try{
+    if( req.cookies && req.cookies.token ) {
+      token = req.cookies.token;
+    };
+    if( !token ) throw new ErrorResponse('❌ انت مش مسجل دخول يا استاذ!', 401 );
+
+    const decoded = jwt.verify( token, process.env.TEACHER_JWT_SECRET );
+
+    if( decoded.role !== 'teacher' ) throw new ErrorResponse('❌ انت مش استاذ!', 403 ); 
+
+    const teacher = await Teacher.findById( decoded.id );
+    if( !teacher ) throw new ErrorResponse('❌ الاستاذ ده مش موجود!', 401 );
+
+    req.teacher = decoded.id;
+
+    next();
+  }catch(err){
+    console.log(err);
+    if( err.name === 'JsonWebTokenError' || err.name === 'TokenExpiredError' ){
+      throw new ErrorResponse('❌ التوكن بتاعك مش صحيح او انتهت صلاحيته!', 401 );
+    };
+    next(err);
+  };
+};
+
+// Protect Student Routes And Verify Token
+export const authStudent =  async ( req, res, next ) => {
+  let token;
+  try{
+    if( req.cookies && req.cookies.token ) {
+      token = req.cookies.token;
+    };
+    if( !token ) throw new ErrorResponse('❌ انت مش مسجل دخول يا طالب!', 401 );
+
+    const decoded = jwt.verify( token, process.env.STUDENT_JWT_SECRET );
+
+    if( decoded.role !== 'student' ) throw new ErrorResponse('❌ انت مش طالب!', 403 ); 
+
+    const student = await Student.findById( decoded.id );
+    if( !student ) throw new ErrorResponse('❌ الطالب ده مش موجود!', 401 );
+
+    req.student = decoded.id;
+
+    next();
+  }catch(err){
+    console.log(err);
+    if( err.name === 'JsonWebTokenError' || err.name === 'TokenExpiredError' ){
+      throw new ErrorResponse('❌ التوكن بتاعك مش صحيح او انتهت صلاحيته!', 401 );
+    };
+    next(err);
+  };
+};
