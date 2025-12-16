@@ -1,6 +1,6 @@
 // models/Teacher.model.js
 import mongoose from "mongoose";
-import bcrypt from "bcrypt";
+import bcrypt from "bcryptjs";
 
 // -------- Earnings History --------
 const EarningsSchema = new mongoose.Schema({

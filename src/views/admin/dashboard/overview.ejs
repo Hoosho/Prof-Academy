@@ -1,0 +1,580 @@
+<!DOCTYPE html>
+<html lang="ar" dir="rtl">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>لوحة تحكم المدير | Admin Dashboard</title>
+    
+    <link href="https://fonts.googleapis.com/css2?family=Almarai:wght@400;700;800&display=swap" rel="stylesheet">
+    <link href="https://fonts.googleapis.com/css2?family=Material+Icons+Outlined&display=swap" rel="stylesheet">
+    
+    <script src="https://cdn.jsdelivr.net/npm/chart.js@4.4.1/dist/chart.umd.min.js"></script>
+    <script src="https://cdn.tailwindcss.com"></script>
+    
+    <script>
+        // تهيئة إعدادات Tailwind CSS
+        tailwind.config = {
+            darkMode: 'class',
+            theme: {
+                extend: {
+                    fontFamily: {
+                        sans: ['Almarai', 'sans-serif'],
+                    },
+                    colors: {
+                        primary: '#3B82F6', 
+                        secondary: '#10B981', 
+                        dark: { bg: '#111827', card: '#1F2937', text: '#F3F4F6' },
+                        light: { bg: '#F3F4F6', card: '#FFFFFF', text: '#1F2937' }
+                    },
+                    keyframes: {
+                        fadeInUp: {
+                            '0%': { opacity: '0', transform: 'translateY(10px)' },
+                            '100%': { opacity: '1', transform: 'translateY(0)' },
+                        }
+                    },
+                    animation: {
+                        fadeInUp: 'fadeInUp 0.5s ease-out forwards',
+                    },
+                }
+            }
+        }
+    </script>
+
+    <style>
+        /* ستايلات الـ Dashboard الأساسية */
+        body { 
+            transition: background-color 0.3s, color 0.3s; 
+            min-height: 100vh;
+        }
+        #sidebar {
+            position: fixed;
+            z-index: 50;
+            top: 0;
+            right: 0;
+            height: 100%;
+            transform: translateX(100%);
+            transition: transform 0.3s ease-out;
+        }
+        .sidebar-open #sidebar {
+            transform: translateX(0);
+        }
+        .sidebar-link.active { background-color: #3B82F6; color: white; }
+        .dark .sidebar-link.active { background-color: #1E40AF; }
+
+        /* كلاسات التأخير الزمني */
+        .animate-delay-1 { animation-delay: 0.1s; }
+        .animate-delay-2 { animation-delay: 0.2s; }
+        .animate-delay-3 { animation-delay: 0.3s; }
+        .animate-delay-4 { animation-delay: 0.4s; }
+        .animate-delay-5 { animation-delay: 0.5s; }
+
+        /* إعداد الـ Counter */
+        .counter-value {
+            min-width: 50px; 
+            /* هام: خاصية الانتقال لتأثير اللون */
+            transition: color 0.3s ease-in-out; 
+            /* اللون الافتراضي في وضع الـ Light Mode */
+            color: #1F2937; /* light:text-light-text */
+        }
+        
+        /* اللون الافتراضي في وضع الـ Dark Mode */
+        .dark .counter-value {
+            color: #F3F4F6; /* dark:text-dark-text */
+        }
+
+        /* === ⭐️ الإصلاح النهائي لـ Hover/Focus: تغيير لون الرقم (Counter Value) === */
+        
+        /* الأزرق (Primary) */
+        .kpi-card-effect.glow-primary:hover .counter-value,
+        .kpi-card-effect.glow-primary:focus-within .counter-value,
+        .kpi-card-effect.glow-primary:active .counter-value {
+            color: #3B82F6; 
+        }
+
+        /* الأخضر الـ Secondary (للمدرسين) */
+        .kpi-card-effect.glow-secondary:hover .counter-value,
+        .kpi-card-effect.glow-secondary:focus-within .counter-value,
+        .kpi-card-effect.glow-secondary:active .counter-value {
+            color: #10B981; 
+        }
+
+        /* الأخضر العادي (للإيرادات) */
+        .kpi-card-effect.glow-green:hover .counter-value,
+        .kpi-card-effect.glow-green:focus-within .counter-value,
+        .kpi-card-effect.glow-green:active .counter-value {
+            color: #22C55E; /* Green-500 */
+        }
+
+        /* الأحمر (للمراجعة) */
+        .kpi-card-effect.glow-red:hover .counter-value,
+        .kpi-card-effect.glow-red:focus-within .counter-value,
+        .kpi-card-effect.glow-red:active .counter-value {
+            color: #EF4444; /* Red-500 */
+        }
+
+        /* === اللمسة الفنية: تأثير الـ GLOW على Hover, Focus, & Active (Light Mode) === */
+        
+        .kpi-card-effect {
+            transition: all 0.3s ease-in-out;
+            cursor: pointer; 
+            box-shadow: 0 4px 6px -1px rgb(0 0 0 / 0.1), 0 2px 4px -2px rgb(0 0 0 / 0.1);
+        }
+        
+        /* Glow الأزرق (للطلاب) - الفاتح */
+        .kpi-card-effect.glow-primary:hover, .kpi-card-effect.glow-primary:focus-within, .kpi-card-effect.glow-primary:active {
+            box-shadow: 0 10px 15px -3px rgba(59, 130, 246, 0.3), 0 4px 6px -4px rgba(59, 130, 246, 0.15); 
+            transform: scale(1.01);
+        }
+        
+        /* Glow الأخضر (للمدرسين) - الفاتح */
+        .kpi-card-effect.glow-secondary:hover, .kpi-card-effect.glow-secondary:focus-within, .kpi-card-effect.glow-secondary:active {
+            box-shadow: 0 10px 15px -3px rgba(16, 185, 129, 0.3), 0 4px 6px -4px rgba(16, 185, 129, 0.15); 
+            transform: scale(1.01);
+        }
+
+        /* Glow الأخضر (للإيرادات) - الفاتح */
+        .kpi-card-effect.glow-green:hover, .kpi-card-effect.glow-green:focus-within, .kpi-card-effect.glow-green:active {
+            box-shadow: 0 10px 15px -3px rgba(34, 197, 94, 0.3), 0 4px 6px -4px rgba(34, 197, 94, 0.15); 
+            transform: scale(1.01);
+        }
+
+        /* Glow الأحمر (للمراجعة) - الفاتح */
+        .kpi-card-effect.glow-red:hover, .kpi-card-effect.glow-red:focus-within, .kpi-card-effect.glow-red:active {
+            box-shadow: 0 10px 15px -3px rgba(239, 68, 68, 0.3), 0 4px 6px -4px rgba(239, 68, 68, 0.15);
+            transform: scale(1.01);
+        }
+
+        /* ********** إصلاح الـ DARK MODE GLOW ********** */
+
+        /* Glow الأزرق (للطلاب) - الداكن */
+        .dark .kpi-card-effect.glow-primary:hover, .dark .kpi-card-effect.glow-primary:focus-within, .dark .kpi-card-effect.glow-primary:active {
+            box-shadow: 0 10px 15px -3px rgba(59, 130, 246, 0.4), 0 4px 6px -4px rgba(59, 130, 246, 0.2);
+            transform: scale(1.01);
+        }
+        
+        /* Glow الأخضر (للمدرسين) - الداكن */
+        .dark .kpi-card-effect.glow-secondary:hover, .dark .kpi-card-effect.glow-secondary:focus-within, .dark .kpi-card-effect.glow-secondary:active {
+            box-shadow: 0 10px 15px -3px rgba(16, 185, 129, 0.4), 0 4px 6px -4px rgba(16, 185, 129, 0.2);
+            transform: scale(1.01);
+        }
+
+        /* Glow الأخضر (للإيرادات) - الداكن */
+        .dark .kpi-card-effect.glow-green:hover, .dark .kpi-card-effect.glow-green:focus-within, .dark .kpi-card-effect.glow-green:active {
+            box-shadow: 0 10px 15px -3px rgba(34, 197, 94, 0.4), 0 4px 6px -4px rgba(34, 197, 94, 0.2); 
+            transform: scale(1.01);
+        }
+
+        /* Glow الأحمر (للمراجعة) - الداكن */
+        .dark .kpi-card-effect.glow-red:hover, .dark .kpi-card-effect.glow-red:focus-within, .dark .kpi-card-effect.glow-red:active {
+            box-shadow: 0 10px 15px -3px rgba(239, 68, 68, 0.4), 0 4px 6px -4px rgba(239, 68, 68, 0.2);
+            transform: scale(1.01);
+        }
+        
+        /* إزالة خط التركيز الافتراضي */
+        .kpi-card-effect:focus {
+            outline: none;
+            box-shadow: 0 0 0 3px rgba(59, 130, 246, 0.5); 
+        }
+
+    </style>
+</head>
+
+<body class="bg-light-bg text-light-text dark:bg-dark-bg dark:text-dark-text transition-colors flex">
+
+    <div id="sidebar-overlay" class="fixed inset-0 z-40 bg-black/50 dark:bg-black/70 hidden md:hidden"></div>
+
+    <div id="sidebar" class="w-64 bg-light-card dark:bg-dark-card shadow-2xl p-4 space-y-4 md:shadow-none md:flex-shrink-0 md:relative md:transform-none">
+        
+        <div class="flex justify-between items-center mb-6">
+            <h1 class="text-2xl font-black text-primary flex items-center gap-2">
+                <i class="material-icons-outlined text-3xl">admin_panel_settings</i>
+                لوحة المدير
+            </h1>
+            <button id="close-sidebar-btn" class="p-2 rounded-full hover:bg-gray-200 dark:hover:bg-gray-700 text-gray-600 dark:text-gray-300 transition-colors md:hidden">
+                <i class="material-icons-outlined">close</i>
+            </button>
+        </div>
+
+        <nav class="space-y-2">
+            <a href="#" class="sidebar-link active flex items-center p-3 rounded-xl font-bold text-sm transition-colors gap-3">
+                <i class="material-icons-outlined text-xl">dashboard</i>
+                لوحة المعلومات (Dashboard)
+            </a>
+            <a href="#" class="sidebar-link flex items-center p-3 rounded-xl font-medium text-sm text-gray-600 dark:text-gray-300 hover:bg-gray-100 dark:hover:bg-gray-700 transition-colors gap-3">
+                <i class="material-icons-outlined text-xl">people</i>
+                إدارة المستخدمين
+            </a>
+            <a href="teacher-management.html" class="sidebar-link flex items-center p-3 rounded-xl font-medium text-sm text-gray-600 dark:text-gray-300 hover:bg-gray-100 dark:hover:bg-gray-700 transition-colors gap-3">
+                <i class="material-icons-outlined text-xl">group</i>
+                إدارة المدرسين
+            </a>
+            <a href="#" class="sidebar-link flex items-center p-3 rounded-xl font-medium text-sm text-gray-600 dark:text-gray-300 hover:bg-gray-100 dark:hover:bg-gray-700 transition-colors gap-3">
+                <i class="material-icons-outlined text-xl">menu_book</i>
+                إدارة الكورسات
+            </a>
+            <a href="#" class="sidebar-link flex items-center p-3 rounded-xl font-medium text-sm text-gray-600 dark:text-gray-300 hover:bg-gray-100 dark:hover:bg-gray-700 transition-colors gap-3">
+                <i class="material-icons-outlined text-xl">attach_money</i>
+                التقارير المالية
+            </a>
+            <a href="#" class="sidebar-link flex items-center p-3 rounded-xl font-medium text-sm text-gray-600 dark:text-gray-300 hover:bg-gray-100 dark:hover:bg-gray-700 transition-colors gap-3">
+                <i class="material-icons-outlined text-xl">settings</i>
+                الإعدادات
+            </a>
+        </nav>
+    </div>
+
+    <div class="flex-1 overflow-y-auto">
+        
+        <header class="sticky top-0 z-30 bg-light-bg/90 dark:bg-dark-bg/90 backdrop-blur-sm border-b border-gray-200 dark:border-gray-700 px-4 py-3 transition-colors">
+            <div class="flex justify-between items-center">
+                
+                <div class="flex items-center gap-3">
+                    <button id="toggle-sidebar-btn" class="p-2 rounded-full hover:bg-gray-200 dark:hover:bg-gray-700 text-gray-600 dark:text-gray-300 transition-colors md:hidden">
+                        <i class="material-icons-outlined text-xl">menu</i>
+                    </button>
+                    <h2 class="text-xl font-black text-gray-800 dark:text-white hidden md:block">لوحة المعلومات</h2>
+                </div>
+
+                <div class="flex items-center gap-2">
+                    <div class="relative">
+                        <button id="notification-btn" class="p-2 rounded-full hover:bg-gray-200 dark:hover:bg-gray-700 text-gray-600 dark:text-gray-300 transition-colors relative">
+                            <i class="material-icons-outlined text-xl">notifications</i>
+                            <span class="absolute top-1 right-1 h-2 w-2 bg-red-500 rounded-full border border-light-bg dark:border-dark-bg"></span>
+                        </button>
+                        <div id="notification-dropdown" class="absolute left-0 mt-2 w-72 bg-light-card dark:bg-dark-card rounded-xl shadow-xl py-2 z-40 hidden border border-gray-100 dark:border-gray-700">
+                            <h4 class="px-4 py-1 text-sm font-bold text-gray-800 dark:text-white border-b dark:border-gray-700">الإشعارات الجديدة</h4>
+                            <a href="#" class="flex items-center gap-3 p-3 hover:bg-gray-50 dark:hover:bg-gray-700 transition-colors">
+                                <i class="material-icons-outlined text-sm text-green-500">person_add</i>
+                                <span class="text-sm">طالب جديد انضم الآن.</span>
+                            </a>
+                             <a href="#" class="flex items-center gap-3 p-3 hover:bg-gray-50 dark:hover:bg-gray-700 transition-colors">
+                                <i class="material-icons-outlined text-sm text-orange-500">upload_file</i>
+                                <span class="text-sm">المدرس (أحمد) رفع محاضرة جديدة</span>
+                            </a>
+                            <div class="flex justify-between items-center border-t dark:border-gray-700 mt-2 pt-2 px-3">
+                                <button id="mark-read-btn" class="text-xs text-primary hover:text-blue-700 dark:text-blue-400 font-bold flex items-center gap-1">
+                                    <i class="material-icons-outlined text-sm">done_all</i>
+                                    تعليم كمقروء
+                                </button>
+                                <a href="#" class="text-xs text-gray-500 hover:text-primary dark:text-gray-400 font-medium">عرض الكل</a>
+                            </div>
+                        </div>
+                    </div>
+                    
+                    <button id="theme-btn" class="p-2 rounded-full hover:bg-gray-200 dark:hover:bg-gray-700 text-gray-600 dark:text-gray-300 transition">
+                        <i class="material-icons-outlined text-xl">brightness_4</i>
+                    </button>
+
+                    <div class="relative">
+                        <img id="profile-btn" src="https://i.pravatar.cc/32?img=68" alt="Admin" class="h-8 w-8 rounded-full border-2 border-primary/50 cursor-pointer ml-2">
+                        <div id="profile-dropdown" class="absolute left-0 mt-2 w-48 bg-light-card dark:bg-dark-card rounded-xl shadow-xl py-2 z-40 hidden border border-gray-100 dark:border-gray-700">
+                            <a href="#" class="flex items-center gap-3 p-3 hover:bg-gray-50 dark:hover:bg-gray-700 transition-colors text-sm">
+                                <i class="material-icons-outlined text-base">account_circle</i>
+                                الملف الشخصي
+                            </a>
+                            <a href="#" class="flex items-center gap-3 p-3 hover:bg-gray-50 dark:hover:bg-gray-700 transition-colors text-sm">
+                                <i class="material-icons-outlined text-base">logout</i>
+                                تسجيل الخروج
+                            </a>
+                        </div>
+                    </div>
+
+                </div>
+            </div>
+        </header>
+
+        <main class="p-4 md:p-6 space-y-6">
+             
+            <div class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-6">
+                
+                <div tabindex="0" class="bg-light-card dark:bg-dark-card p-5 rounded-2xl border border-gray-100 dark:border-gray-700 flex justify-between items-center opacity-0 animate-fadeInUp animate-delay-1 kpi-card-effect glow-primary">
+                    <div>
+                        <p class="text-sm font-medium text-gray-500 dark:text-gray-400">الطلاب النشطين</p>
+                        <h3 class="text-3xl font-black mt-1 counter-value" data-target="12450">0</h3>
+                    </div>
+                    <div class="p-3 bg-primary/20 text-primary rounded-full">
+                        <i class="material-icons-outlined text-3xl">person</i>
+                    </div>
+                </div>
+
+                <div tabindex="0" class="bg-light-card dark:bg-dark-card p-5 rounded-2xl border border-gray-100 dark:border-gray-700 flex justify-between items-center opacity-0 animate-fadeInUp animate-delay-2 kpi-card-effect glow-secondary">
+                    <div>
+                        <p class="text-sm font-medium text-gray-500 dark:text-gray-400">إجمالي المدرسين</p>
+                        <h3 class="text-3xl font-black mt-1 counter-value" data-target="15">0</h3>
+                    </div>
+                    <div class="p-3 bg-secondary/20 text-secondary rounded-full">
+                        <i class="material-icons-outlined text-3xl">school</i>
+                    </div>
+                </div>
+                
+                <div tabindex="0" class="bg-light-card dark:bg-dark-card p-5 rounded-2xl border border-gray-100 dark:border-gray-700 flex justify-between items-center opacity-0 animate-fadeInUp animate-delay-3 kpi-card-effect glow-green">
+                    <div>
+                        <p class="text-sm font-medium text-gray-500 dark:text-gray-400">إيرادات هذا الشهر</p>
+                        <h3 class="text-3xl font-black mt-1 counter-value" data-target="85200">0</h3>
+                        <span class="text-xs text-green-500 font-bold">+12% من الشهر الماضي</span>
+                    </div>
+                    <div class="p-3 bg-green-500/20 text-green-500 rounded-full">
+                        <i class="material-icons-outlined text-3xl">payments</i>
+                    </div>
+                </div>
+                
+                <div tabindex="0" class="bg-light-card dark:bg-dark-card p-5 rounded-2xl border border-gray-100 dark:border-gray-700 flex justify-between items-center opacity-0 animate-fadeInUp animate-delay-4 kpi-card-effect glow-red">
+                    <div>
+                        <p class="text-sm font-medium text-gray-500 dark:text-gray-400">كورسات للمراجعة</p>
+                        <h3 class="text-3xl font-black mt-1 counter-value" data-target="3">0</h3>
+                    </div>
+                    <div class="p-3 bg-red-500/20 text-red-500 rounded-full">
+                        <i class="material-icons-outlined text-3xl">pending_actions</i>
+                    </div>
+                </div>
+
+            </div>
+            
+            <div class="grid grid-cols-1 lg:grid-cols-3 gap-6">
+
+                <div class="lg:col-span-2 bg-light-card dark:bg-dark-card p-5 rounded-2xl shadow-lg border border-gray-100 dark:border-gray-700 transition-colors opacity-0 animate-fadeInUp animate-delay-5">
+                    <h4 class="text-lg font-bold mb-4 text-gray-800 dark:text-white">نمو الإيرادات لآخر 6 أشهر</h4>
+                    <div class="h-64">
+                         <canvas id="revenueChart" class="h-full w-full"></canvas>
+                    </div>
+                </div>
+
+                <div class="bg-light-card dark:bg-dark-card p-5 rounded-2xl shadow-lg border border-gray-100 dark:border-gray-700 transition-colors opacity-0 animate-fadeInUp animate-delay-5">
+                    <h4 class="text-lg font-bold mb-4 text-gray-800 dark:text-white">آخر الاشتراكات والنشاطات</h4>
+                    
+                    <ul class="space-y-3">
+                        <li class="flex items-center justify-between text-sm">
+                            <span class="flex items-center gap-2">
+                                <i class="material-icons-outlined text-green-500 text-lg">check_circle</i>
+                                تم تسجيل طالب جديد
+                            </span>
+                            <span class="text-xs text-gray-500">منذ 5 دقائق</span>
+                        </li>
+                        <li class="flex items-center justify-between text-sm">
+                            <span class="flex items-center gap-2">
+                                <i class="material-icons-outlined text-orange-500 text-lg">upload_file</i>
+                                المدرس (أحمد) رفع محاضرة جديدة
+                            </span>
+                            <span class="text-xs text-gray-500">منذ ساعتين</span>
+                        </li>
+                        <li class="flex items-center justify-between text-sm">
+                            <span class="flex items-center gap-2">
+                                <i class="material-icons-outlined text-red-500 text-lg">warning</i>
+                                5 محاولات دخول فاشلة
+                            </span>
+                            <span class="text-xs text-gray-500">اليوم</span>
+                        </li>
+                    </ul>
+                    
+                    <a href="#" class="w-full mt-4 text-primary hover:text-primary/80 dark:text-blue-400 dark:hover:text-blue-300 transition-colors text-sm font-bold flex justify-center items-center gap-1">
+                        عرض كل النشاطات
+                        <i class="material-icons-outlined text-lg">arrow_back</i>
+                    </a>
+
+                </div>
+            </div>
+
+        </main>
+
+    </div>
+    
+    <script>
+        // === Global Variables ===
+        const html = document.documentElement;
+        const body = document.body;
+        
+        // Sidebar Elements
+        const sidebar = document.getElementById('sidebar');
+        const sidebarOverlay = document.getElementById('sidebar-overlay');
+        const toggleSidebarBtn = document.getElementById('toggle-sidebar-btn');
+        const closeSidebarBtn = document.getElementById('close-sidebar-btn'); 
+
+        // Dropdown Elements
+        const profileBtn = document.getElementById('profile-btn');
+        const profileDropdown = document.getElementById('profile-dropdown');
+        const notificationBtn = document.getElementById('notification-btn');
+        const notificationDropdown = document.getElementById('notification-dropdown');
+        const themeBtn = document.getElementById('theme-btn');
+        const themeIcon = themeBtn.querySelector('i');
+        const markReadBtn = document.getElementById('mark-read-btn'); 
+
+        // === 1. إدارة الشريط الجانبي (Sidebar) ===
+        function toggleSidebar() {
+            body.classList.toggle('sidebar-open');
+            
+            if (body.classList.contains('sidebar-open')) {
+                sidebar.classList.remove('transform', 'translate-x-full'); 
+                sidebar.classList.add('translate-x-0'); 
+                sidebarOverlay.classList.remove('hidden');
+                body.style.overflow = 'hidden'; 
+            } else {
+                sidebar.classList.remove('translate-x-0');
+                sidebar.classList.add('transform', 'translate-x-full'); 
+                sidebarOverlay.classList.add('hidden');
+                body.style.overflow = ''; 
+            }
+        }
+
+        // ربط الأحداث (Event Listeners)
+        toggleSidebarBtn.addEventListener('click', toggleSidebar);
+        closeSidebarBtn.addEventListener('click', toggleSidebar);
+        sidebarOverlay.addEventListener('click', toggleSidebar);
+        
+        // === 2. إدارة الثيم (Dark/Light Mode) ===
+        function updateThemeIcon() {
+            themeIcon.textContent = html.classList.contains('dark') ? 'light_mode' : 'brightness_4';
+        }
+
+        // Initialization
+        if (localStorage.theme === 'dark' || (!('theme' in localStorage) && window.matchMedia('(prefers-color-scheme: dark)').matches)) {
+            html.classList.add('dark');
+        } else {
+            html.classList.remove('dark');
+        }
+        updateThemeIcon();
+
+        // Event Listener
+        themeBtn.addEventListener('click', () => {
+            html.classList.toggle('dark');
+            localStorage.theme = html.classList.contains('dark') ? 'dark' : 'light';
+            updateThemeIcon();
+            updateChartColors();
+        });
+
+        // === 3. إدارة قوائم الدروب داون (Profile & Notifications) ===
+        function toggleDropdown(dropdown) {
+            dropdown.classList.toggle('hidden');
+        }
+
+        profileBtn.addEventListener('click', (e) => {
+            e.stopPropagation();
+            toggleDropdown(profileDropdown);
+            notificationDropdown.classList.add('hidden');
+        });
+
+        notificationBtn.addEventListener('click', (e) => {
+            e.stopPropagation();
+            toggleDropdown(notificationDropdown);
+            profileDropdown.classList.add('hidden');
+        });
+
+        document.addEventListener('click', () => {
+            profileDropdown.classList.add('hidden');
+            notificationDropdown.classList.add('hidden');
+        });
+
+        // === 4. وظيفة "تعليم كمقروء" الوهمية (Dummy Mark as Read) ===
+        markReadBtn.addEventListener('click', (e) => {
+            e.preventDefault();
+            alert('تم تعليم جميع الإشعارات كمقروءة! (هنا يتم إرسال طلب للباك إند)');
+            notificationDropdown.classList.add('hidden');
+        });
+        
+        // === 5. تنفيذ العداد (Count Up Effect) ===
+        function countUp() {
+            const counters = document.querySelectorAll('.counter-value');
+
+            counters.forEach(counter => {
+                const target = +counter.getAttribute('data-target');
+                let start = 0;
+                
+                const duration = 1500; // مدة العد بالمللي ثانية
+                const step = target / (duration / 10); 
+
+                const updateCount = () => {
+                    const increment = target < 100 ? 1 : step;
+                    
+                    if (start < target) {
+                        start = Math.min(start + increment, target);
+                        
+                        counter.textContent = Math.ceil(start).toLocaleString('ar-EG'); 
+                        
+                        setTimeout(updateCount, 10);
+                    } else {
+                        counter.textContent = target.toLocaleString('ar-EG');
+                    }
+                };
+
+                updateCount();
+            });
+        }
+        
+        document.addEventListener('DOMContentLoaded', () => {
+            createChart();
+            setTimeout(countUp, 500);
+        });
+        
+        // === 6. تحديث الرسم البياني (Chart.js) ===
+        let revenueChart; 
+
+        function createChart() {
+            const ctx = document.getElementById('revenueChart');
+            const labels = ['سبتمبر', 'أكتوبر', 'نوفمبر', 'ديسمبر', 'يناير', 'فبراير'];
+            const data = [45000, 62000, 58000, 85200, 79000, 91000];
+
+            const isDarkMode = html.classList.contains('dark');
+            const gridColor = isDarkMode ? '#374151' : '#E5E7EB';
+            const tickColor = isDarkMode ? '#D1D5DB' : '#6B7280';
+
+            revenueChart = new Chart(ctx, {
+                type: 'bar',
+                data: {
+                    labels: labels,
+                    datasets: [{
+                        label: 'الإيرادات بالجنيه',
+                        data: data,
+                        backgroundColor: '#3B82F6',
+                        borderRadius: 6,
+                        hoverBackgroundColor: '#1D4ED8'
+                    }]
+                },
+                options: {
+                    responsive: true,
+                    maintainAspectRatio: false,
+                    plugins: {
+                        legend: { display: false },
+                        tooltip: {
+                            rtl: true,
+                            callbacks: {
+                                label: function(context) {
+                                    return context.dataset.label + ': ' + context.formattedValue + ' ج.م';
+                                }
+                            }
+                        }
+                    },
+                    scales: {
+                        y: {
+                            beginAtZero: true,
+                            grid: { color: gridColor },
+                            ticks: {
+                                color: tickColor,
+                                callback: function(value) {
+                                    return value.toLocaleString('ar-EG');
+                                }
+                            }
+                        },
+                        x: {
+                             grid: { display: false },
+                            ticks: { color: tickColor }
+                        }
+                    }
+                }
+            });
+        }
+        
+        function updateChartColors() {
+            if (revenueChart) {
+                const isDarkMode = html.classList.contains('dark');
+                const gridColor = isDarkMode ? '#374151' : '#E5E7EB';
+                const tickColor = isDarkMode ? '#D1D5DB' : '#6B7280';
+
+                revenueChart.options.scales.y.grid.color = gridColor;
+                revenueChart.options.scales.y.ticks.color = tickColor;
+                revenueChart.options.scales.x.ticks.color = tickColor;
+                
+                revenueChart.update();
+            }
+        }
+    </script>
+</body>
+</html>

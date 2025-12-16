@@ -1,6 +1,6 @@
 // middlewares/errorHandler.middleware.js
 import { isCelebrateError } from 'celebrate';
-import { ErrorResponse } from '../utils/ErrorResponse.util.js';
+import { ErrorResponse } from '../utils/errorResponse.util.js';
 
 export const errorHandler = ( err, req, res, next ) => {
   // Joi Errors 
