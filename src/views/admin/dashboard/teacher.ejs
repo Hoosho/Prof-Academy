@@ -1,0 +1,780 @@
+<!DOCTYPE html>
+<html lang="ar" dir="rtl">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>إدارة المدرسين | Teacher Management</title>
+    
+    <link href="https://fonts.googleapis.com/css2?family=Almarai:wght@400;700;800&display=swap" rel="stylesheet">
+    <link href="https://fonts.googleapis.com/css2?family=Material+Icons+Outlined&display=swap" rel="stylesheet">
+    
+    <script src="https://cdn.tailwindcss.com"></script>
+    
+    <script>
+        tailwind.config = {
+            darkMode: 'class',
+            theme: {
+                extend: {
+                    fontFamily: {
+                        sans: ['Almarai', 'sans-serif'],
+                    },
+                    colors: {
+                        primary: '#3B82F6', 
+                        secondary: '#10B981', 
+                        dark: { bg: '#111827', card: '#1F2937', text: '#F3F4F6' },
+                        light: { bg: '#F3F4F6', card: '#FFFFFF', text: '#1F2937' }
+                    },
+                    keyframes: {
+                        fadeInUp: {
+                            '0%': { opacity: '0', transform: 'translateY(10px)' },
+                            '100%': { opacity: '1', transform: 'translateY(0)' },
+                        }
+                    },
+                    animation: {
+                        fadeInUp: 'fadeInUp 0.5s ease-out forwards',
+                    },
+                }
+            }
+        }
+    </script>
+
+    <style>
+        body { transition: background-color 0.3s, color 0.3s; min-height: 100vh; font-family: 'Almarai', sans-serif; }
+        #sidebar { position: fixed; z-index: 50; top: 0; right: 0; height: 100%; transform: translateX(100%); transition: transform 0.3s ease-out; }
+        .sidebar-open #sidebar { transform: translateX(0); }
+        .sidebar-link.active { background-color: #3B82F6; color: white; }
+        .dark .sidebar-link.active { background-color: #1E40AF; }
+
+        .data-table-row { transition: background-color 0.2s; }
+        .data-table-row:nth-child(even) { background-color: #F9FAFB; }
+        .dark .data-table-row:nth-child(even) { background-color: #1F2937; }
+        .data-table-row:hover { background-color: #E5E7EB; }
+        .dark .data-table-row:hover { background-color: #374151; }
+        
+        .modal-overlay {
+            background-color: rgba(0, 0, 0, 0.6);
+            backdrop-filter: blur(4px);
+            transition: opacity 0.3s ease;
+        }
+        .modal-content {
+            transition: transform 0.3s ease, opacity 0.3s ease;
+            max-height: 90vh; 
+            overflow-y: auto;
+            width: 95%; 
+            max-width: 500px; 
+        }
+
+        .overflow-x-auto {
+            overflow-x: auto;
+        }
+
+        .data-table-row td, .data-table-row th {
+            min-width: 120px; 
+        }
+        
+        .data-table-row td:first-child { 
+             min-width: 240px;
+        }
+        
+        .teacher-contact-info {
+            display: block;
+            white-space: nowrap;
+        }
+        
+        .kpi-card-effect {
+            transition: all 0.3s ease-in-out;
+            cursor: pointer; 
+            box-shadow: 0 4px 6px -1px rgb(0 0 0 / 0.1), 0 2px 4px -2px rgb(0 0 0 / 0.1);
+        }
+        .kpi-card-effect.glow-primary:hover, .kpi-card-effect.glow-primary:focus-within {
+            box-shadow: 0 10px 15px -3px rgba(59, 130, 246, 0.3), 0 4px 6px -4px rgba(59, 130, 246, 0.15); 
+            transform: scale(1.01);
+        }
+        .kpi-card-effect.glow-primary:hover .kpi-value, .kpi-card-effect.glow-primary:focus-within .kpi-value { color: #3B82F6; }
+        .kpi-card-effect.glow-green:hover, .kpi-card-effect.glow-green:focus-within {
+            box-shadow: 0 10px 15px -3px rgba(34, 197, 94, 0.3), 0 4px 6px -4px rgba(34, 197, 94, 0.15); 
+            transform: scale(1.01);
+        }
+        .kpi-card-effect.glow-green:hover .kpi-value, .kpi-card-effect.glow-green:focus-within .kpi-value { color: #22C55E; }
+        .kpi-card-effect.glow-red:hover, .kpi-card-effect.glow-red:focus-within {
+            box-shadow: 0 10px 15px -3px rgba(239, 68, 68, 0.3), 0 4px 6px -4px rgba(239, 68, 68, 0.15);
+            transform: scale(1.01);
+        }
+        .kpi-card-effect.glow-red:hover .kpi-value, .kpi-card-effect.glow-red:focus-within .kpi-value { color: #EF4444; }
+        .kpi-card-effect.glow-yellow:hover, .kpi-card-effect.glow-yellow:focus-within {
+            box-shadow: 0 10px 15px -3px rgba(245, 158, 11, 0.3), 0 4px 6px -4px rgba(245, 158, 11, 0.15); 
+            transform: scale(1.01);
+        }
+        .kpi-card-effect.glow-yellow:hover .kpi-value, .kpi-card-effect.glow-yellow:focus-within .kpi-value { color: #F59E0B; }
+        .dark .kpi-card-effect.glow-primary:hover, .dark .kpi-card-effect.glow-primary:focus-within { box-shadow: 0 10px 15px -3px rgba(59, 130, 246, 0.4), 0 4px 6px -4px rgba(59, 130, 246, 0.2); }
+        .dark .kpi-card-effect.glow-green:hover, .dark .kpi-card-effect.glow-green:focus-within { box-shadow: 0 10px 15px -3px rgba(34, 197, 94, 0.4), 0 4px 6px -4px rgba(34, 197, 94, 0.2); }
+        .dark .kpi-card-effect.glow-red:hover, .dark .kpi-card-effect.glow-red:focus-within { box-shadow: 0 10px 15px -3px rgba(239, 68, 68, 0.4), 0 4px 6px -4px rgba(239, 68, 68, 0.2); }
+        .dark .kpi-card-effect.glow-yellow:hover, .dark .kpi-card-effect.glow-yellow:focus-within { box-shadow: 0 10px 15px -3px rgba(245, 158, 11, 0.4), 0 4px 6px -4px rgba(245, 158, 11, 0.2); }
+
+        /* Toast Message من صفحة OTP */
+        #toast-message {
+            position: fixed; top: 20px; left: 50%; transform: translateX(-50%) translateY(-150%);
+            padding: 16px 28px; border-radius: 12px; color: white; font-weight: 800;
+            opacity: 0; transition: all 0.5s cubic-bezier(0.175, 0.885, 0.32, 1.275);
+            z-index: 100; box-shadow: 0 10px 25px rgba(0, 0, 0, 0.3);
+            width: 90%; max-width: 450px; text-align: center;
+        }
+        .toast-show { opacity: 1 !important; transform: translateX(-50%) translateY(0) !important; }
+        .toast-success { background-color: #15803d; }
+        .toast-info { background-color: #2563eb; }
+        .toast-failed { background-color: #b91c1c; }
+
+        .spinner {
+            border: 3px solid rgba(255, 255, 255, 0.3); border-top: 3px solid white;
+            border-radius: 50%; width: 22px; height: 22px;
+            animation: spin 0.8s linear infinite;
+            display: inline-block;
+        }
+        @keyframes spin { 0% { transform: rotate(0deg); } 100% { transform: rotate(360deg); } }
+
+        .btn-loading { opacity: 0.7; cursor: not-allowed; }
+    </style>
+</head>
+
+<body class="bg-light-bg text-light-text dark:bg-dark-bg dark:text-dark-text transition-colors flex">
+
+    <div id="sidebar-overlay" class="fixed inset-0 z-40 bg-black/50 dark:bg-black/70 hidden md:hidden"></div>
+
+    <div id="sidebar" class="w-64 bg-light-card dark:bg-dark-card shadow-2xl p-4 space-y-4 md:shadow-none md:flex-shrink-0 md:relative md:transform-none">
+        <div class="flex justify-between items-center mb-6">
+            <h1 class="text-2xl font-black text-primary flex items-center gap-2">
+                <i class="material-icons-outlined text-3xl">admin_panel_settings</i> لوحة المدير
+            </h1>
+            <button id="close-sidebar-btn" class="p-2 rounded-full hover:bg-gray-200 dark:hover:bg-gray-700 text-gray-600 dark:text-gray-300 transition-colors md:hidden">
+                <i class="material-icons-outlined">close</i>
+            </button>
+        </div>
+
+        <nav class="space-y-2">
+            <a href="dashboard.html" class="sidebar-link flex items-center p-3 rounded-xl font-medium text-sm text-gray-600 dark:text-gray-300 hover:bg-gray-100 dark:hover:bg-gray-700 transition-colors gap-3">
+                <i class="material-icons-outlined text-xl">dashboard</i> لوحة المعلومات
+            </a>
+            <a href="#" class="sidebar-link active flex items-center p-3 rounded-xl font-bold text-sm transition-colors gap-3">
+                <i class="material-icons-outlined text-xl">people</i> إدارة المستخدمين
+            </a>
+            <a href="#" class="sidebar-link flex items-center p-3 rounded-xl font-medium text-sm text-gray-600 dark:text-gray-300 hover:bg-gray-100 dark:hover:bg-gray-700 transition-colors gap-3">
+                <i class="material-icons-outlined text-xl">menu_book</i> إدارة الكورسات
+            </a>
+            <a href="#" class="sidebar-link flex items-center p-3 rounded-xl font-medium text-sm text-gray-600 dark:text-gray-300 hover:bg-gray-100 dark:hover:bg-gray-700 transition-colors gap-3">
+                <i class="material-icons-outlined text-xl">attach_money</i> التقارير المالية
+            </a>
+            <a href="#" class="sidebar-link flex items-center p-3 rounded-xl font-medium text-sm text-gray-600 dark:text-gray-300 hover:bg-gray-100 dark:hover:bg-gray-700 transition-colors gap-3">
+                <i class="material-icons-outlined text-xl">settings</i> الإعدادات
+            </a>
+        </nav>
+    </div>
+
+    <div class="flex-1 overflow-y-auto">
+        
+        <header class="sticky top-0 z-30 bg-light-bg/90 dark:bg-dark-bg/90 backdrop-blur-sm border-b border-gray-200 dark:border-gray-700 px-4 py-3 transition-colors">
+            <div class="flex justify-between items-center">
+                
+                <div class="flex items-center gap-3">
+                    <button id="toggle-sidebar-btn" class="p-2 rounded-full hover:bg-gray-200 dark:hover:bg-gray-700 text-gray-600 dark:text-gray-300 transition-colors md:hidden">
+                        <i class="material-icons-outlined text-xl">menu</i>
+                    </button>
+                    <h2 class="text-xl font-black text-gray-800 dark:text-white">إدارة المدرسين</h2>
+                </div>
+
+                <div class="flex items-center gap-2">
+                    <button id="theme-btn" class="p-2 rounded-full hover:bg-gray-200 dark:hover:bg-gray-700 text-gray-600 dark:text-gray-300 transition">
+                        <i class="material-icons-outlined text-xl">brightness_4</i>
+                    </button>
+                    <img id="profile-btn" src="https://i.pravatar.cc/32?img=68" alt="Admin" class="h-8 w-8 rounded-full border-2 border-primary/50 cursor-pointer ml-2">
+                </div>
+            </div>
+        </header>
+
+        <main class="p-4 md:p-6 space-y-6">
+            
+            <div class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-6">
+                
+                <div tabindex="0" class="kpi-card-effect glow-primary bg-light-card dark:bg-dark-card p-5 rounded-2xl border border-gray-100 dark:border-gray-700 flex justify-between items-center opacity-0 animate-fadeInUp">
+                    <div>
+                        <p class="text-sm font-medium text-gray-500 dark:text-gray-400">إجمالي المدرسين</p>
+                        <h3 id="stat-total" class="text-3xl font-black text-gray-800 dark:text-white mt-1 transition-colors duration-300 kpi-value">0</h3>
+                    </div>
+                    <div class="p-3 bg-primary/20 text-primary rounded-full">
+                        <i class="material-icons-outlined text-3xl">school</i>
+                    </div>
+                </div>
+
+                <div tabindex="0" class="kpi-card-effect glow-green bg-light-card dark:bg-dark-card p-5 rounded-2xl border border-gray-100 dark:border-gray-700 flex justify-between items-center opacity-0 animate-fadeInUp">
+                    <div>
+                        <p class="text-sm font-medium text-gray-500 dark:text-gray-400">نشطون حالياً</p>
+                        <h3 id="stat-active" class="text-3xl font-black text-gray-800 dark:text-white mt-1 transition-colors duration-300 kpi-value">0</h3>
+                    </div>
+                    <div class="p-3 bg-green-500/20 text-green-500 rounded-full">
+                        <i class="material-icons-outlined text-3xl">check_circle</i>
+                    </div>
+                </div>
+                
+                <div tabindex="0" class="kpi-card-effect glow-red bg-light-card dark:bg-dark-card p-5 rounded-2xl border border-gray-100 dark:border-gray-700 flex justify-between items-center opacity-0 animate-fadeInUp">
+                    <div>
+                        <p class="text-sm font-medium text-gray-500 dark:text-gray-400">موقوفين</p>
+                        <h3 id="stat-suspended" class="text-3xl font-black text-gray-800 dark:text-white mt-1 transition-colors duration-300 kpi-value">0</h3>
+                    </div>
+                    <div class="p-3 bg-red-500/20 text-red-500 rounded-full">
+                        <i class="material-icons-outlined text-3xl">cancel</i>
+                    </div>
+                </div>
+                
+                <div tabindex="0" class="kpi-card-effect glow-yellow bg-light-card dark:bg-dark-card p-5 rounded-2xl border border-gray-100 dark:border-gray-700 flex justify-between items-center opacity-0 animate-fadeInUp">
+                    <div>
+                        <p class="text-sm font-medium text-gray-500 dark:text-gray-400">متوسط التقييم</p>
+                        <h3 id="stat-rating" class="text-3xl font-black text-gray-800 dark:text-white mt-1 transition-colors duration-300 kpi-value">0.0</h3>
+                    </div>
+                    <div class="p-3 bg-yellow-500/20 text-yellow-500 rounded-full">
+                        <i class="material-icons-outlined text-3xl">star</i>
+                    </div>
+                </div>
+
+            </div>
+            
+            <div class="flex flex-col md:flex-row justify-between items-stretch md:items-center gap-4">
+                
+                <div class="flex flex-col sm:flex-row items-stretch sm:items-center gap-3 w-full md:w-auto">
+                    <div class="relative flex-grow">
+                        <input type="text" id="search-input" placeholder="البحث باسم أو رقم الهاتف..." class="w-full pr-10 pl-4 py-2 border border-gray-300 dark:border-gray-700 rounded-xl bg-light-card dark:bg-dark-card focus:ring-primary focus:border-primary transition-colors text-sm placeholder-gray-500 dark:placeholder-gray-400">
+                        <i class="material-icons-outlined absolute right-3 top-1/2 transform -translate-y-1/2 text-gray-400 text-xl">search</i>
+                    </div>
+                    
+                    <div class="relative w-full sm:w-32">
+                        <select id="status-filter" class="appearance-none py-2 pr-10 pl-3 border border-gray-300 dark:border-gray-700 rounded-xl bg-light-card dark:bg-dark-card text-sm focus:ring-primary focus:border-primary transition-colors w-full">
+                            <option value="all">كل الحالات</option>
+                            <option value="نشط">نشط</option>
+                            <option value="موقوف">موقوف</option>
+                        </select>
+                         <i class="material-icons-outlined absolute right-3 top-1/2 transform -translate-y-1/2 text-gray-400 text-xl pointer-events-none">filter_alt</i>
+                    </div>
+                </div>
+
+                <button id="add-teacher-btn" class="flex items-center justify-center gap-2 px-5 py-2 bg-secondary text-white font-bold rounded-xl hover:bg-secondary/90 transition-colors w-full md:w-auto text-sm shadow-md">
+                    <i class="material-icons-outlined text-xl">person_add</i>
+                    إضافة مدرس جديد
+                </button>
+            </div>
+
+            <div class="bg-light-card dark:bg-dark-card p-4 rounded-2xl shadow-lg border border-gray-100 dark:border-gray-700 overflow-x-auto">
+                
+                <table class="min-w-full divide-y divide-gray-200 dark:divide-gray-700">
+                    <thead>
+                        <tr>
+                            <th class="px-3 py-3 text-right text-xs font-bold text-gray-500 dark:text-gray-400 uppercase tracking-wider whitespace-nowrap">الاسم ورقم الهاتف</th>
+                            <th class="px-3 py-3 text-right text-xs font-bold text-gray-500 dark:text-gray-400 uppercase tracking-wider whitespace-nowrap">البريد الإلكتروني</th>
+                            <th class="px-3 py-3 text-right text-xs font-bold text-gray-500 dark:text-gray-400 uppercase tracking-wider whitespace-nowrap">التخصص</th>
+                            <th class="px-3 py-3 text-center text-xs font-bold text-gray-500 dark:text-gray-400 uppercase tracking-wider whitespace-nowrap">الطلاب</th>
+                            <th class="px-3 py-3 text-center text-xs font-bold text-gray-500 dark:text-gray-400 uppercase tracking-wider whitespace-nowrap">الحالة</th>
+                            <th class="px-3 py-3 text-left text-xs font-bold text-gray-500 dark:text-gray-400 uppercase tracking-wider whitespace-nowrap">الإجراءات</th>
+                        </tr>
+                    </thead>
+                    
+                    <tbody id="teachers-table-body" class="divide-y divide-gray-200 dark:divide-gray-700 text-sm">
+                        <tr>
+                            <td colspan="6" class="px-3 py-8 text-center text-gray-500">
+                                <div class="spinner mx-auto mb-2"></div>
+                                <p>جاري تحميل البيانات...</p>
+                            </td>
+                        </tr>
+                    </tbody>
+                </table>
+                
+                <div class="mt-4 flex justify-between items-center text-sm text-gray-600 dark:text-gray-400 gap-3">
+                    <span id="pagination-info">عرض 0 إلى 0 من 0 نتائج</span>
+                    <div id="pagination-controls" class="flex gap-2"></div>
+                </div>
+
+            </div>
+
+        </main>
+
+    </div>
+    
+    <div id="teacher-modal" class="fixed inset-0 hidden flex items-center justify-center z-50 modal-overlay opacity-0 p-4">
+        <div id="modal-content" class="bg-light-card dark:bg-dark-card rounded-2xl shadow-2xl mx-auto modal-content transform translate-y-full">
+            
+            <div class="flex justify-between items-center border-b border-gray-200 dark:border-gray-700 p-6 pb-3">
+                <h3 id="modal-title" class="text-xl font-bold text-gray-800 dark:text-white">إضافة مدرس جديد</h3>
+                <button onclick="closeModal()" class="text-gray-500 dark:text-gray-400 hover:text-red-500 transition-colors p-1 rounded-full hover:bg-gray-100 dark:hover:bg-gray-700">
+                    <i class="material-icons-outlined">close</i>
+                </button>
+            </div>
+            
+            <form id="teacher-form" class="p-6 space-y-4">
+                <input type="hidden" id="teacher-id-field">
+                <input type="hidden" id="form-mode">
+                
+                <div>
+                    <label for="teacher-name" class="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-1">الاسم الكامل <span class="text-red-500">*</span></label>
+                    <input type="text" id="teacher-name" placeholder="مثال: أحمد مصطفى" required class="w-full px-4 py-2 border border-gray-300 dark:border-gray-600 rounded-lg bg-light-bg dark:bg-dark-card focus:ring-primary focus:border-primary">
+                </div>
+
+                <div>
+                    <label for="teacher-email" class="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-1">البريد الإلكتروني <span class="text-red-500">*</span></label>
+                    <input type="email" id="teacher-email" placeholder="example@domain.com" required class="w-full px-4 py-2 border border-gray-300 dark:border-gray-600 rounded-lg bg-light-bg dark:bg-dark-card focus:ring-primary focus:border-primary">
+                </div>
+                
+                <div>
+                    <label for="teacher-phone" class="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-1">رقم الهاتف <span class="text-red-500">*</span></label>
+                    <input type="tel" id="teacher-phone" placeholder="010XXXXXXXX" required class="w-full px-4 py-2 border border-gray-300 dark:border-gray-600 rounded-lg bg-light-bg dark:bg-dark-card focus:ring-primary focus:border-primary">
+                </div>
+
+                <div id="password-field-container">
+                    <label for="teacher-password" class="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-1">كلمة المرور <span class="text-red-500">*</span></label>
+                    <input type="password" id="teacher-password" placeholder="********" class="w-full px-4 py-2 border border-gray-300 dark:border-gray-600 rounded-lg bg-light-bg dark:bg-dark-card focus:ring-primary focus:border-primary">
+                </div>
+
+                <div>
+                    <label for="teacher-subject" class="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-1">التخصص <span class="text-red-500">*</span></label>
+                    <input type="text" id="teacher-subject" placeholder="مثال: الرياضيات" required class="w-full px-4 py-2 border border-gray-300 dark:border-gray-600 rounded-lg bg-light-bg dark:bg-dark-card focus:ring-primary focus:border-primary">
+                </div>
+
+                <div id="status-field-container" class="hidden">
+                    <label for="teacher-status" class="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-1">الحالة</label>
+                    <select id="teacher-status" class="w-full px-4 py-2 border border-gray-300 dark:border-gray-600 rounded-lg bg-light-bg dark:bg-dark-card focus:ring-primary focus:border-primary">
+                        <option value="نشط">نشط</option>
+                        <option value="موقوف">موقوف</option>
+                    </select>
+                </div>
+
+                <div id="bio-field-container" class="hidden">
+                    <label for="teacher-bio" class="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-1">نبذة تعريفية</label>
+                    <textarea id="teacher-bio" rows="3" placeholder="نبذة مختصرة عن المعلم..." class="w-full px-4 py-2 border border-gray-300 dark:border-gray-600 rounded-lg bg-light-bg dark:bg-dark-card focus:ring-primary focus:border-primary"></textarea>
+                </div>
+                
+                <div class="pt-4 border-t border-gray-200 dark:border-gray-700 flex justify-end gap-3">
+                    <button type="button" onclick="closeModal()" class="px-4 py-2 text-sm font-medium text-gray-600 dark:text-gray-300 rounded-lg hover:bg-gray-100 dark:hover:bg-gray-700 transition-colors">إلغاء</button>
+                    <button type="submit" id="submit-btn" class="px-4 py-2 text-sm font-bold bg-primary text-white rounded-lg hover:bg-primary/90 transition-colors flex items-center gap-2">
+                        <span id="submit-text">حفظ التغييرات</span>
+                        <div class="spinner hidden" id="submit-spinner"></div>
+                    </button>
+                </div>
+            </form>
+        </div>
+    </div>
+
+    <div id="toast-message"></div>
+
+    <script>
+        // === Global Variables ===
+        const html = document.documentElement;
+        const body = document.body;
+        
+        const sidebar = document.getElementById('sidebar');
+        const sidebarOverlay = document.getElementById('sidebar-overlay');
+        const toggleSidebarBtn = document.getElementById('toggle-sidebar-btn');
+        const closeSidebarBtn = document.getElementById('close-sidebar-btn'); 
+
+        const tableBody = document.getElementById('teachers-table-body');
+        const searchInput = document.getElementById('search-input');
+        const statusFilter = document.getElementById('status-filter');
+        const paginationInfo = document.getElementById('pagination-info');
+        const paginationControls = document.getElementById('pagination-controls');
+
+        const teacherModal = document.getElementById('teacher-modal');
+        const modalTitle = document.getElementById('modal-title');
+        const modalContent = document.getElementById('modal-content');
+        const addTeacherBtn = document.getElementById('add-teacher-btn');
+        const teacherForm = document.getElementById('teacher-form');
+        const toastMessage = document.getElementById('toast-message');
+
+        let currentPage = 1;
+        let currentLimit = 10;
+        let currentSearch = '';
+        let currentStatus = 'all';
+
+        // === Toast Message Function ===
+        function showToast(msg, type = 'success', duration = 3500) {
+            if (!msg || msg.trim() === '') return;
+            
+            toastMessage.textContent = msg;
+            toastMessage.className = `toast-show toast-${type}`;
+            
+            setTimeout(() => {
+                toastMessage.classList.remove('toast-show');
+            }, duration);
+        }
+
+        // === Sidebar & Theme ===
+        function toggleSidebar() {
+            body.classList.toggle('sidebar-open');
+            if (body.classList.contains('sidebar-open')) {
+                sidebar.classList.remove('transform', 'translate-x-full'); 
+                sidebar.classList.add('translate-x-0'); 
+                sidebarOverlay.classList.remove('hidden');
+                body.style.overflow = 'hidden'; 
+            } else {
+                sidebar.classList.remove('translate-x-0');
+                sidebar.classList.add('transform', 'translate-x-full'); 
+                sidebarOverlay.classList.add('hidden');
+                body.style.overflow = ''; 
+            }
+        }
+        toggleSidebarBtn.addEventListener('click', toggleSidebar);
+        closeSidebarBtn.addEventListener('click', toggleSidebar);
+        sidebarOverlay.addEventListener('click', toggleSidebar);
+
+        const themeBtn = document.getElementById('theme-btn');
+        const themeIcon = themeBtn.querySelector('i');
+        function updateThemeIcon() {
+            themeIcon.textContent = html.classList.contains('dark') ? 'light_mode' : 'brightness_4';
+        }
+        if (localStorage.theme === 'dark' || (!('theme' in localStorage) && window.matchMedia('(prefers-color-scheme: dark)').matches)) {
+            html.classList.add('dark');
+        } else {
+            html.classList.remove('dark');
+        }
+        updateThemeIcon();
+        themeBtn.addEventListener('click', () => {
+            html.classList.toggle('dark');
+            localStorage.theme = html.classList.contains('dark') ? 'dark' : 'light';
+            updateThemeIcon();
+        });
+
+        // === API Functions ===
+        async function fetchTeachers() {
+            try {
+                const params = new URLSearchParams({
+                    page: currentPage,
+                    limit: currentLimit,
+                    search: currentSearch,
+                    status: currentStatus === 'all' ? '' : currentStatus
+                });
+
+                const response = await fetch(`/admin/teachers?${params}`);
+                const data = await response.json();
+
+                if (!response.ok || !data.success) {
+                    throw new Error(data.msg || 'فشل في جلب البيانات');
+                }
+
+                updateStats(data.data.stats);
+                renderTeachersTable(data.data.teachers);
+                updatePagination(data.data.pagination);
+
+            } catch (error) {
+                console.error('Error fetching teachers:', error);
+                showToast('❌ حدث خطأ أثناء تحميل البيانات', 'failed');
+                tableBody.innerHTML = `
+                    <tr>
+                        <td colspan="6" class="px-3 py-8 text-center text-red-500">
+                            <i class="material-icons-outlined text-4xl">error_outline</i>
+                            <p class="mt-2">فشل في تحميل البيانات</p>
+                        </td>
+                    </tr>
+                `;
+            }
+        }
+
+        function updateStats(stats) {
+            document.getElementById('stat-total').textContent = stats.totalTeachers || 0;
+            document.getElementById('stat-active').textContent = stats.totalActiveTeachers || 0;
+            document.getElementById('stat-suspended').textContent = stats.totalSuspendedTeachers || 0;
+            document.getElementById('stat-rating').textContent = stats.averageRating || 0;
+        }
+
+        function renderTeachersTable(teachers) {
+            if (!teachers || teachers.length === 0) {
+                tableBody.innerHTML = `
+                    <tr>
+                        <td colspan="6" class="px-3 py-8 text-center text-gray-500">
+                            <i class="material-icons-outlined text-4xl">inbox</i>
+                            <p class="mt-2">لا توجد بيانات لعرضها</p>
+                        </td>
+                    </tr>
+                `;
+                return;
+            }
+
+            tableBody.innerHTML = teachers.map(teacher => `
+                <tr class="data-table-row">
+                    <td class="px-3 py-4 whitespace-nowrap">
+                        <div class="flex items-center gap-3">
+                            <div class="h-10 w-10 rounded-full bg-primary/20 flex items-center justify-center text-primary font-bold">
+                                ${teacher.name.charAt(0)}
+                            </div>
+                            <div class="min-w-0">
+                                <p class="font-bold text-gray-800 dark:text-white">${teacher.name}</p>
+                                <p class="text-xs text-gray-500 dark:text-gray-400 teacher-contact-info">${teacher.phone}</p>
+                            </div>
+                        </div>
+                    </td>
+                    <td class="px-3 py-4 whitespace-nowrap text-sm text-gray-600 dark:text-gray-300">${teacher.email || '-'}</td>
+                    <td class="px-3 py-4 whitespace-nowrap font-medium">${teacher.subject || '-'}</td>
+                    <td class="px-3 py-4 whitespace-nowrap text-center">${teacher.studentsCount || 0}</td>
+                    <td class="px-3 py-4 whitespace-nowrap text-center">
+                        <span class="px-3 py-1 inline-flex text-xs leading-5 font-semibold rounded-full ${
+                            teacher.status === 'نشط' 
+                            ? 'bg-green-100 text-green-800 dark:bg-green-700 dark:text-green-100' 
+                            : 'bg-red-100 text-red-800 dark:bg-red-700 dark:text-red-100'
+                        }">
+                            ${teacher.status}
+                        </span>
+                    </td>
+                    <td class="px-3 py-4 whitespace-nowrap text-left">
+                        <div class="relative inline-block text-left">
+                            <button class="action-dropdown-btn p-1 rounded-full text-gray-500 dark:text-gray-400 hover:bg-gray-100 dark:hover:bg-gray-700 transition-colors" onclick="event.stopPropagation(); toggleDropdown(this)">
+                                <i class="material-icons-outlined text-lg">more_vert</i>
+                            </button>
+                            <div class="action-dropdown-menu hidden absolute left-0 z-10 w-40 mt-2 origin-top-right bg-light-card dark:bg-dark-card border border-gray-100 dark:border-gray-700 rounded-md shadow-lg py-1">
+                                <a href="#" class="dropdown-item flex items-center px-4 py-2 text-sm text-gray-700 dark:text-gray-200 hover:bg-gray-50 dark:hover:bg-gray-700 gap-2" onclick="event.preventDefault(); openEditModal('${teacher._id}', ${JSON.stringify(teacher).replace(/"/g, '&quot;')})">
+                                    <i class="material-icons-outlined text-base">edit</i> تعديل
+                                </a>
+                                <a href="#" class="dropdown-item flex items-center px-4 py-2 text-sm text-red-600 dark:text-red-400 hover:bg-gray-50 dark:hover:bg-gray-700 gap-2" onclick="event.preventDefault(); deleteTeacher('${teacher._id}', '${teacher.name}')">
+                                    <i class="material-icons-outlined text-base">delete</i> حذف
+                                </a>
+                            </div>
+                        </div>
+                    </td>
+                </tr>
+            `).join('');
+
+            setupDropdowns();
+        }
+
+        function updatePagination(pagination) {
+            const { page, limit, totalResults, totalPages } = pagination;
+            
+            const displayStart = totalResults === 0 ? 0 : (page - 1) * limit + 1;
+            const displayEnd = Math.min(page * limit, totalResults);
+            paginationInfo.textContent = `عرض ${displayStart} إلى ${displayEnd} من ${totalResults} نتيجة`;
+
+            paginationControls.innerHTML = '';
+            
+            const prevBtn = document.createElement('button');
+            prevBtn.textContent = 'السابق';
+            prevBtn.className = `px-3 py-1 border border-gray-300 dark:border-gray-700 rounded-lg hover:bg-gray-100 dark:hover:bg-gray-700 transition-colors ${page === 1 ? 'opacity-50 cursor-not-allowed' : ''}`;
+            prevBtn.disabled = page === 1;
+            prevBtn.onclick = () => { if (page > 1) { currentPage--; fetchTeachers(); } };
+            paginationControls.appendChild(prevBtn);
+
+            for (let i = 1; i <= totalPages; i++) {
+                if (i === 1 || i === totalPages || (i >= page - 1 && i <= page + 1)) {
+                    const pageBtn = document.createElement('button');
+                    pageBtn.textContent = i;
+                    pageBtn.className = `px-3 py-1 rounded-lg transition-colors ${i === page ? 'bg-primary text-white' : 'border border-gray-300 dark:border-gray-700 hover:bg-gray-100 dark:hover:bg-gray-700'}`;
+                    pageBtn.onclick = () => { currentPage = i; fetchTeachers(); };
+                    paginationControls.appendChild(pageBtn);
+                } else if (i === page - 2 || i === page + 2) {
+                    const dots = document.createElement('span');
+                    dots.textContent = '...';
+                    dots.className = 'px-1';
+                    paginationControls.appendChild(dots);
+                }
+            }
+
+            const nextBtn = document.createElement('button');
+            nextBtn.textContent = 'التالي';
+            nextBtn.className = `px-3 py-1 border border-gray-300 dark:border-gray-700 rounded-lg hover:bg-gray-100 dark:hover:bg-gray-700 transition-colors ${page === totalPages ? 'opacity-50 cursor-not-allowed' : ''}`;
+            nextBtn.disabled = page === totalPages;
+            nextBtn.onclick = () => { if (page < totalPages) { currentPage++; fetchTeachers(); } };
+            paginationControls.appendChild(nextBtn);
+        }
+
+        // === Dropdown Management ===
+        function toggleDropdown(buttonElement) {
+            const dropdownMenu = buttonElement.nextElementSibling;
+            
+            document.querySelectorAll('.action-dropdown-menu').forEach(menu => {
+                if (menu !== dropdownMenu) {
+                    menu.classList.add('hidden');
+                }
+            });
+
+            dropdownMenu.classList.toggle('hidden');
+        }
+
+        function setupDropdowns() {
+            document.addEventListener('click', (e) => {
+                if (!e.target.closest('.action-dropdown-btn') && !e.target.closest('.action-dropdown-menu')) {
+                     document.querySelectorAll('.action-dropdown-menu').forEach(menu => {
+                        menu.classList.add('hidden');
+                    });
+                }
+            });
+        }
+
+        // === Modal Management ===
+        function openModal(mode) {
+            teacherModal.classList.remove('hidden');
+            body.style.overflow = 'hidden'; 
+
+            setTimeout(() => {
+                teacherModal.classList.add('opacity-100');
+                modalContent.classList.remove('translate-y-full');
+                modalContent.classList.add('translate-y-0');
+            }, 10);
+            
+            document.getElementById('form-mode').value = mode;
+            
+            if (mode === 'add') {
+                modalTitle.textContent = 'إضافة مدرس جديد';
+                teacherForm.reset();
+                document.getElementById('teacher-id-field').value = '';
+                document.getElementById('password-field-container').classList.remove('hidden');
+                document.getElementById('teacher-password').required = true;
+                document.getElementById('status-field-container').classList.add('hidden');
+                document.getElementById('bio-field-container').classList.add('hidden');
+                document.getElementById('submit-text').textContent = 'إضافة المعلم';
+            }
+        }
+
+        function openEditModal(teacherId, teacherData) {
+            const teacher = typeof teacherData === 'string' ? JSON.parse(teacherData) : teacherData;
+            
+            openModal('edit');
+            modalTitle.textContent = 'تعديل بيانات المعلم';
+            
+            document.getElementById('teacher-id-field').value = teacherId;
+            document.getElementById('teacher-name').value = teacher.name || '';
+            document.getElementById('teacher-email').value = teacher.email || '';
+            document.getElementById('teacher-phone').value = teacher.phone || '';
+            document.getElementById('teacher-subject').value = teacher.subject || '';
+            document.getElementById('teacher-status').value = teacher.status || 'نشط';
+            document.getElementById('teacher-bio').value = teacher.bio || '';
+            
+            document.getElementById('password-field-container').classList.add('hidden');
+            document.getElementById('teacher-password').required = false;
+            document.getElementById('status-field-container').classList.remove('hidden');
+            document.getElementById('bio-field-container').classList.remove('hidden');
+            document.getElementById('submit-text').textContent = 'حفظ التغييرات';
+        }
+
+        function closeModal() {
+            teacherModal.classList.remove('opacity-100');
+            modalContent.classList.remove('translate-y-0');
+            modalContent.classList.add('translate-y-full');
+            
+            setTimeout(() => {
+                teacherModal.classList.add('hidden');
+                body.style.overflow = ''; 
+                teacherForm.reset();
+            }, 300);
+        }
+
+        teacherModal.addEventListener('click', (e) => {
+            if (e.target === teacherModal) closeModal();
+        });
+
+        document.addEventListener('keydown', (e) => {
+            if (e.key === 'Escape' && !teacherModal.classList.contains('hidden')) {
+                closeModal();
+            }
+        });
+
+        // === Form Submission ===
+        teacherForm.addEventListener('submit', async (e) => {
+            e.preventDefault();
+            
+            const submitBtn = document.getElementById('submit-btn');
+            const submitText = document.getElementById('submit-text');
+            const submitSpinner = document.getElementById('submit-spinner');
+            const mode = document.getElementById('form-mode').value;
+            const teacherId = document.getElementById('teacher-id-field').value;
+
+            submitBtn.disabled = true;
+            submitBtn.classList.add('btn-loading');
+            submitSpinner.classList.remove('hidden');
+
+            try {
+                const formData = {
+                    name: document.getElementById('teacher-name').value.trim(),
+                    email: document.getElementById('teacher-email').value.trim(),
+                    phone: document.getElementById('teacher-phone').value.trim(),
+                    subject: document.getElementById('teacher-subject').value.trim(),
+                };
+
+                if (mode === 'add') {
+                    formData.password = document.getElementById('teacher-password').value;
+                } else {
+                    formData.status = document.getElementById('teacher-status').value;
+                    formData.bio = document.getElementById('teacher-bio').value.trim();
+                    formData.avatar = '';
+                }
+
+                const url = mode === 'add' ? '/api/admin/teacher' : `/api/admin/teacher/${teacherId}`;
+                const method = mode === 'add' ? 'POST' : 'PUT';
+
+                const response = await fetch(url, {
+                    method: method,
+                    headers: { 'Content-Type': 'application/json' },
+                    body: JSON.stringify(formData)
+                });
+
+                const data = await response.json();
+
+                if (!response.ok || !data.success) {
+                    throw new Error(data.msg || 'فشل في حفظ البيانات');
+                }
+
+                showToast(data.msg, 'success');
+                closeModal();
+                fetchTeachers();
+
+            } catch (error) {
+                console.error('Error saving teacher:', error);
+                showToast(error.message || '❌ حدث خطأ أثناء حفظ البيانات', 'failed');
+            } finally {
+                submitBtn.disabled = false;
+                submitBtn.classList.remove('btn-loading');
+                submitSpinner.classList.add('hidden');
+            }
+        });
+
+        // === Delete Teacher ===
+        async function deleteTeacher(teacherId, teacherName) {
+            if (!confirm(`هل أنت متأكد من حذف المعلم "${teacherName}"؟\nلا يمكن التراجع عن هذا الإجراء.`)) {
+                return;
+            }
+
+            try {
+                const response = await fetch(`/api/admin/teacher/${teacherId}`, {
+                    method: 'DELETE'
+                });
+
+                const data = await response.json();
+
+                if (!response.ok || !data.success) {
+                    throw new Error(data.msg || 'فشل في حذف المعلم');
+                }
+
+                showToast(data.msg, 'success');
+                fetchTeachers();
+
+            } catch (error) {
+                console.error('Error deleting teacher:', error);
+                showToast(error.message || '❌ حدث خطأ أثناء حذف المعلم', 'failed');
+            }
+        }
+
+        // === Search & Filter ===
+        let searchTimeout;
+        searchInput.addEventListener('input', (e) => {
+            clearTimeout(searchTimeout);
+            searchTimeout = setTimeout(() => {
+                currentSearch = e.target.value.trim();
+                currentPage = 1;
+                fetchTeachers();
+            }, 500);
+        });
+
+        statusFilter.addEventListener('change', (e) => {
+            currentStatus = e.target.value;
+            currentPage = 1;
+            fetchTeachers();
+        });
+
+        addTeacherBtn.addEventListener('click', () => openModal('add'));
+
+        // === Initialize ===
+        document.addEventListener('DOMContentLoaded', () => {
+            fetchTeachers();
+        });
+    </script>
+</body>
+</html>

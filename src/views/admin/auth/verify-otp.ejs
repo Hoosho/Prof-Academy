@@ -1,0 +1,211 @@
+<!DOCTYPE html>
+<html lang="ar" dir="rtl">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>التحقق من الرمز - Prof Academy</title>
+    
+    <link href="https://fonts.googleapis.com/css2?family=Almarai:wght@400;700;800&display=swap" rel="stylesheet">
+    <link href="https://fonts.googleapis.com/icon?family=Material+Icons" rel="stylesheet">
+    <script src="https://cdn.tailwindcss.com"></script>
+    
+    <script>
+        tailwind.config = {
+            darkMode: 'class',
+            theme: {
+                extend: {
+                    fontFamily: { sans: ['Almarai', 'sans-serif'] },
+                    colors: {
+                        dark: { bg: '#111827', card: '#1F2937', text: '#F3F4F6' },
+                        light: { bg: '#F3F4F6', card: '#FFFFFF', text: '#1F2937' }
+                    }
+                }
+            }
+        }
+    </script>
+
+    <style>
+        body { font-family: 'Almarai', sans-serif; transition: background-color 0.3s; }
+        
+        .otp-input {
+            width: 100%; max-width: 45px; height: 55px;
+            text-align: center; font-size: 1.5rem; font-weight: 800;
+            border: 2px solid #d1d5db; border-radius: 10px;
+            background-color: transparent; transition: all 0.2s ease-in-out;
+        }
+
+        .dark .otp-input { border-color: #4b5563; color: white; }
+        .otp-input:focus {
+            border-color: #2563EB; box-shadow: 0 0 0 3px rgba(37, 99, 235, 0.2);
+            outline: none; transform: translateY(-2px);
+        }
+
+        /* 🌟 Toast Message Colors 🌟 */
+        #toast-message {
+            position: fixed; top: 20px; left: 50%; transform: translateX(-50%) translateY(-150%);
+            padding: 16px 28px; border-radius: 12px; color: white; font-weight: 800;
+            opacity: 0; transition: all 0.5s cubic-bezier(0.175, 0.885, 0.32, 1.275);
+            z-index: 100; box-shadow: 0 10px 25px rgba(0, 0, 0, 0.3);
+            width: 90%; max-width: 450px; text-align: center;
+        }
+        .toast-show { opacity: 1 !important; transform: translateX(-50%) translateY(0) !important; }
+        
+        /* كلاسات الألوان بناءً على طلبك */
+        .toast-success { background-color: #15803d; } /* أخضر Green */
+        .toast-info { background-color: #2563eb; }    /* أزرق Primary */
+        .toast-failed { background-color: #b91c1c; }   /* أحمر Danger */
+
+        .spinner {
+            border: 3px solid rgba(255, 255, 255, 0.3); border-top: 3px solid white;
+            border-radius: 50%; width: 22px; height: 22px;
+            animation: spin 0.8s linear infinite;
+        }
+        @keyframes spin { 0% { transform: rotate(0deg); } 100% { transform: rotate(360deg); } }
+    </style>
+</head>
+<body class="bg-light-bg text-light-text dark:bg-dark-bg dark:text-dark-text min-h-screen flex items-center justify-center p-4">
+
+    <button id="theme-btn" class="fixed top-4 right-4 z-50 p-2.5 rounded-full bg-white/80 dark:bg-gray-800/80 backdrop-blur-md shadow-lg transition active:scale-95">
+        <i class="material-icons text-blue-600">brightness_4</i>
+    </button>
+    
+    <div class="w-full max-w-[420px] bg-light-card dark:bg-dark-card p-6 sm:p-10 rounded-3xl shadow-2xl">
+        
+        <div class="text-center mb-8">
+            <div id="icon-container" class="inline-flex items-center justify-center w-16 h-16 bg-blue-100 dark:bg-blue-900/30 rounded-full mb-4">
+                <i id="main-icon" class="material-icons text-blue-600 text-4xl">verified_user</i>
+            </div>
+            
+            <h1 class="text-2xl sm:text-3xl font-extrabold mb-3">رمز التحقق</h1>
+            <p class="text-gray-500 dark:text-gray-400 text-sm sm:text-base px-4">أدخل الرمز المكون من 6 أرقام المرسل إليك لتأمين حسابك.</p>
+        </div>
+
+        <form id="otp-form" class="space-y-8">
+            <div class="flex justify-center gap-2 sm:gap-3" dir="ltr">
+                <input type="text" maxlength="1" inputmode="numeric" pattern="[0-9]*" class="otp-input" required autofocus>
+                <input type="text" maxlength="1" inputmode="numeric" pattern="[0-9]*" class="otp-input" required>
+                <input type="text" maxlength="1" inputmode="numeric" pattern="[0-9]*" class="otp-input" required>
+                <input type="text" maxlength="1" inputmode="numeric" pattern="[0-9]*" class="otp-input" required>
+                <input type="text" maxlength="1" inputmode="numeric" pattern="[0-9]*" class="otp-input" required>
+                <input type="text" maxlength="1" inputmode="numeric" pattern="[0-9]*" class="otp-input" required>
+            </div>
+
+            <button id="verify-btn" type="submit" class="w-full bg-blue-600 hover:bg-blue-700 text-white py-4 rounded-2xl text-lg font-bold shadow-xl shadow-blue-500/20 transition-all flex items-center justify-center gap-3 active:scale-[0.98]">
+                <span>تأكيد الرمز</span>
+                <div id="loader" class="spinner hidden"></div>
+            </button>
+        </form>
+
+        <div class="mt-8 text-center">
+            <p class="text-sm text-gray-500 dark:text-gray-400">
+                لم تستلم الكود؟ 
+                <button id="resend-btn" class="text-blue-600 font-bold hover:underline focus:outline-none">إعادة الإرسال</button>
+            </p>
+            <a href="/admin/login" class="inline-block mt-4 text-xs text-gray-400 hover:text-blue-500 transition">العودة لتسجيل الدخول</a>
+        </div>
+    </div>
+
+    <div id="toast-message"></div>
+
+    <script>
+        // --- إدارة الثيم ---
+        const themeBtn = document.getElementById('theme-btn');
+        const html = document.documentElement;
+        
+        if (localStorage.theme === 'dark' || (!('theme' in localStorage) && window.matchMedia('(prefers-color-scheme: dark)').matches)) {
+            html.classList.add('dark');
+        }
+
+        themeBtn.addEventListener('click', () => {
+            html.classList.toggle('dark');
+            localStorage.theme = html.classList.contains('dark') ? 'dark' : 'light';
+        });
+
+        // --- إدارة خانات الـ OTP ---
+        const inputs = document.querySelectorAll('.otp-input');
+        inputs.forEach((input, index) => {
+            input.addEventListener('input', (e) => {
+                if (e.inputType === "deleteContentBackward") return;
+                if (e.target.value.length === 1 && index < inputs.length - 1) inputs[index + 1].focus();
+            });
+            input.addEventListener('keydown', (e) => {
+                if (e.key === 'Backspace' && !e.target.value && index > 0) inputs[index - 1].focus();
+            });
+            input.addEventListener('click', () => input.select());
+        });
+
+        // --- إدارة التوست مسج ---
+        const toastMessage = document.getElementById('toast-message');
+
+        function showToast(msg, type = 'success', duration = 3500) {
+            if (!msg || msg.trim() === '') return;
+            
+            toastMessage.textContent = msg;
+            // استخدام المسميات success, info, failed لتركيب الكلاس
+            toastMessage.className = `toast-show toast-${type}`;
+            
+            setTimeout(() => {
+                toastMessage.classList.remove('toast-show');
+            }, duration);
+        }
+
+        // 🚀 حقن بيانات EJS وتشغيل الرسالة فور التحميل
+        window.addEventListener('DOMContentLoaded', () => {
+            const initialMsg = '<%= msg %>';
+            const initialType = '<%= type %>'; // success, info, failed
+            
+            if (initialMsg) {
+                showToast(initialMsg, initialType);
+                
+                // تغيير لون الأيقونة لو الحالة failed (danger)
+                if (initialType === 'failed') {
+                    document.getElementById('icon-container').classList.replace('bg-blue-100', 'bg-red-100');
+                    document.getElementById('main-icon').classList.replace('text-blue-600', 'text-red-600');
+                    document.getElementById('main-icon').textContent = 'report_problem';
+                }
+            }
+        });
+
+        // --- إرسال كود التحقق ---
+        const otpForm = document.getElementById('otp-form');
+        const loader = document.getElementById('loader');
+
+        otpForm.addEventListener('submit', async (e) => {
+            e.preventDefault();
+            const otpCode = Array.from(inputs).map(input => input.value).join('');
+            
+            if (otpCode.length < 6) {
+                showToast('يرجى إدخال الرمز كاملاً', 'failed');
+                return;
+            }
+
+            loader.classList.remove('hidden');
+            document.getElementById('verify-btn').disabled = true;
+
+            try {
+                const response = await fetch('/api/admin/verify-otp', {
+                    method: 'POST',
+                    headers: { 'Content-Type': 'application/json' },
+                    body: JSON.stringify({ otp: otpCode }),
+                });
+
+                const data = await response.json();
+
+                if (response.ok && data.success) {
+                    showToast( data.msg || '✅ تم التحقق بنجاح! جارِ التوجيه...', 'success');
+                    setTimeout(() => window.location.href = '/admin/teachers', 1500);
+                } else {
+                    showToast(data.msg || '❌ الرمز غير صحيح', 'failed');
+                    inputs.forEach(input => input.value = '');
+                    inputs[0].focus();
+                }
+            } catch (error) {
+                showToast('❌ مشكلة في الاتصال بالسيرفر', 'failed');
+            } finally {
+                loader.classList.add('hidden');
+                document.getElementById('verify-btn').disabled = false;
+            }
+        });
+    </script>
+</body>
+</html>

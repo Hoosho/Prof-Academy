@@ -1,0 +1,269 @@
+<!DOCTYPE html>
+<html lang="ar" dir="rtl">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Prof Academy Login - الإداري</title>
+    
+    <link href="https://fonts.googleapis.com/css2?family=Almarai:wght@400;700;800&display=swap" rel="stylesheet">
+    <link href="https://fonts.googleapis.com/icon?family=Material+Icons" rel="stylesheet">
+
+    <script src="https://cdn.tailwindcss.com"></script>
+    
+    <script>
+        tailwind.config = {
+            darkMode: 'class',
+            theme: {
+                extend: {
+                    fontFamily: {
+                        sans: ['Almarai', 'sans-serif'],
+                    },
+                    colors: {
+                        // تعريف الألوان المشتركة
+                        dark: { bg: '#111827', card: '#1F2937', text: '#F3F4F6' },
+                        light: { bg: '#F3F4F6', card: '#FFFFFF', text: '#1F2937' }
+                    }
+                }
+            }
+        }
+    </script>
+
+    <style>
+        /* إضافة انتقال الألوان */
+        body {
+            font-family: 'Almarai', sans-serif;
+            transition: background-color 0.3s, color 0.3s;
+        }
+        
+        /* دعم الدارك مود للـ Input Focus */
+        .input-focus:focus {
+            border-color: #2563EB !important;
+            box-shadow: 0 0 0 1px #2563EB, 0 1px 3px 0 rgba(0, 0, 0, 0.05);
+        }
+        
+        .input-icon-padding {
+            padding-right: 3rem !important;
+            padding-left: 1rem;
+            transition: all 0.2s;
+        }
+
+        /* 🌟 تصميم Toast Message مُحسَّن 🌟 */
+        #toast-message {
+            position: fixed;
+            top: 20px; 
+            left: 50%;
+            transform: translateX(-50%) translateY(-150%); /* زيادة الإزاحة للاختفاء */
+            padding: 16px 28px; /* زيادة الحشو */
+            border-radius: 12px; /* زيادة الـ border radius */
+            color: white;
+            font-weight: 800; /* خط أثقل */
+            opacity: 0;
+            transition: opacity 0.5s cubic-bezier(0.25, 0.8, 0.25, 1), transform 0.5s cubic-bezier(0.25, 0.8, 0.25, 1);
+            z-index: 60;
+            box-shadow: 0 8px 20px rgba(0, 0, 0, 0.4); /* ظل أقوى */
+            min-width: 300px; /* زيادة العرض الأدنى */
+            text-align: center;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            gap: 10px; /* مسافة بين النص والأيقونة لو أضيفت لاحقاً */
+        }
+        .toast-show {
+            opacity: 1 !important;
+            transform: translateX(-50%) translateY(0) !important;
+        }
+        
+        /* Loading Spinner */
+        .spinner {
+            border: 4px solid rgba(255, 255, 255, 0.3);
+            border-top: 4px solid white;
+            border-radius: 50%;
+            width: 24px;
+            height: 24px;
+            animation: spin 1s linear infinite;
+        }
+
+        @keyframes spin {
+            0% { transform: rotate(0deg); }
+            100% { transform: rotate(360deg); }
+        }
+
+        /* الألوان المُحسَّنة للـ Toast */
+        .toast-success {
+            background-color: #15803d; /* لون أخضر أكثر تشبعاً وغامق (Green-700) */
+        }
+        .toast-error {
+            background-color: #b91c1c; /* لون أحمر أكثر تشبعاً وغامق (Red-700) */
+        }
+    </style>
+</head>
+<body class="bg-light-bg text-light-text dark:bg-dark-bg dark:text-dark-text min-h-screen flex items-center justify-center p-4">
+
+    <button id="theme-btn" class="fixed top-4 right-4 z-50 p-2 rounded-full 
+            bg-light-card/70 dark:bg-dark-card/70 backdrop-blur-sm 
+            text-gray-600 dark:text-gray-300 transition"
+            title="تبديل وضع العرض">
+        <i class="material-icons text-xl">brightness_4</i>
+    </button>
+    
+    <div class="w-full max-w-xs sm:max-w-sm 
+        bg-light-card dark:bg-dark-card 
+        p-6 md:p-8 rounded-2xl shadow-2xl transition-colors">
+        
+        <div class="text-center mb-10">
+            <div class="flex justify-center mb-4">
+                <i class="material-icons text-blue-600 text-5xl">manage_accounts</i> </div>
+            
+            <h1 class="text-3xl font-extrabold text-light-text dark:text-dark-text mb-2">تسجيل دخول الإداري</h1>
+            <p class="text-gray-500 dark:text-gray-400">يرجى إدخال اسم المستخدم وكلمة المرور الخاصة بك.</p>
+        </div>
+
+        <form id="admin-login-form">
+            
+            <div class="mb-5">
+                <label for="username-input" class="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-2">اسم المستخدم</label>
+                <div class="relative">
+                    <input 
+                        type="text" 
+                        id="username-input" 
+                        placeholder="ادخل اسم المستخدم"
+                        required
+                        class="w-full py-3 border border-gray-300 dark:border-gray-600 dark:bg-gray-700 dark:text-dark-text rounded-lg focus:outline-none input-focus text-lg text-right input-icon-padding"
+                    >
+                    <i class="material-icons absolute right-3 top-1/2 transform -translate-y-1/2 text-gray-400 dark:text-gray-500">person</i>
+                </div>
+            </div>
+
+            <div class="mb-8">
+                <label for="password-input" class="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-2">كلمة المرور</label>
+                <div class="relative">
+                    <input 
+                        type="password" 
+                        id="password-input" 
+                        placeholder="ادخل كلمة المرور"
+                        required
+                        class="w-full py-3 border border-gray-300 dark:border-gray-600 dark:bg-gray-700 dark:text-dark-text rounded-lg focus:outline-none input-focus text-lg text-right input-icon-padding"
+                    >
+                    <i class="material-icons absolute right-3 top-1/2 transform -translate-y-1/2 text-gray-400 dark:text-gray-500">lock</i>
+                </div>
+            </div>
+
+            <button id="login-btn" type="submit" class="w-full bg-blue-600 text-white py-3 rounded-xl text-xl font-bold shadow-lg hover:bg-blue-700 transition flex items-center justify-center">
+                تسجيل الدخول
+                <div id="loading-spinner-btn" class="spinner ml-3 hidden"></div>
+            </button>
+        </form>
+
+    </div>
+
+    <div id="toast-message" class="toast-success"></div>
+
+    <script>
+        // ⚠️ منطق تبديل الثيم ⚠️
+        const themeBtn = document.getElementById('theme-btn');
+        const themeIcon = themeBtn.querySelector('i');
+        const html = document.documentElement;
+
+        function updateThemeIcon() {
+            const isDark = html.classList.contains('dark');
+            themeIcon.textContent = isDark ? 'light_mode' : 'brightness_4';
+        }
+
+        // تطبيق الثيم المحفوظ أو ثيم النظام عند التحميل
+        if (localStorage.theme === 'dark' || (!('theme' in localStorage) && window.matchMedia('(prefers-color-scheme: dark)').matches)) {
+            html.classList.add('dark');
+        } else {
+            html.classList.remove('dark');
+        }
+        updateThemeIcon(); 
+
+        // تبديل الثيم عند الضغط على الزر
+        themeBtn.addEventListener('click', () => {
+            html.classList.toggle('dark');
+            localStorage.theme = html.classList.contains('dark') ? 'dark' : 'light';
+            updateThemeIcon();
+        });
+        // ⚠️ نهاية منطق الثيم ⚠️
+        
+        
+        const loginForm = document.getElementById('admin-login-form');
+        const usernameInput = document.getElementById('username-input');
+        const passwordInput = document.getElementById('password-input');
+        const loginBtn = document.getElementById('login-btn');
+        const loadingSpinner = document.getElementById('loading-spinner-btn');
+        const toastMessage = document.getElementById('toast-message');
+        
+        const API_ENDPOINT = '/api/admin/login'; // 🎯 الـ End Point المطلوب 🎯
+
+        // دالة لعرض رسالة سريعة
+        function showToast(message, isError = false) {
+            toastMessage.textContent = message;
+            
+            // تحديث تصميم التوست مسج
+            toastMessage.classList.remove('toast-success', 'toast-error');
+            toastMessage.classList.add(isError ? 'toast-error' : 'toast-success');
+            
+            // إعادة تفعيل التوست
+            toastMessage.classList.remove('toast-show');
+            // تأخير بسيط لإعادة تشغيل الـ Animation
+            void toastMessage.offsetWidth; 
+            toastMessage.classList.add('toast-show');
+
+            // إخفاء التوست بعد 3 ثواني
+            setTimeout(() => {
+                toastMessage.classList.remove('toast-show');
+            }, 3000);
+        }
+
+        // دالة التحكم في حالة زر الإرسال
+        function setFormLoading(isLoading) {
+            loginBtn.disabled = isLoading;
+            if (isLoading) {
+                loadingSpinner.classList.remove('hidden');
+                loginBtn.textContent = 'جارِ التحقق...';
+                loginBtn.classList.remove('hover:bg-blue-700');
+            } else {
+                loadingSpinner.classList.add('hidden');
+                loginBtn.textContent = 'تسجيل الدخول';
+                loginBtn.classList.add('hover:bg-blue-700');
+            }
+        }
+        
+        // منطق تسجيل الدخول (Form Submit)
+        loginForm.addEventListener('submit', async (e) => {
+            e.preventDefault();
+            setFormLoading(true);
+
+            const username = usernameInput.value.trim();
+            const password = passwordInput.value;
+
+            try {
+                const response = await fetch(API_ENDPOINT, {
+                    method: 'POST',
+                    headers: {
+                        'Content-Type': 'application/json',
+                    },
+                    body: JSON.stringify({ username, password }),
+                });
+
+                const data = await response.json();
+
+                if (response.ok && data.success) {
+                     window.location.href = '/admin/verify-otp';            
+                } else {
+                    // فشل تسجيل الدخول 
+                    const errorMsg = data.msg || '❌ خطأ: لم يتم العثور على اسم المستخدم أو كلمة المرور غير صحيحة.';
+                    showToast(errorMsg, true);
+                }
+
+            } catch (error) {
+                console.error('Fetch error:', error);
+                showToast('❌ خطأ في الاتصال بالخادم. يرجى المحاولة لاحقاً.', true);
+            } finally {
+                setFormLoading(false);
+            }
+        });
+
+    </script>
+</body>
+</html>

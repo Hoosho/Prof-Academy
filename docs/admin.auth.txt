@@ -1,0 +1,111 @@
+==============================
+Admin Authentication API
+Project: Prof Academy
+==============================
+
+Base URL:
+/api/admin
+
+Notes:
+- All responses are JSON
+- Error messages are returned EXACTLY as sent from backend
+- Frontend should display error messages in Toast
+- Authentication uses OTP + HttpOnly Cookie Token
+
+
+--------------------------------
+1) Admin Login (Step 1)
+--------------------------------
+
+Endpoint:
+POST /api/admin/login
+
+Access:
+Public
+
+Request Body:
+{
+  "username": "string",
+  "password": "string"
+}
+
+Success Response:
+{
+  "success": true
+}
+
+Behavior:
+- Validates username & password
+- Generates OTP and sends it via email
+- Frontend should redirect to OTP page after success
+
+Possible Errors:
+404 - ❌ يجب ادخال جميع البينات المطلوبة!
+401 - ❌ اسم المستخدم أو الباسورد غلط
+401 - ❌ اسم المستخدم أو الباسورد غلط. متبقي X محاولات
+423 - 🔒 الحساب تم قفله مؤقتًا بسبب محاولات تسجيل دخول خاطئة متكررة
+
+--------------------------------
+2) OTP Status / Info
+--------------------------------
+
+Endpoint:
+GET /api/admin/verify-otp
+
+Access:
+Public (requires session)
+
+Success Response:
+{
+  "msg": "string",
+  "type": "success | info | failed"
+}
+
+Messages:
+success:
+✅ تم إرسال كود OTP إلى بريدك الإلكتروني. الرجاء إدخاله لإكمال تسجيل الدخول.
+
+info:
+⚠️ يوجد رمز تحقق فعال أرسل إليك بالفعل، يرجى استخدامه
+
+failed:
+❌ انتهت صلاحية الرمز، يرجى تسجيل الدخول مجدداً
+
+--------------------------------
+3) Verify OTP (Step 2)
+--------------------------------
+
+Endpoint:
+POST /api/admin/verify-otp
+
+Access:
+Public (requires session)
+
+Request Body:
+{
+  "otp": "string"
+}
+
+Success Response:
+{
+  "success": true,
+  "msg": "✅ تم التحقق من OTP وتسجيل الدخول بنجاح."
+}
+
+Possible Errors:
+400 - ❌ يجب ادخال اسم المستخدم و OTP
+401 - ❌ المستخدم غير موجود
+400 - ❌ لا يوجد OTP صالح للتوثيق
+400 - ❌ انتهت صلاحية OTP
+401 - ❌ كود OTP غير صحيح. متبقي X محاولات
+423 - 🔒 تم إيقاف إدخال OTP مؤقتًا، حاول لاحقًا
+
+
+--------------------------------
+Frontend Notes
+--------------------------------
+
+- Display all error messages as Toast
+- Do NOT modify backend messages
+- After successful login → go to OTP screen
+- Token is already stored in cookie
