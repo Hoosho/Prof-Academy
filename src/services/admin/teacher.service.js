@@ -244,7 +244,7 @@ export const updateTeacherService = async ( req, teacherId, {
       ] 
     }).session(session);
     if( existsTeacher ){
-       throw new ErrorResponse(`❌ هذا البريد/رقم الهاتف مستخدم بالفعل لدى ${existTeacher.name}`, 409);
+      throw new ErrorResponse(`❌ هذا البريد/رقم الهاتف مستخدم بالفعل لدى ${existsTeacher.name}`, 409);
     };
 
     // Old Data Of Teacher Before Has Been Updated

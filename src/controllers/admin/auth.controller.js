@@ -102,7 +102,7 @@
       const { token } = await verifyAdminOtpService( username, otp, req );
 
       // Save Token In Cookie
-      res.cookie('token', token, {
+      res.cookie('adminToken', token, {
         httpOnly: true,
         maxAge: 1 * 24 * 60 * 60 * 1000,
         secure: false,

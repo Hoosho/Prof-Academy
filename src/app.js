@@ -22,7 +22,7 @@ import adminAuthRoutes from './routes/admin/auth.route.js';
 import adminOverviewRoutes from './routes/admin/overview.route.js';
 import adminTeacherRoutes from './routes/admin/teacher.route.js';
 // TEACHER
-// import teacherRoutes from './routes/teacher/index.routes.js';
+import teacherAuthRoutes from './routes/teacher/auth.route.js';
 // STUDENT
 // import userRoutes from './routes/user/index.routes.js';
 
@@ -98,7 +98,7 @@ app.use( '/', adminAuthRoutes );
 app.use( '/', adminOverviewRoutes );
 app.use( '', adminTeacherRoutes )
 // TEACHEER
-// app.use('/api/teacher', teacherRoutes);
+app.use('', teacherAuthRoutes);
 // STUDENT
 // app.use('/api/user', userRoutes);
 
