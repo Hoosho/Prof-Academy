@@ -7,7 +7,7 @@ import  { sendEmail } from '../../utils/sendEmail.util.js';
 import { createAuditLog } from '../system/auditLog.service.js';
 
 /**
- * @desc 
+ * @desc Login Teacher
  * @param { string } email & password
  * @param { string } deviceId
  * @param { object } req

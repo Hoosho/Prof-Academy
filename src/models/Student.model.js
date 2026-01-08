@@ -131,6 +131,15 @@ const StudentSchema = new mongoose.Schema(
       default: 0,
       min: [0, "الرصيد لا يمكن أن يقل عن 0!"],
     },
+    assignedTeacher: [
+      {
+        teacherId: {
+          type: mongoose.Schema.Types.ObjectId,
+          ref: 'Teacher',
+          required: true
+        }
+      }
+    ],
 
     boughtMonths: [BoughtMonthSchema],
     watchedLectures: [WatchedLectureSchema],
@@ -155,6 +164,9 @@ StudentSchema.index({ lastLogin: -1 });
 
 // Grade
 StudentSchema.index({ grade: 1 });
+
+// Assigned Teacher
+StudentSchema.index({ 'assignedTeacher.teacherId': 1 });
 
 // Watched Lectures 
 StudentSchema.index({ "watchedLectures.lectureId": 1 });

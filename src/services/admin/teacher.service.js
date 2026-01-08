@@ -41,9 +41,6 @@ export const createTeacherService = async ( data ) => {
         phone,
         password,
         subject,
-        bio: '',
-        avatar: '',
-        status: 'نشط'   
       };
 
       // Check Network Connection Before Save Teacher In DB
@@ -57,7 +54,7 @@ export const createTeacherService = async ( data ) => {
       [ teacherPayload ], { session }
     );
     
-    // Create Audit Log - OTP Send Successfully
+    // Create Audit Log - Teacher Created Successfully
     await createAuditLog({
       actor: { 
         id: req.admin,
@@ -69,7 +66,7 @@ export const createTeacherService = async ( data ) => {
         model: 'Teacher',
         id: newTeacher._id
       },
-      reason: 'Created Teacher Successfully',
+      reason: 'Teacher Created Successfully',
       context: req?.context?.context || {},
       after:{
         ...newTeacher.toObject(), password : undefined
@@ -87,7 +84,7 @@ export const createTeacherService = async ( data ) => {
     await session.abortTransaction();
     session.endSession();
 
-    // To Prevent Race Condition Attack
+    // Prevent Race Condition Attack
     if(err.code === 11000){
       throw new ErrorResponse(  `❌ تمت إضافة هذا المعلم من قبل!`, 409 )
     };
