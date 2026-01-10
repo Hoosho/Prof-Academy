@@ -84,6 +84,51 @@ export const createStudentService = async ( req, teacherId, teacherRole, payload
 };
 
 /**
+ * @desc Get Students Stats Service
+ * @param { string } teacherId
+ * @returns { object } stats
+*/
+export const getStudentsStats = async ( teacherId ) => {
+  try{
+    // Total Students
+    const totalStudents = await Student.countDocuments({
+      isDeleted: false, 'assignedTeacher.teacherId': teacherId
+    });
+
+    // Active Students
+    const totalActiveStudents = await Student.countDocuments({
+      isDeleted: false, 'assignedTeacher.teacherId': teacherId, status : 'نشط'
+    });
+
+    // Total In Active Students
+    const totalInActiveStudents = totalStudents - totalActiveStudents || 0;
+
+    // Total Login Today Students 
+    const today = new Date();
+    today.setHours( 0, 0, 0, 0 );
+
+    const tomorrow = new Date( today );
+    tomorrow.setDate( tomorrow.getDate() + 1 );
+    const totalLoginTodayStudents = await Student.countDocuments({
+      lastLogin: { $gte: today, $lt: tomorrow }, isDeleted: false,
+      'assignedTeacher.teacherId': teacherId
+    });
+
+    // Returns Stats Obj
+    return{
+      stats: {
+        totalStudents,
+        totalActiveStudents,
+        totalInActiveStudents,
+        totalLoginTodayStudents
+      }
+    };
+  }catch(err){
+    throw err;
+  };
+};
+
+/**
  * @desc Update Student Service
  * @param { object } req
  * @param { string } teacherId

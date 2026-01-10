@@ -163,6 +163,9 @@ const StudentSchema = new mongoose.Schema(
 // Phone: Partial Unique 
 StudentSchema.index({ phone: 1 }, { unique: true, partialFilterExpression: { isDeleted: false } });
 
+// Is Deleted
+StudentSchema.index({ isDeleted: 1 });
+
 // Code
 StudentSchema.index({ code: 1 });
 

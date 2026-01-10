@@ -76,7 +76,6 @@ export const createTeacherService = async (
     if(err.code === 11000){
       throw new ErrorResponse(  `❌ تمت إضافة هذا المعلم من قبل!`, 409 )
     };
-    console.log(err);
     throw err;
   };
 };
@@ -87,23 +86,18 @@ export const createTeacherService = async (
 */
 export const getTeachersStatsService = async () => {
   try{
-    // Check DB Connection
-    if (mongoose.connection.readyState !== 1) {
-      throw new ErrorResponse('❌ لا يوجد اتصال بخادم قاعدة البيانات', 503);
-    };
-
     // Total Teachers
-    const totalTeachers = await Teacher.countDocuments() || 0;
+    const totalTeachers = await Teacher.countDocuments({ isDeleted: false }) || 0;
 
     // Total Active Teachers 
-    const totalActiveTeachers = await Teacher.countDocuments({ status: 'نشط' }) || 0;
+    const totalActiveTeachers = await Teacher.countDocuments({ isDeleted: false, status: 'نشط' }) || 0;
 
     // Total Suspended Teachers 
     const totalSuspendedTeachers = totalTeachers - totalActiveTeachers || 0;
 
     // Rate Average Teachers
     const averageRatingAgg = await Teacher.aggregate([
-      { $match: { rating: { $exists: true } } },
+      { $match: { rating: { $exists: true }, isDeleted: false } },
       { $group: { _id: null, avgRating: { $avg: '$rating' } } }
     ]);
     const averageRating = averageRatingAgg[0]?.avgRating || 0;
@@ -119,7 +113,6 @@ export const getTeachersStatsService = async () => {
     };
     
   }catch(err){
-    console.log(err);
     throw err
   };
 };
@@ -136,11 +129,6 @@ export const getTeachersService = async ({
   status = 'all'
 }) => {
   try{
-    // Check DB Connection   
-    if (mongoose.connection.readyState !== 1) {
-      throw new ErrorResponse('❌ لا يوجد اتصال بخادم قاعدة البيانات', 503);
-    };
-
     // Sanitize Pagination
     page = Math.max( Number( page ), 1 );
     limit = Math.min( Math.max( Number( limit ), 1 ), 50 );
@@ -184,7 +172,6 @@ export const getTeachersService = async ({
         }
       };
   }catch(err){
-    console.log(err);
     throw ere
   };
 };
@@ -260,7 +247,6 @@ export const updateTeacherService = async ( req, teacherId, {
     await session.abortTransaction();
     await session.endSession();
 
-    console.log(err);
     throw err
   };
 };
