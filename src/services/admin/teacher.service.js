@@ -283,40 +283,41 @@ export const deleteTeacherService = async ( req, teacherId ) => {
     if( !teacher ) throw new ErrorResponse( '❌ لم يتم العثور علي هذا المعلم!', 404 )
   
     // Keep Teacher Data For Audit Before Soft Delete
-    const teacherBeforeDelete = teacher.toObject();
+    const teacherBeforeSoftDelete = teacher.toObject();
 
     // Soft Delete Teacher
     teacher.isDeleted = true;
     teacher.deletedAt = new Date();
     await teacher.save({ session });
 
-    // Create Audit Log - Teacher Deleted Successfully
+    // Create Audit Log - Teacher Soft Deleted Successfully
     await createAuditLog({
       actor: req.context?.actor || {},
       action: 'TEACHER.SOFT_DELETE',
       target: {
         model: 'Teacher',
-        id: teacherId
+        id: teacher._id
       },
-      reason: 'Soft delete Teacher.',
+      reason: 'Teacher soft deleted successfully.',
       context: req?.context?.context || {},
       before: teacherBeforeDelete,
       after: teacher.toObject(),
     });
 
-    // Commit & End Session In DB
+    // Commit Transaction & End Session In DB
     await session.commitTransaction();
     session.endSession();
 
     // Return Teacher Name
     return {
-      teacherName: teacherBeforeDelete.name
+      teacherName: teacher.name
     };
 
   }catch(err){
+    // Abort Transaction & End Session
     await session.abortTransaction();
     session.endSession();
-    console.log(err);
+
     throw err
   };
 };

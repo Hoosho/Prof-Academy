@@ -170,15 +170,44 @@ export const deleteStudentService = async ( req, teacherId, studentId ) => {
 
     // Check If Student Exists
     const student = await Student.findOne({
-      _id: studentId, 'assignedTeacher.teacherId': teacherId
+      _id: studentId, 'assignedTeacher.teacherId': teacherId, isDeleted: false
     }).session( session );
     if( !student ) throw new ErrorResponse( '❌ هذا الطالب غير موجود!', 404 );
 
     // Keep Student Data Before Soft Delete
     const studentBeforeSoftDelete = student.toObject();
 
+    // Soft Delete Student
+    student.isDeleted = true;
+    student.deletedAt = new Date();
+    await student.save({ session });
     
+    // Create Audit Log - Student Soft Deleted Successfully
+    await createAuditLog({
+      actor: req.context?.actor || {},
+      action: STUDENT.SOFT_DELETE,
+      target: {
+        model: 'Student',
+        id: student._id
+      },
+      reason: 'Student soft deleted successfully.',
+      before: studentBeforeSoftDelete,
+      after: student.toObject()
+    });
+
+    // Commit Transaction & End Session
+    session.commitTransaction();
+    session.endSession();
+
+    // Return Student Name
+    return {
+      studentName: student.name
+    };
   }catch( err ){
+    // Abort Transaction & End Session
+    session.abortTransaction();
+    session.endSession();
+
     throw err;
   };
 };
