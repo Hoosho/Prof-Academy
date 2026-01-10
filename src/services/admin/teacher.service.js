@@ -11,7 +11,7 @@ import { ErrorResponse } from '../../utils/errorResponse.util.js';
  * @returns { string } teacherName
 */ 
 export const createTeacherService = async ( 
-  req, { name, email, phone, password, subject }
+  req, { name, email, phone, password, subject, bio }
 ) => {
   // Start DB Transaction  
   const session = await mongoose.startSession();
@@ -180,11 +180,11 @@ export const getTeachersService = async ({
  * @desc Update teacher Service
  * @param { object } req 
  * @param { string } teacherId
- * @param { object } { name, email, phone, subject, status, avatar, bio }
+ * @param { object } { name, email, phone, password, subject, status, bio }
  * @retunrs { string } teacherName
 */ 
 export const updateTeacherService = async ( req, teacherId, {
-  name, email, phone, subject, status, avatar, bio
+  name, email, phone, password, subject, status, bio
 }) => {
   // Open Session In DB
   const session = await mongoose.startSession();
@@ -215,7 +215,7 @@ export const updateTeacherService = async ( req, teacherId, {
     const updatedTeacher = await Teacher.findByIdAndUpdate(
       teacherId,
       { $set: {
-        name, email, phone, subject, status, avatar, bio
+        name, email, phone, subject, status, bio
       }},
       { new: true, session, runValidators: true, context: 'query' }
     ).lean();
@@ -233,6 +233,24 @@ export const updateTeacherService = async ( req, teacherId, {
       before: teacherBeforeUpdate,
       after: updatedTeacher.toObject()
     });
+
+    // Update Password If Exist
+    if (password && password.trim() !== '') {
+      teacher.password = password;
+      await teacher.save();
+
+      // Create Audit Log - Password Upated Successfully
+      await createAuditLog({
+        actor: req.context?.actor || {},
+        action: 'TEACHER.UPDATE_PASSWORD',
+        target: {
+          model: 'Teacher',
+          id: teacher._id
+        },
+        reason: 'Update teacher password successfully.',
+        context: req.context?.context || {}
+      });
+    };
 
     // Commit Transaction & End Session In DB
     await session.commitTransaction();

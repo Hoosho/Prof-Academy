@@ -169,7 +169,7 @@ TeacherSchema.pre('save', async function () {
   ) {
     const salt = await bcrypt.genSalt(12);
 
-    // Hash Password if modified
+    // Hash Passwor d if modified
     if (this.isModified('password')) {
       this.password = await bcrypt.hash(this.password, salt);
     };

@@ -7,21 +7,20 @@ import { ErrorResponse } from '../../utils/errorResponse.util.js';
 /**
  * @desc Create New Student
  * @param { string } req
- * @param { string } payload
- * @returns  { name } name
+ * @param { string } teacherId
+ * @param { string } { name, email, phone, guardianPhone, grade, cash }
+ * @returns  { name } studentName
 */
-export const createStudentService = async ( req, teacherId, teacherRole, payload ) => {
+export const createStudentService = async ( req, teacherId,
+  {
+    name, email, phone, guardianPhone, grade, cash
+  }
+) => {
   // Start Session
   const session = await mongoose.startSession()
   try{
     // Start DB Transaction
     session.startTransaction();
-
-  // Take Fields From Payload Obj
-  const {
-    name, email, phone, guardianPhone, grade, cash
-  } = payload;
-
 
   // Check IF Phone Or Email Exist
   const existingStudent = await Student.findOne({
@@ -37,7 +36,6 @@ export const createStudentService = async ( req, teacherId, teacherRole, payload
       throw new ErrorResponse( '❌ هذا الطالب مسجل بالفعل من قبل!', 400 );
     };
   };
-
 
   // Create Student Document
   const [ newStudent ] = await Student.create(
@@ -88,7 +86,7 @@ export const createStudentService = async ( req, teacherId, teacherRole, payload
  * @param { string } teacherId
  * @returns { object } stats
 */
-export const getStudentsStats = async ( teacherId ) => {
+export const getStudentsStatsService = async ( teacherId ) => {
   try{
     // Total Students
     const totalStudents = await Student.countDocuments({
@@ -134,7 +132,7 @@ export const getStudentsStats = async ( teacherId ) => {
  * @param { string } teacherId
  * @returns { object } { students, paginations }
 */
-export const getAllStudents = async (
+export const getStudentsService = async (
   teacherId, 
   {
     page = 1,

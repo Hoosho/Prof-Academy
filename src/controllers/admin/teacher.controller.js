@@ -44,7 +44,7 @@ export const createTeacher = async ( req, res, next ) => {
 */
 export const getAllTeachersWithStats = async ( req, res, next ) => {
   try{
-    // Take Data If Exists In Queries 
+    // Take Queries Of Filteration & Pagination If Exists  
     const {
       page, limit, search, status  
     } = req.query || {};
@@ -83,21 +83,21 @@ export const updateTeacher = async ( req, res, next ) => {
   try{
     // Take Data From Req Body
     const {
-      name, email, phone, subject, status, avatar, bio
+      name, email, phone, password, subject, status, bio
     } = req.body || {};
 
     // Take Teacher Id From Params
     const teacherId = req.params.id || {};
     
     // Validate Required Fields
-    if( !teacherId || !name || !email || !phone || !subject ){
+    if( !name || !email || !password || !phone || !subject || !bio ){
       throw new ErrorResponse( '❌ يرجي إدخال جميع الحقول المطلوبة كاملةَ!', 400 )
     };
 
     // Call Update Teacher Service
     const { teacherName } = await updateTeacherService(
       req, teacherId, {
-        name, email, phone, subject, status, avatar, bio
+        name, email, phone, password, subject, status, bio
       }
     );
     

@@ -28,6 +28,7 @@ const AuditLogSchema = new mongoose.Schema({
       // TEACHER
       "TEACHER.CREATE",
       "TEACHER.UPDATE",
+      "TEACHER.UPDATE_PASSWORD",
       "TEACHER.SOFT_DELETE",
       "TEACHER.DELETE",
 
