@@ -119,8 +119,8 @@ export const getTeachersStatsService = async () => {
 
 /**
  * @desc Get All Teachers ( Table ) Service
- * @param { object } page, limit, search, status
- * @returns { object } teachers + paginations
+ * @param { object } { page, limit, search, status }
+ * @returns { object } { teachers + paginations }
 */
 export const getTeachersService = async ({
   page = 1,
@@ -134,7 +134,7 @@ export const getTeachersService = async ({
     limit = Math.min( Math.max( Number( limit ), 1 ), 50 );
     const skip = ( page - 1 ) * limit;
 
-    // Built filter = {};
+    // Built filter Obj
     const filter = {};
 
     if( search.trim() ){
@@ -172,7 +172,7 @@ export const getTeachersService = async ({
         }
       };
   }catch(err){
-    throw ere
+    throw err
   };
 };
 

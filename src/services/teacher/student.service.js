@@ -129,6 +129,76 @@ export const getStudentsStats = async ( teacherId ) => {
 };
 
 /**
+ * @desc Get All Students ( Table ) Service - Raled With Teacher
+ * @param { object } { object, limit, search, status, grade }
+ * @param { string } teacherId
+ * @returns { object } { students, paginations }
+*/
+export const getAllStudents = async (
+  teacherId, 
+  {
+    page = 1,
+    limit = 10,
+    search = '',
+    status = 'all',
+    grade = 'all'
+})  => {
+  try{
+    // Sanatize Pagination
+    page = Math.max( Number( page ), 1 );
+    limit = Math.min( Math.max( Number( limit ), 1 ), 50 );
+    const skip = ( page - 1 ) * limit;
+
+    // Buile Filter Obj
+    const filter = {
+      isDeleted : false,
+      'assignedTeacher.teacherId': teacherId
+    };
+
+    if( search.trim() ){
+      filter.$or = [
+        { code: { $regex: search.trim(), $options: 'i' } },
+        { name: { $regex: search.trim(), $options: 'i' } },
+        { phone: { $regex: search.trim(), $options: 'i' } },
+      ];
+    };
+
+    // Status & Grade Filter
+    if( status && status !== 'all' ){
+      filter.status = status;
+    };
+    if( grade && grade !== 'all' ){
+      filter.grade = grade;
+    };
+
+    // Parallel Queries
+    const [ students, totalResults ] = await Promise.all([
+      Student.find( filter )
+        .select(' _id code name email guardianPhone grade status cash lastLogin deviceId ')
+        .sort({ createdAt: -1 })
+        .skip( skip )
+        .limit( limit )
+        .lean(),
+
+        Student.countDocuments( filter )
+      ]);
+
+      // Return Student Data Paginated
+      return {
+        students,
+        pagination: {
+          page,
+          limit,
+          totalResults,
+          totalPages: Math.ceil( totalResults / limit )
+        }
+      };
+  }catch( err ){
+    throw err
+  };
+};
+
+/**
  * @desc Update Student Service
  * @param { object } req
  * @param { string } teacherId
