@@ -22,10 +22,6 @@ export const createStudentService = async ( req, teacherId, teacherRole, payload
     name, email, phone, guardianPhone, grade, cash
   } = payload;
 
-  // Validate Require Fields
-  if( !name || !email || !guardianPhone || !grade ){
-    throw new ErrorResponse( '❌ يجب إدخال جميع البينات!' )
-  };
 
   // Check IF Phone Or Email Exist
   const existingStudent = await Student.findOne({
@@ -52,11 +48,7 @@ export const createStudentService = async ( req, teacherId, teacherRole, payload
 
   // Create Audit Log - Student Created Successfully
   await createAuditLog({
-    actor: {
-      id: teacherId,
-      type: 'TEACHER',
-      role: teacherRole
-    },
+    actor: req.context?.actor || {},
     action: 'STUDENT.CREATE',
     target: {
       model: 'Student',
@@ -95,12 +87,12 @@ export const createStudentService = async ( req, teacherId, teacherRole, payload
  * @desc Update Student Service
  * @param { object } req
  * @param { string } teacherId
- * @param { string } teacherRole
  * @param { string } studentId
- * @param { object } payload
+ * @param { object } { name, email, phone, guardianPhone, grade, cash, deviceId }
+ * @returns { string } studentName
 */
 export const updateStudentService = async (
-  req, teacherId, teacherRole, studentId, payload
+  req, teacherId, studentId, { name, email, phone, guardianPhone, grade, cash, deviceId }
 ) => {
   // Start Session
   const session = await mongoose.startSession();
@@ -110,16 +102,83 @@ export const updateStudentService = async (
 
     // Fetch Student Id & teacherId
     const student = await Student.findOne({
-      _id: studentId, 'assignedTeacher?.teacherId': teacherId
+      _id: studentId, 'assignedTeacher.teacherId': teacherId
     }).session( session );
     if( !student ) throw new ErrorResponse( '❌ هذا الطالب غير موجود!', 404 );
 
     // Store Original State For Audit Before Updating
-    const beforeUpdate = student.toObject();
+    const studentBeforeUpdate = student.toObject();
 
+    // Update Student
+    const updatedStudent = await Student.findByIdAndUpdate(
+      studentId,
+      {
+        $set: {
+          name, email, phone, guardianPhone, grade, cash, deviceId
+        }
+      },
+      {
+        new: true, session, runValidators: true, context: 'query' 
+      }
+    );
 
+    // Create Audit Log - Student Updated Successfully
+    await createAuditLog({
+      actor: req.context?.actor || {},
+      action: 'STUDENT.UPDATE',
+      target: {
+        model: 'Student',
+        id: updatedStudent._id,
+      },
+      reason: 'Update student data',
+      before: studentBeforeUpdate,
+      after: updatedStudent.toObject()
+    });
+
+    // Commit Transaction & End Session
+    await session.commitTransaction();
+    session.endSession();
+    
+
+    // Return Student Name
+    return {
+      studentName: updatedStudent.name
+    };
   }catch(err){
+    // Abort Transaction & End Session
+    await session.abortTransaction();
+    await session.endSession();
+
     console.log(err);
     throw err;
-  }
-}
+  };
+};
+
+/**
+ * @desc Delete Student Service
+ * @param { object } required
+ * @param { string } teacherId
+ * @param { string } studentId
+ * @returns { string } studentName
+*/
+export const deleteStudentService = async ( req, teacherId, studentId ) => {
+  // Start Session In DB
+  const session = await mongoose.startSession();
+  try{
+    // Start DB Transaction
+    session.startTransaction();
+
+    // Check If Student Exists
+    const student = await Student.findOne({
+      _id: studentId, 'assignedTeacher.teacherId': teacherId
+    }).session( session );
+    if( !student ) throw new ErrorResponse( '❌ هذا الطالب غير موجود!', 404 );
+
+    // Keep Student Data Before Soft Delete
+    const studentBeforeSoftDelete = student.toObject();
+
+    
+  }catch( err ){
+    throw err;
+  };
+};

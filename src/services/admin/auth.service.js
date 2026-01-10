@@ -12,7 +12,7 @@ import { createAuditLog } from '../system/auditLog.service.js';
  * @param { string } username 
  * @param { string } password
 */
-export const adminLoginService = async ( username, password, req ) => {
+export const adminLoginService = async ( req, username, password ) => {
 
   // Check If Admin Found 
   const admin =  await Admin.findOne({ username })
@@ -44,11 +44,7 @@ export const adminLoginService = async ( username, password, req ) => {
 
     // Create Audit Log - Login Failed 
     await createAuditLog({
-      actor: { 
-        id: admin._id,
-        type: 'ADMIN',
-        role: 'ADMIN'
-      },
+      actor: req.context.actor || {},
       action: 'AUTH.LOGIN.CREDENTIALS.FAIL',
       target: {
         model: 'Admin',
@@ -91,11 +87,7 @@ export const adminLoginService = async ( username, password, req ) => {
 
   // Create Audit Log - OTP Send Successfully
   await createAuditLog({
-    actor: { 
-      id: admin._id,
-      type: 'ADMIN',
-      role: 'ADMIN'
-    },
+    actor: req.context.actor || {},
     action: 'AUTH.LOGIN.CREDENTIALS.SUCCESS',
     target: {
       model: 'Admin',
@@ -161,11 +153,7 @@ export const verifyAdminOtpService = async ( username, otp, req ) => {
 
     // Audit Log
     await createAuditLog({
-      actor: {
-        id: admin._id,
-        type: 'ADMIN',
-        role: 'ADMIN'
-      },
+      actor: req.context.actor || {},
       action: 'AUTH.OTP.FAIL',
       target: { model: 'Admin', id: admin._id },
       reason: 'Invalid OTP',
@@ -190,11 +178,7 @@ export const verifyAdminOtpService = async ( username, otp, req ) => {
   
   // Create Audit Log - OTP Verified Successfully 
   await createAuditLog({
-    actor: {
-      id: admin._id,
-      type: 'ADMIN',
-      role: 'ADMIN'
-    },
+    actor: req.context.actor || {},
     action: 'AUTH.OTP.VERIFIED',
     target: { model: 'Admin', id: admin._id },
     reason: 'OTP verified, token issued',

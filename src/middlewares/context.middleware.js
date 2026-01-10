@@ -9,23 +9,23 @@ export const contextMiddleware = ( req, res, next ) => {
     };
   
     // Priority: ADMIN > TEACHER > STUDENT
-    if( req.admin ){
+    if( req.admin.id && req.admin.role ){
       actor = {
         id: req.admin,
         type: 'ADMIN',
-        role: 'ADMIN'
+        role: req.admin.role
       };
-    }else if( req.teacher ){
+    }else if( req.teacher.id && req.teacher.role ){
       actor = {
         id: req.teacher,
         type: 'TEACHER',
-        role: 'TEACHER'
+        role: req.teacher.role
       };
-    }else if( req.student ){
+    }else if( req.student.id && req.student.role ){
       actor = {
         id: req.student,
         type: 'STUDENT',
-        role: 'STUDENT'
+        role: req.student.role
       };
     }
 

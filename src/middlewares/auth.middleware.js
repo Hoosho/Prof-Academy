@@ -20,8 +20,8 @@ export const authAdmin = ( req, res, next ) => {
     if( decoded.role !== 'ADMIN' ) throw new ErrorResponse('❌ انت مش ادمن!', 403 ); 
 
     // Attach Admin Info To Req
-    req.admin = decoded.id;
-
+    req.admin.id = decoded.id;
+    req.admin.role = decoded.role;
     next();
   }catch(err){
     console.log(err);

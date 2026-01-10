@@ -6,26 +6,18 @@ import { ErrorResponse } from '../../utils/errorResponse.util.js';
 
 /**
  * @desc Create Teacher Service 
- * @params { object } name, email, phone, password, subject
- * @returns { object } name
+ * @param { object } req
+ * @param { object } { name, email, phone, password, subject }
+ * @returns { string } teacherName
 */ 
-export const createTeacherService = async ( data ) => {
+export const createTeacherService = async ( 
+  req, { name, email, phone, password, subject }
+) => {
   // Start DB Transaction  
   const session = await mongoose.startSession();
   try{
     session.startTransaction();
-  
-    // Extract Data From Data Obj
-    const {
-      req, name, email, phone, password, subject
-    } = data || {};
 
-    // Vlaidate Required Fields
-    if (!name || !phone || !email || !password || !subject) {
-      throw new ErrorResponse( '❌ البيانات الأساسية للمدرس غير مكتملة', 400 );
-    };
-    
-    
     // Check If Email Or Phone Exists
     const teacher = await Teacher.findOne({
       $or: [
@@ -56,11 +48,7 @@ export const createTeacherService = async ( data ) => {
     
     // Create Audit Log - Teacher Created Successfully
     await createAuditLog({
-      actor: { 
-        id: req.admin,
-        type: 'TEACHER',
-        role: 'TEACHER'
-      },  
+      actor: req.context?.actor,
       action: 'TEACHER.CREATE',
       target: {
         model: 'Teacher',
@@ -78,7 +66,7 @@ export const createTeacherService = async ( data ) => {
     
     // Return Teacher Name
     return {
-      teacherName:newTeacher.name
+      teacherName: newTeacher.name
     };
   }catch(err){
     await session.abortTransaction();
@@ -90,10 +78,8 @@ export const createTeacherService = async ( data ) => {
     };
     console.log(err);
     throw err;
-    
   };
 };
-
 
 /**
  * @desc Get Teachers Stats Service 
@@ -134,9 +120,7 @@ export const getTeachersStatsService = async () => {
     
   }catch(err){
     console.log(err);
-    throw err instanceof ErrorResponse
-      ? err
-      : new ErrorResponse( '❌ حدثت مشكلة أثناء جلب بينات المعلمين!', 500 ); 
+    throw err
   };
 };
 
@@ -201,17 +185,15 @@ export const getTeachersService = async ({
       };
   }catch(err){
     console.log(err);
-    throw err instanceof ErrorResponse
-      ? err
-      : new ErrorResponse( '❌ حدثت مشكلة أثناء جلب بينات المعلمين!', 500 ); 
+    throw ere
   };
 };
 
 /**
  * @desc Update teacher Service
+ * @param { object } req 
  * @param { string } teacherId
- * @param { object } {   name, email, phone, subject, status, avatar, bio }
- * @param { object } req ( For Audit )
+ * @param { object } { name, email, phone, subject, status, avatar, bio }
  * @retunrs { string } teacherName
 */ 
 export const updateTeacherService = async ( req, teacherId, {
@@ -223,11 +205,6 @@ export const updateTeacherService = async ( req, teacherId, {
     // Start DB Transaction
     session.startTransaction();
     
-    // Validate Required Fields
-    if( !name || !email || !phone || !subject ){
-      throw new ErrorResponse( '❌ يرجي إدخال جميع الحقول المطلوبة كاملةَ!', 400 )
-    };
-
     // Check If TeacherId Exists 
     const teacher = await Teacher.findById( teacherId ).session(session);
     if( !teacher ) throw new ErrorResponse( '❌ لم يتم العثور علي هذا المعلم!', 404 )
@@ -258,23 +235,19 @@ export const updateTeacherService = async ( req, teacherId, {
 
     // Create Audit Log - Teacher Updated Successfully
     await createAuditLog({
-      actor: {
-        id: req.admin,
-        type: 'ADMIN',
-        role: 'ADMIN'
-      },
+      actor: req.context?.actor || {},
       action: 'TEACHER.UPDATE',
       target: {
         model: 'Teacher',
         id: teacher._id
       },
-      reason: 'Update Teacher Details.',
+      reason: 'Update Teacher data.',
       context: req?.context?.context || {},
       before: teacherBeforeUpdate,
-      after: updatedTeacher
+      after: updatedTeacher.toObject()
     });
 
-    // Commit & End Session In DB
+    // Commit Transaction & End Session In DB
     await session.commitTransaction();
     session.endSession();
 
@@ -283,21 +256,20 @@ export const updateTeacherService = async ( req, teacherId, {
       teacherName: updatedTeacher.name
     };
   }catch(err){
+    // Abort Transaction & End Session
     await session.abortTransaction();
     await session.endSession();
 
     console.log(err);
-    throw err instanceof ErrorResponse
-    ? err
-    : new ErrorResponse( `❌حدثت مشكلة أثناء تحديث بينات المعلم ${ teacher.name || '' }!`, 500 ); 
+    throw err
   };
 };
 
 /**
  * @desc Delete Teacher Service 
- * @param { string } teacherId
  * @param { object } req
- * @returns { object } teacherName
+ * @param { string } teacherId
+ * @returns { string } teacherName
 */
 export const deleteTeacherService = async ( req, teacherId ) => {
   // Start Session In DB
@@ -310,28 +282,26 @@ export const deleteTeacherService = async ( req, teacherId ) => {
     const teacher = await Teacher.findById( teacherId );
     if( !teacher ) throw new ErrorResponse( '❌ لم يتم العثور علي هذا المعلم!', 404 )
   
-    // Keep Teacher Data For Audit Before Deletion
+    // Keep Teacher Data For Audit Before Soft Delete
     const teacherBeforeDelete = teacher.toObject();
 
-    // Delete Teacher
-    await Teacher.deleteOne({ _id: teacherId }).session(session);
+    // Soft Delete Teacher
+    teacher.isDeleted = true;
+    teacher.deletedAt = new Date();
+    await teacher.save({ session });
 
-      // Create Audit Log - Teacher Deleted Successfully
-      await createAuditLog({
-      actor: {
-        id: req.admin,
-        type: 'ADMIN',
-        role: 'ADMIN'
-      },
-      action: 'TEACHER.DELETE',
+    // Create Audit Log - Teacher Deleted Successfully
+    await createAuditLog({
+      actor: req.context?.actor || {},
+      action: 'TEACHER.SOFT_DELETE',
       target: {
         model: 'Teacher',
         id: teacherId
       },
-      reason: 'Delete Teacher.',
+      reason: 'Soft delete Teacher.',
       context: req?.context?.context || {},
       before: teacherBeforeDelete,
-      after: null
+      after: teacher.toObject(),
     });
 
     // Commit & End Session In DB
@@ -347,8 +317,6 @@ export const deleteTeacherService = async ( req, teacherId ) => {
     await session.abortTransaction();
     session.endSession();
     console.log(err);
-    throw err instanceof ErrorResponse
-      ? err
-      : new ErrorResponse( `❌حدثت مشكلة أثناء حذف بينات المعلم ${ teacherBeforeDelete?.name || '' }!`, 500 ); 
+    throw err
   };
 };

@@ -23,11 +23,7 @@ export const teacherLoginService = async ( req, email, password, deviceId ) => {
   // Check Account Is Locked 
   if( teacher.lockUntil && teacher.lockUntil > Date.now() ){
     await createAuditLog({
-      actor: {
-        id: teacher._id,
-        type: 'TEACHER',
-        role: teacher.role
-      },
+      actor: req.context.actor || {},
       action: 'AUTH.LOGIN.BLOCKED.LOCKED',
       target: {
         model: 'Teacher',
@@ -56,11 +52,7 @@ export const teacherLoginService = async ( req, email, password, deviceId ) => {
 
     // Create Audit Log - Login Failed 
     await createAuditLog({
-      actor: {
-        id: teacher._id,
-        type: 'TEACHER',
-        role: teacher.role
-      },
+      actor: req.context.actor || {},
       action: 'AUTH.LOGIN.CREDENTIALS.FAIL',
       target: {
         model: 'Teacher',
@@ -79,11 +71,7 @@ export const teacherLoginService = async ( req, email, password, deviceId ) => {
   // Check Account Status 
   if( teacher.status !== 'نشط' ){
     await createAuditLog({
-      actor: {
-        id: teacher._id,
-        type: 'TEACHER',
-        role: teacher.role
-      },
+      actor: req.context.actor || {},
       action: 'AUTH.LOGIN.BLOCKED.STATUS',
       target: {
         model: 'Teacher',
@@ -121,11 +109,7 @@ export const teacherLoginService = async ( req, email, password, deviceId ) => {
 
     // Create Audit Log - Success Login First Device Trusted  
     await createAuditLog({
-      actor: {
-        id: teacher._id,
-        type: 'TEACHER',
-        role: teacher.role
-      },
+      actor: req.context.actor || {},
       action: 'AUTH.LOGIN.FIRST_DEVICE.TRUSTED',
       target: {
         model: 'Teacher',
@@ -168,11 +152,7 @@ export const teacherLoginService = async ( req, email, password, deviceId ) => {
     await sendEmail( teacher.email, 'رمز التحقق - Prof Academy', otp );
     // Create Audit Log - Required New Device
     await createAuditLog({
-      actor: {
-        id: teacher._id,
-        type: 'TEACHER',
-        role: teacher.role
-      },
+      actor: req.context.actor || {},
       action: 'AUTH.LOGIN.OTP.REQUIRED.NEW_DEVICE',
       target: {
         model: 'Teacher',
@@ -204,11 +184,7 @@ export const teacherLoginService = async ( req, email, password, deviceId ) => {
 
   // Create Audit Log - Success Login Trusted Device  
   await createAuditLog({
-    actor: {
-      id: teacher._id,
-      type: 'TEACHER',
-      role: teacher.role
-    },
+    actor: req.context.actor || {},
     action: 'AUTH.LOGIN.CREDENTIALS.SUCCESS',
     target: {
       model: 'Teacher',

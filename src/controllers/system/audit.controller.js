@@ -30,7 +30,7 @@ export const getAuditLogs = async ( req, res, next ) => {
     if( action ) filter.action = action;
     if( actorType ) filter['actor.type'] = actorType;
     if( targetModel ) filter['target.model'] = targetModel;
-       
+    
     const logs = await AuditLog.find(filter)
       .sort({ createdAt:-1 })
       .skip( ( page -1 ) * limit )

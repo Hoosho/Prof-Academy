@@ -25,19 +25,16 @@ const AuditLogSchema = new mongoose.Schema({
     required: true,
     index: true,
     enum: [
-      // USER
-      "USER.CREATE",
-      "USER.UPDATE",
-      "USER.DELETE",
-
       // TEACHER
       "TEACHER.CREATE",
       "TEACHER.UPDATE",
+      "TEACHER.SOFT_DELETE",
       "TEACHER.DELETE",
 
       // STUDENT
       "STUDENT.CREATE",
       "STUDENT.UPDATE",
+      "STUDENT.SOFT_DELETE",
       "STUDENT.DELETE",
 
       // AUTH

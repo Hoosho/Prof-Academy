@@ -22,14 +22,14 @@ export const createTeacher = async ( req, res, next ) => {
     };
 
     // Create New Teacher Instance
-     await createTeacherService({
-      req, name, email, phone, password, subject
-    });
+    const { teacherName } = await createTeacherService( 
+      req, { name, email, phone, password, subject }
+    );
 
     // Return Success Response
     return res.status(201).json({
       success: true,
-      msg: `✅ تم إنشاء حساب المعلم ${ name }, بنجاح.`
+      msg: `✅ تم إنشاء حساب المعلم ${ teacherName || '' }, بنجاح.`
     });
   }catch(err){
     console.log(err);
@@ -70,14 +70,7 @@ export const getAllTeachersWithStats = async ( req, res, next ) => {
     });
   }catch(err){
     console.log(err);
-    next(
-      err instanceof ErrorResponse
-      ? err
-      : new ErrorResponse(
-        '❌ حدثت مشكلة أثناء جلب بينات المعلمين!',
-        500
-      ) 
-    );
+    next( err );
   };
 };
 
@@ -103,11 +96,11 @@ export const updateTeacher = async ( req, res, next ) => {
 
     // Call Update Teacher Service
     const { teacherName } = await updateTeacherService(
-     req, teacherId, {
-      name, email, phone, subject, status, avatar, bio
-     }
+      req, teacherId, {
+        name, email, phone, subject, status, avatar, bio
+      }
     );
-     
+    
     // Return Success Response
     return res.status(200).json({
       success: true,
@@ -115,14 +108,7 @@ export const updateTeacher = async ( req, res, next ) => {
     });
   }catch(err){
     console.log(err);
-    next(
-      err instanceof ErrorResponse
-      ? err
-      : new ErrorResponse(
-        '❌ حدثت مشكلة أثناء تحديث بيانات المعلم',
-        500
-      ) 
-    );
+    next( err );
   };
 };
 
@@ -151,13 +137,6 @@ export const deleteTeacher = async ( req, res, next ) => {
     });
   }catch(err){
     console.log(err);
-    next(
-      err instanceof ErrorResponse
-      ? err
-      : new ErrorResponse(
-        `❌حدثت مشكلة أثناء حذف بينات المعلم!`,
-        500
-      ) 
-    );
+    next( err );
   };
 };

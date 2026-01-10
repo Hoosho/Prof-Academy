@@ -144,14 +144,24 @@ const StudentSchema = new mongoose.Schema(
     boughtMonths: [BoughtMonthSchema],
     watchedLectures: [WatchedLectureSchema],
     achievements: [AchievementsSchema],
+  
+    // Soft Delete
+    isDeleted: {
+      type: Boolean,
+      default: false
+    },
+    deletedAt: {
+      type: Date,
+      default: null
+    }
   },
   { timestamps: true }
 );
 
 // ---------------- Indexes ----------------
 
-// Phone
-StudentSchema.index({ phone: 1 }, { unique: true });
+// Phone: Partial Unique 
+StudentSchema.index({ phone: 1 }, { unique: true, partialFilterExpression: { isDeleted: false } });
 
 // Code
 StudentSchema.index({ code: 1 });

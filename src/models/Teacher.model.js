@@ -146,6 +146,17 @@ const TeacherSchema = new mongoose.Schema({
     type: Date,
     default: null
   },
+
+
+  // Soft Delete
+  isDeleted: {
+    type: Boolean,
+    default: false
+  },
+  deletedAt: {
+    type: Date,
+    default: null
+  }
 }, {
   timestamps: true
 });
@@ -182,8 +193,10 @@ TeacherSchema.methods.compareOtpCode = async function ( otp ) {
 
 
 // -------- INDEXES --------
-TeacherSchema.index({ email: 1 }, { unique: true, sparse: true });
-TeacherSchema.index({ phone: 1 }, { unique: true, sparse: true });
+// Partial Unique
+TeacherSchema.index({ email: 1 }, { unique: true, partialFilterExpression: { isDeleted: false } });
+TeacherSchema.index({ phone: 1 }, { unique: true, partialFilterExpression: { isDeleted: false } });
+
 TeacherSchema.index({ deviceId: 1 });
 TeacherSchema.index({ months: 1 });
 TeacherSchema.index({ lectures: 1 });
