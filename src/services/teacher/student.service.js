@@ -54,9 +54,7 @@ export const createStudentService = async ( req, teacherId,
     },
     reason: 'Student Created Successfully',
     context: req.context?.context || {},
-    after: {
-      ...newStudent.toObject()
-    }
+    after: newStudent.toObject()
   });
 
   // Commit Transaction & End Session
@@ -298,7 +296,7 @@ export const deleteStudentService = async ( req, teacherId, studentId ) => {
     // Create Audit Log - Student Soft Deleted Successfully
     await createAuditLog({
       actor: req.context?.actor || {},
-      action: STUDENT.SOFT_DELETE,
+      action: 'STUDENT.SOFT_DELETE',
       target: {
         model: 'Student',
         id: student._id

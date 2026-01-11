@@ -39,7 +39,7 @@ export const createTeacher = async ( req, res, next ) => {
 
 /**
  * @desc Get All Teachers With Stats
- * @route GET /admin/teachers
+ * @route GET /api/admin/teachers
  * @access Private ( Only Admins )
 */
 export const getAllTeachersWithStats = async ( req, res, next ) => {

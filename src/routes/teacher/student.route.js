@@ -12,7 +12,9 @@ import {
 } from '../../controllers/teacher/student.controller.js'
 
 // Import Validations
-
+import {
+  createStudentValidation, getStudentsQueryValidation, studentIdValidation, updateStudentValidation
+} from '../../validations/teacher/student.validation.js'
 /**
  * @desc Create Student
  * @route POST /api/teacher/student 
@@ -21,6 +23,7 @@ router.post(
   '/api/teacher/student',
   authTeacher,
   contextMiddleware,
+  createStudentValidation,
   createStudent
 );
 
@@ -32,6 +35,7 @@ router.get(
   '/api/teacher/student',
   authTeacher,
   contextMiddleware,
+  getStudentsQueryValidation,
   getAllStudents
 );
 
@@ -43,6 +47,8 @@ router.put(
   '/api/teacher/student/:id',
   authTeacher,
   contextMiddleware,
+  studentIdValidation,
+  updateStudentValidation,
   updateTeacher
 );
 
@@ -54,6 +60,7 @@ router.delete(
   '/api/teacher/student/:id',
   authTeacher,
   contextMiddleware,
+  studentIdValidation,
   deleteStudent
 );
 

@@ -56,13 +56,13 @@ export const getAllStudents = async ( req, res, next ) => {
     const teacherId = req.teacher.id;
 
     // Call Students Stats Service
-    const { stats } = await getStudentsStatsService();
+    const { stats } = await getStudentsStatsService( teacherId );
 
     // Call Get Students Service
     const {
       students, pagination
     } = await getStudentsService(
-      { page, limit, search, status, grade }
+      teacherId, { page, limit, search, status, grade }
     );
 
 
@@ -139,7 +139,7 @@ export const deleteStudent = async ( req, res, next ) => {
     };
 
     // Call Delete Student Service
-    const { teacherName } = await deleteStudentService( teacherId, studentId);
+    const { teacherName } = await deleteStudentService( teacherId, studentId );
 
     // Return Success Response 
     return res.status(200).json({

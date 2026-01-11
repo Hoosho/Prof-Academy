@@ -3,15 +3,15 @@ import { isCelebrateError } from 'celebrate';
 import { ErrorResponse } from '../utils/errorResponse.util.js';
 
 export const errorHandler = ( err, req, res, next ) => {
-  // Joi Errors 
   if (isCelebrateError(err)) {
-    const bodyError = err.details.get('body');
-    const msg = bodyError
-      ? bodyError.details[0].message
-      : '❌ خطأ في البيانات المدخلة';
+    const validationType = ['body', 'query', 'params', 'headers']
+      .find(key => err.details.get(key));
 
-    // تسجيل الخطأ في اللوجات
-    // logger.error(`Validation Error: ${msg}`);
+    const errorDetails = err.details.get(validationType);
+
+    const msg = errorDetails
+      ? errorDetails.details[0].message
+      : '❌ خطأ في البيانات المدخلة';
 
     return res.status(400).json({
       success: false,
@@ -24,7 +24,7 @@ export const errorHandler = ( err, req, res, next ) => {
     // logger.error(`Custom Error: ${err}`)
     return res.status(err.statusCode || 400).json({
       success: false,
-      msg: err.msg
+      msg: err.msg // In Production use msg not intenal error like   msg: '❌ حدث خطأ غير متوقع'
     });
   };
 

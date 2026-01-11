@@ -7,13 +7,13 @@ import { contextMiddleware } from '../../middlewares/context.middleware.js';
 
 // Import Validations
 import {
-  createTeacherValidation, teacherIdValidation, updateTeacherValidation
+  createTeacherValidation, getTeachersQueryValidation, teacherIdValidation, updateTeacherValidation
 } from '../../validations/admin/teacher.validatoin.js';
 
 // Import Controllers
 import {
   createTeacher, getAllTeachersWithStats, updateTeacher, deleteTeacher
-} from '../../controllers/admin/teacher.controller.js'
+} from '../../controllers/admin/teacher.controller.js';
 
 /**
  * @desc Create New Teacher
@@ -34,6 +34,7 @@ router.post(
 router.get(
   '/api/admin/teachers',
   authAdmin,
+  getTeachersQueryValidation,
   getAllTeachersWithStats
 );
 

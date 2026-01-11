@@ -1,6 +1,5 @@
 // /src/validations/admin/teacher.validation.js
-import { Joi, celebrate, Segments } from "celebrate";
-
+import { Joi, celebrate, Segments } from 'celebrate';
 /**
  * ✅ Create Teacher Validation
  */
@@ -40,6 +39,45 @@ export const createTeacherValidation = celebrate({
   })
 });
 
+/**
+ * ✅ Get Teacher Queries Validation
+ */
+export const getTeachersQueryValidation = celebrate({
+  [Segments.QUERY]: Joi.object({
+    page: Joi.number()
+      .min(1)
+      .default(1)
+      .messages({
+        "number.base": "❌ رقم الصفحة يجب أن يكون رقم",
+        "number.min": "❌ رقم الصفحة يجب أن يكون أكبر من 0",
+      }),
+
+    limit: Joi.number()
+      .min(1)
+      .max(100)
+      .default(20)
+      .messages({
+        "number.base": "❌ الحد يجب أن يكون رقم",
+        "number.min": "❌ الحد الأدنى 1",
+        "number.max": "❌ الحد الأقصى 100",
+      }),
+
+    status: Joi.string()
+      .valid("نشط", "محظور")
+      .optional()
+      .messages({
+        "any.only": "❌ حالة المعلم غير صحيحة",
+      }),
+
+    search: Joi.string()
+      .trim()
+      .min(1)
+      .optional()
+      .messages({
+        "string.min": "❌ قيمة البحث غير صحيحة",
+      }),
+  })
+});
 /**
  * ✅ Update Teacher Validation
  */
