@@ -23,6 +23,7 @@ import adminOverviewRoutes from './routes/admin/overview.route.js';
 import adminTeacherRoutes from './routes/admin/teacher.route.js';
 // TEACHER
 import teacherAuthRoutes from './routes/teacher/auth.route.js';
+import teacherStudentRoutes from './routes/teacher/student.route.js';
 // STUDENT
 // import userRoutes from './routes/user/index.routes.js';
 
@@ -96,9 +97,10 @@ app.use(express.static(path.join(path.resolve(), 'src/public')));
 // ADMIN
 app.use( '/', adminAuthRoutes );
 app.use( '/', adminOverviewRoutes );
-app.use( '', adminTeacherRoutes )
+app.use( '/', adminTeacherRoutes )
 // TEACHEER
-app.use('', teacherAuthRoutes);
+app.use( '/', teacherAuthRoutes );
+app.use( '/', teacherStudentRoutes )
 // STUDENT
 // app.use('/api/user', userRoutes);
 
