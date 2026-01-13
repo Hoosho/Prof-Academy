@@ -44,7 +44,11 @@ export const adminLoginService = async ( req, username, password ) => {
 
     // Create Audit Log - Login Failed 
     await createAuditLog({
-      actor: req.context.actor || {},
+      actor: {
+        id: admin._id,
+        role: admin.role,
+        type: 'ADMIN'
+      },
       action: 'AUTH.LOGIN.CREDENTIALS.FAIL',
       target: {
         model: 'Admin',
@@ -87,7 +91,11 @@ export const adminLoginService = async ( req, username, password ) => {
 
   // Create Audit Log - OTP Send Successfully
   await createAuditLog({
-    actor: req.context.actor || {},
+    actor: {
+      id: admin._id,
+      role: admin.role,
+      type: 'ADMIN'
+    },
     action: 'AUTH.LOGIN.CREDENTIALS.SUCCESS',
     target: {
       model: 'Admin',
@@ -153,8 +161,11 @@ export const verifyAdminOtpService = async ( username, otp, req ) => {
 
     // Audit Log
     await createAuditLog({
-      actor: req.context.actor || {},
-      action: 'AUTH.OTP.FAIL',
+      actor: {
+        id: admin._id,
+        role: admin.role,
+        type: 'ADMIN'
+      },      action: 'AUTH.OTP.FAIL',
       target: { model: 'Admin', id: admin._id },
       reason: 'Invalid OTP',
       context: req.context?.context || {}
@@ -178,7 +189,11 @@ export const verifyAdminOtpService = async ( username, otp, req ) => {
   
   // Create Audit Log - OTP Verified Successfully 
   await createAuditLog({
-    actor: req.context.actor || {},
+    actor: {
+      id: admin._id,
+      role: admin.role,
+      type: 'ADMIN'
+    },
     action: 'AUTH.OTP.VERIFIED',
     target: { model: 'Admin', id: admin._id },
     reason: 'OTP verified, token issued',
