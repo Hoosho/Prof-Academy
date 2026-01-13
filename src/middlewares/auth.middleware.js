@@ -48,7 +48,8 @@ export const authTeacher = async ( req, res, next ) => {
     const teacher = await Teacher.findById( decoded.id );
     if( !teacher ) throw new ErrorResponse('❌ الاستاذ ده مش موجود!', 401 );
 
-    req.teacher = decoded.id;
+    req.teacher.id = decoded.id;
+    req.teacher.role = decoded.role;
 
     next();
   }catch(err){
@@ -76,7 +77,9 @@ export const authStudent =  async ( req, res, next ) => {
     const student = await Student.findById( decoded.id );
     if( !student ) throw new ErrorResponse('❌ الطالب ده مش موجود!', 401 );
 
-    req.student = decoded.id;
+    req.student.id = decoded.id;
+    req.student.role = decoded.role;
+    req.student.assignedTeacher = decoded.assignedTeacher;
 
     next();
   }catch(err){

@@ -28,19 +28,20 @@ export const createStudentService = async ( req, teacherId,
       { email }, { phone }
     ]
   }).session( session );
-  if( existingStudent ){
-    const alreadyAssigned = existingStudent.assignedTeacher
-      ?.some( t => t.teacherId.toString() === teacherId.toString() );
-
-    if( alreadyAssigned ){
-      throw new ErrorResponse( '❌ هذا الطالب مسجل بالفعل من قبل!', 400 );
-    };
+if (existingStudent) {
+  if (
+    existingStudent.isDeleted === false &&
+    teacherId.toString() === existingStudent.assignedTeacher.toString()
+  ){
+    throw new ErrorResponse('❌ هذا الطالب مسجل بالفعل من قبل!', 400);
   };
+};
+
 
   // Create Student Document
   const [ newStudent ] = await Student.create(
     [{
-      name, email, phone, guardianPhone, grade, cash, assignedTeacher: [{ teacherId }]
+      name, email, phone, guardianPhone, grade, cash, assignedTeacher: teacherId
     }], { session }
   );
 
@@ -88,12 +89,12 @@ export const getStudentsStatsService = async ( teacherId ) => {
   try{
     // Total Students
     const totalStudents = await Student.countDocuments({
-      isDeleted: false, 'assignedTeacher.teacherId': teacherId
+      isDeleted: false, assignedTeacher: teacherId
     });
 
     // Active Students
     const totalActiveStudents = await Student.countDocuments({
-      isDeleted: false, 'assignedTeacher.teacherId': teacherId, status : 'نشط'
+      isDeleted: false, assignedTeacher: teacherId, status : 'نشط'
     });
 
     // Total In Active Students
@@ -107,7 +108,7 @@ export const getStudentsStatsService = async ( teacherId ) => {
     tomorrow.setDate( tomorrow.getDate() + 1 );
     const totalLoginTodayStudents = await Student.countDocuments({
       lastLogin: { $gte: today, $lt: tomorrow }, isDeleted: false,
-      'assignedTeacher.teacherId': teacherId
+      assignedTeacher: teacherId
     });
 
     // Returns Stats Obj
@@ -148,7 +149,7 @@ export const getStudentsService = async (
     // Buile Filter Obj
     const filter = {
       isDeleted : false,
-      'assignedTeacher.teacherId': teacherId
+      assignedTeacher: teacherId
     };
 
     if( search.trim() ){
@@ -213,7 +214,7 @@ export const updateStudentService = async (
 
     // Fetch Student Id & teacherId
     const student = await Student.findOne({
-      _id: studentId, 'assignedTeacher.teacherId': teacherId
+      _id: studentId, assignedTeacher: teacherId
     }).session( session );
     if( !student ) throw new ErrorResponse( '❌ هذا الطالب غير موجود!', 404 );
 
@@ -281,7 +282,7 @@ export const deleteStudentService = async ( req, teacherId, studentId ) => {
 
     // Check If Student Exists
     const student = await Student.findOne({
-      _id: studentId, 'assignedTeacher.teacherId': teacherId, isDeleted: false
+      isDeleted: false, _id: studentId, assignedTeacher: teacherId
     }).session( session );
     if( !student ) throw new ErrorResponse( '❌ هذا الطالب غير موجود!', 404 );
 

@@ -7,7 +7,7 @@ import { ErrorResponse } from '../../utils/errorResponse.util.js';
 /**
  * @desc Create Teacher Service 
  * @param { object } req
- * @param { object } { name, email, phone, password, subject }
+ * @param { object } { name, email, phone, password, subject, bio }
  * @returns { string } teacherName
 */ 
 export const createTeacherService = async ( 
@@ -33,6 +33,7 @@ export const createTeacherService = async (
         phone,
         password,
         subject,
+        bio: bio || ''
       };
 
       // Check Network Connection Before Save Teacher In DB
@@ -152,7 +153,7 @@ export const getTeachersService = async ({
     // Parallel Queries 
     const [ teachers, totalResults ] = await Promise.all([
       Teacher.find(filter)
-        .select( '_id name email phone subject studentsCount  status' )
+        .select( '_id name email phone subject bio studentsCount status' )
         .sort({ createdAt: -1 })
         .skip( skip )
         .limit( limit ) 

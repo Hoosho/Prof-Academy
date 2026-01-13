@@ -13,7 +13,7 @@ export const createTeacher = async ( req, res, next ) => {
   try{
     // Extract Data From Req Body
     const {
-      name, email, phone, password, subject
+      name, email, phone, password, subject, bio
     } = req.body || {}; 
 
     // Vlaidate Require Fields
@@ -23,7 +23,7 @@ export const createTeacher = async ( req, res, next ) => {
 
     // Create New Teacher Instance
     const { teacherName } = await createTeacherService( 
-      req, { name, email, phone, password, subject }
+      req, { name, email, phone, password, subject, bio }
     );
 
     // Return Success Response
@@ -90,7 +90,7 @@ export const updateTeacher = async ( req, res, next ) => {
     const teacherId = req.params.id || {};
     
     // Validate Required Fields
-    if( !name || !email || !password || !phone || !subject || !bio ){
+    if( !name || !email || !password || !phone || !subject  ){
       throw new ErrorResponse( '❌ يرجي إدخال جميع الحقول المطلوبة كاملةَ!', 400 )
     };
 

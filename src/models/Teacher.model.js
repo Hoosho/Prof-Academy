@@ -197,6 +197,7 @@ TeacherSchema.methods.compareOtpCode = async function ( otp ) {
 TeacherSchema.index({ email: 1 }, { unique: true, partialFilterExpression: { isDeleted: false } });
 TeacherSchema.index({ phone: 1 }, { unique: true, partialFilterExpression: { isDeleted: false } });
 
+TeacherSchema.index({ assignedTeacher: 1 });
 TeacherSchema.index({ isDeleted: 1 });
 TeacherSchema.index({ deviceId: 1 });
 TeacherSchema.index({ months: 1 });

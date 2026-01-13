@@ -11,7 +11,7 @@ export const contextMiddleware = ( req, res, next ) => {
     // Priority: ADMIN > TEACHER > STUDENT
     if( req.admin.id && req.admin.role ){
       actor = {
-        id: req.admin,
+        id: req.admin.id,
         type: 'ADMIN',
         role: req.admin.role
       };
