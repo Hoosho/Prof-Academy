@@ -21,7 +21,6 @@ import {
 */
 router.post(
   '/api/admin/login',
-  contextMiddleware,
   adminLoginValidation,
   adminLogin
 );
@@ -32,7 +31,6 @@ router.post(
 */
 router.get(
   '/api/admin/verify-otp',
-  contextMiddleware,
   getOtpStatus
 );
 
@@ -42,7 +40,6 @@ router.get(
 */
 router.post(
   '/api/admin/verify-otp',
-  contextMiddleware,
   verifyAdminOtpValidation,
   verifyAdminOtp
 );
