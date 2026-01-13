@@ -11,19 +11,19 @@ export const generateToken = ({ id, role }) => {
     return jwt.sign (
       { id, role },
       process.env.STUDENT_JWT_SECRET,
-      { expiresIn: process.env.JWT_EXPIRES_IN }
+      { expiresIn: process.env.STUDENT_JWT_EXPIRES_IN }
     );
   }else if( role === 'TEACHER' ){
     return jwt.sign (
       { id, role },
       process.env.TEACHER_JWT_SECRET,
-      { expiresIn: process.env.JWT_EXPIRES_IN }
+      { expiresIn: process.env.TEACHER_JWT_EXPIRES_IN }
     );
   }else if( role === 'ADMIN' ){
     return jwt.sign (
       { id, role },
       process.env.ADMIN_JWT_SECRET,
-      { expiresIn: process.env.JWT_EXPIRES_IN }
+      { expiresIn: process.env.ADMIN_JWT_EXPIRES_IN }
     );
   }; 
 };

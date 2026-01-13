@@ -36,7 +36,7 @@ export const teacherLogin = async ( req, res, next ) => {
         secure: false,
         sameSite: 'Lax'
       });
-    }
+    };
 
     // Return Success Response
     return res.status(200).json({

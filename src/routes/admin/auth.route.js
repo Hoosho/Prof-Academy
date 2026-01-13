@@ -1,3 +1,4 @@
+// /src/routes/admin/auth.rotue.js
 import express from "express";
 const router = express.Router();
 

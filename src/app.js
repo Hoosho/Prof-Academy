@@ -25,7 +25,7 @@ import adminTeacherRoutes from './routes/admin/teacher.route.js';
 import teacherAuthRoutes from './routes/teacher/auth.route.js';
 import teacherStudentRoutes from './routes/teacher/student.route.js';
 // STUDENT
-// import userRoutes from './routes/user/index.routes.js';
+import studentAuthRoutes from './routes/student/auth.route.js';
 
 // Import error handler
 import { errorHandler } from './middlewares/errorHandler.middleware.js';
@@ -102,8 +102,7 @@ app.use( '/', adminTeacherRoutes )
 app.use( '/', teacherAuthRoutes );
 app.use( '/', teacherStudentRoutes )
 // STUDENT
-// app.use('/api/user', userRoutes);
-
+app.use( '/', studentAuthRoutes );
 // TEST
 app.get('/api/test', ( req, res ) => {
   return res.status(200).render('test')
