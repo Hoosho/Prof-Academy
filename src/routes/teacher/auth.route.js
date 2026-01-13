@@ -10,7 +10,9 @@ import {
 } from '../../controllers/teacher/auth.controller.js'
 
 // Import Validations
-
+import {
+  teacherLoginValidation
+} from '../../validations/teacher/auth.validation.js';
 /**
  * @desc Admin Login Route
  * @route POST /api/teacher/login 
@@ -18,6 +20,7 @@ import {
 router.post(
   '/api/teacher/login',
   contextMiddleware,
+  teacherLoginValidation,
   teacherLogin
 );
 

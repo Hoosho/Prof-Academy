@@ -11,9 +11,9 @@ import {
 } from '../../controllers/student/auth.controller.js'
 
 // Import Validations
-// import {
-
-// } from '../../validations/student/auth.validation.js';
+import {
+  studentLoginValidation
+} from '../../validations/student/auth.validation.js';
 
 /**
  * @desc Student Login Route
@@ -22,6 +22,7 @@ import {
 router.post(
   '/api/student/login',
   contextMiddleware,
+  studentLoginValidation,
   studentLogin
 );
 
