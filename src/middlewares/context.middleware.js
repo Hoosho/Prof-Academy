@@ -1,35 +1,32 @@
-// middlewares/context.middleware.js
-
-export const contextMiddleware = ( req, res, next ) => {
-  try{
+export const contextMiddleware = (req, res, next) => {
+  try {
     let actor = {
       id: 'SYSTEM',
       type: 'SYSTEM',
       role: null
     };
-  
     // Priority: ADMIN > TEACHER > STUDENT
-    if( req.admin.id && req.admin.role ){
+    if (req.admin && req.admin.id && req.admin.role) {
       actor = {
         id: req.admin.id,
+        role: req.admin.role,
         type: 'ADMIN',
-        role: req.admin.role
       };
-    }else if( req.teacher.id && req.teacher.role ){
+    } else if (req.teacher && req.teacher.id && req.teacher.role) {
       actor = {
-        id: req.teacher,
-        type: 'TEACHER',
-        role: req.teacher.role
+        id: req.teacher.id,
+        role: req.teacher.role,
+        type: 'TEACHER'
       };
-    }else if( req.student.id && req.student.role ){
+    } else if (req.student && req.student.id && req.student.role) {
       actor = {
-        id: req.student,
-        type: 'STUDENT',
-        role: req.student.role
+        id: req.student.id,
+        role: req.student.role,
+        type: 'STUDENT'
       };
     }
 
-    // Attack Unifie Context To Request 
+    // Attach Unified Context To Request
     req.context = {
       actor,
       context: {
@@ -40,8 +37,8 @@ export const contextMiddleware = ( req, res, next ) => {
     };
 
     next();
-  }catch(err){
-    console.log(err);
+  } catch (err) {
+    console.error('Context Middleware Error:', err);
     next(err);
-  };
+  }
 };

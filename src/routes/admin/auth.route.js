@@ -11,7 +11,7 @@ import {
 } from '../../controllers/admin/auth.controller.js'
 
 // Import Validations
-import {
+import {  
   adminLoginValidation, verifyAdminOtpValidation
 } from '../../validations/admin/auth.validation.js';
 
@@ -21,6 +21,7 @@ import {
 */
 router.post(
   '/api/admin/login',
+  contextMiddleware,
   adminLoginValidation,
   adminLogin
 );
@@ -31,6 +32,7 @@ router.post(
 */
 router.get(
   '/api/admin/verify-otp',
+  contextMiddleware,
   getOtpStatus
 );
 
@@ -40,6 +42,7 @@ router.get(
 */
 router.post(
   '/api/admin/verify-otp',
+  contextMiddleware,
   verifyAdminOtpValidation,
   verifyAdminOtp
 );

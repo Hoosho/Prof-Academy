@@ -10,6 +10,8 @@
     */
     export const adminLogin = async ( req, res, next ) => {
       try{
+        console.log( 'test', req.context )
+        
         // Take Data From Req Body 
         const { username, password } = req.body || {}; 
         
@@ -17,7 +19,7 @@
         if( !username || !password ) throw new ErrorResponse( '❌ يجب ادخال جميع البينات المطلوبة!', 404 );
 
         // Call Service
-        await adminLoginService(username, password, req);
+        await adminLoginService( req, username, password );
         
         // Return Success Response
         return res.status(200).json({

@@ -1,5 +1,4 @@
 // /services/admin/auth.service.js
-import bcrypt from 'bcryptjs';
 import Admin from '../../models/Admin.model.js';
 import { generateToken } from '../../utils/generateToken.util.js';
 import { generateOtp } from '../../utils/generateOtp.util.js';
@@ -11,10 +10,13 @@ import { createAuditLog } from '../system/auditLog.service.js';
  * @desc Admin Login Step 1: Validate Credentials & Generate OTP
  * @param { string } username 
  * @param { string } password
+ * @param { object } req
+ * @returns { string } adminName
 */
 export const adminLoginService = async ( req, username, password ) => {
 
   // Check If Admin Found 
+  console.log(await Admin.find());
   const admin =  await Admin.findOne({ username })
     .select('+password +otpCode +otpExpires');
   if( !admin ) throw new ErrorResponse( '❌ اسم المستخدم أو الباسورد غلط', 401 );
@@ -55,7 +57,7 @@ export const adminLoginService = async ( req, username, password ) => {
         id: admin._id
       },
       reason: 'Incorrect password or account locked',
-      context: req.context.context
+      context: req.context?.context || {}
     });
 
     // Save New Updates
@@ -102,9 +104,8 @@ export const adminLoginService = async ( req, username, password ) => {
       id: admin._id
     },
     reason: 'OTP sent to email',
-    context: req.context.context
+    context: req.context?.context || {}
   });
-  
 };
 /**
  * @desc Admin Login Step2: Verify OTP & Issue Token
@@ -197,7 +198,7 @@ export const verifyAdminOtpService = async ( username, otp, req ) => {
     action: 'AUTH.OTP.VERIFIED',
     target: { model: 'Admin', id: admin._id },
     reason: 'OTP verified, token issued',
-    context: req.context.context || {}
+    context: req.context?.context || {}
   });
 
   // Delete Username From Session

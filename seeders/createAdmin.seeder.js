@@ -1,40 +1,47 @@
-// seeders/createAdmin.seeder.js
-import mongoose from "mongoose";
-import Admin from '../src/models/Admin.model.js';
+// middlewares/context.middleware.js
 
-const seedAdmin = async () => {
-  try {
-    await mongoose.connect('mongodb+srv://hooshodev_db_user:LiQAL0P90Uop1ppr@profacademy.ua7qfro.mongodb.net/ProfAcademy', {
-      dbName: 'ProfAcademy'
-    });
-    console.log('🔗 MongoDB connected');
-
-    const exist = await Admin.findOne({
-      $or: [
-        { username: 'ALShewihi' },
-        { email: 'alshwyhym97@gmail.com' }
-      ]
-    });
-
-    if (exist) {
-      console.log('❌ الادمن موجود بالفعل');
-      return;
+export const contextMiddleware = ( req, res, next ) => {
+  try{
+    let actor = {
+      id: 'SYSTEM',
+      type: 'SYSTEM',
+      role: null
+    };
+  
+    // Priority: ADMIN > TEACHER > STUDENT
+    if( req.admin.id && req.admin.role ){
+      actor = {
+        id: req.admin.id,
+        type: 'ADMIN',
+        role: req.admin.role
+      };
+    }else if( req.teacher.id && req.teacher.role ){
+      actor = {
+        id: req.teacher,
+        type: 'TEACHER',
+        role: req.teacher.role
+      };
+    }else if( req.student.id && req.student.role ){
+      actor = {
+        id: req.student,
+        type: 'STUDENT',
+        role: req.student.role
+      };
     }
 
-    await Admin.create({
-      username: 'ALShewihi',
-      email: 'alshwyhym97@gmail.com',
-      password: 'SaMT(jp3tg^FQNnT',
-      status: 'نشط',
-      otpVerified: true
-    });
+    // Attack Unifie Context To Request 
+    req.context = {
+      actor: actor || {},
+      context: {
+        ip: req.ip,
+        userAgent: req.headers['user-agent'] || null,
+        deviceId: req.headers['x-device-id'] || null
+      }
+    };
 
-    console.log('✅ تم إنشاء الادمن بنجاح');
-    await mongoose.disconnect();
-  } catch (err) {
-    console.error("❌ Failed to seed admin:", err.message);
-    await mongoose.disconnect();
-  }
+    next();
+  }catch(err){
+    console.log(err);
+    next(err);
+  };
 };
-
-seedAdmin();
