@@ -9,9 +9,7 @@
      * @access Public
     */
     export const adminLogin = async ( req, res, next ) => {
-      try{
-        console.log( 'test', req.context )
-        
+      try{        
         // Take Data From Req Body 
         const { username, password } = req.body || {}; 
         
@@ -119,6 +117,7 @@
       }catch(err){
         console.log(err);
         next(err);
+
       };
     };
 
