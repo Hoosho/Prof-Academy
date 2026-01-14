@@ -105,8 +105,8 @@
         res.cookie('adminToken', token, {
           httpOnly: true,
           maxAge: 1 * 24 * 60 * 60 * 1000,
-          secure: true,
-          sameSite: 'None'
+          secure: false,
+          sameSite: 'Lax'
         });
         
         // Return Success Response
