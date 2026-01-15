@@ -90,7 +90,7 @@ export const updateTeacher = async ( req, res, next ) => {
     const teacherId = req.params.id || {};
     
     // Validate Required Fields
-    if( !name || !email || !password || !phone || !subject  ){
+    if( !name || !email || !phone || !subject  ){
       throw new ErrorResponse( '❌ يرجي إدخال جميع الحقول المطلوبة كاملةَ!', 400 )
     };
 

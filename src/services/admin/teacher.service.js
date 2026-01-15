@@ -219,7 +219,7 @@
           name, email, phone, subject, status, bio
         }},
         { new: true, session, runValidators: true, context: 'query' }
-      ).lean();
+      );
 
       // Create Audit Log - Teacher Updated Successfully
       await createAuditLog({
@@ -231,8 +231,8 @@
         },
         reason: 'Update Teacher data.',
         context: req?.context?.context || {},
-        before: teacherBeforeUpdate,
-        after: updatedTeacher.toObject()
+        before: teacherBeforeUpdate || {},
+        after: updatedTeacher.toObject() || {}
       });
 
       // Update Password If Exist
