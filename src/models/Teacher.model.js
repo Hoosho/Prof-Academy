@@ -50,6 +50,10 @@ const TeacherSchema = new mongoose.Schema({
     maxlength: [ 500, 'السيرة الذاتية طويلة جدا!' ],
     default: ''
   },
+  monthsCount: {
+    type: Number,
+    default: 0
+  },
 
   // Earnings & History & Stats 
   studentsCount: {
@@ -69,7 +73,7 @@ const TeacherSchema = new mongoose.Schema({
       },
     }
   ],
-  raiting: {
+  rating: {
     type: Number,
     default: 0
   },

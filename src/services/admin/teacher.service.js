@@ -153,7 +153,7 @@
       // Parallel Queries 
       const [ teachers, totalResults ] = await Promise.all([
         Teacher.find(filter)
-          .select( '_id name email phone subject bio studentsCount status' )
+          .select( '_id name email phone subject bio studentsCount rating status montsCoun subject' )
           .sort({ createdAt: -1 })
           .skip( skip )
           .limit( limit ) 
