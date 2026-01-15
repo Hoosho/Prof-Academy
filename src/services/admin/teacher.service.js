@@ -153,7 +153,7 @@
       // Parallel Queries 
       const [ teachers, totalResults ] = await Promise.all([
         Teacher.find(filter)
-          .select( '_id name email phone subject bio studentsCount rating status monthsCount' )
+          .select( '_id name email phone subject bio studentsCount rating status  ' )
           .sort({ createdAt: -1 })
           .skip( skip )
           .limit( limit ) 
@@ -288,7 +288,7 @@
       if( !teacher ) throw new ErrorResponse( '❌ لم يتم العثور علي هذا المعلم!', 404 )
     
       // Keep Teacher Data For Audit Before Soft Delete
-      const teacherBeforeSoftDelete = teacher.toObject();
+      const teacherBeforeSoftDelete = teacher;
 
       // Soft Delete Teacher
       teacher.isDeleted = true;
@@ -305,7 +305,7 @@
         },
         reason: 'Teacher soft deleted successfully.',
         context: req?.context?.context || {},
-        before: teacherBeforeDelete,
+        before: teacherBeforeSoftDelete.toObject(),
         after: teacher.toObject(),
       });
 
