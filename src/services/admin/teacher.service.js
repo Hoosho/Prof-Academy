@@ -159,7 +159,7 @@
           .limit( limit ) 
           .lean(),
 
-          Teacher.countDocuments( filter )
+          Teacher.countDocuments( { isDeleted: false }, filter )
         ]);
 
         // Return Teacher Data Paginated
