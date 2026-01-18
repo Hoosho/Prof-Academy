@@ -24,9 +24,9 @@ import adminTeacherRoutes from './routes/admin/teacher.route.js';
 // TEACHER
 import teacherAuthRoutes from './routes/teacher/auth.route.js';
 import teacherStudentRoutes from './routes/teacher/student.route.js';
+import teacherMonthRoutes from './routes/teacher/month.route.js';
 // STUDENT
 import studentAuthRoutes from './routes/student/auth.route.js';
-
 // Import error handler
 import { errorHandler } from './middlewares/errorHandler.middleware.js';
 
@@ -97,12 +97,14 @@ app.use(express.static(path.join(path.resolve(), 'src/public')));
 // ADMIN
 app.use( '/', adminAuthRoutes );
 app.use( '/', adminOverviewRoutes );
-app.use( '/', adminTeacherRoutes )
+app.use( '/', adminTeacherRoutes );
 // TEACHEER
 app.use( '/', teacherAuthRoutes );
-app.use( '/', teacherStudentRoutes )
+app.use( '/', teacherStudentRoutes );
+app.use( '/', teacherMonthRoutes );
 // STUDENT
 app.use( '/', studentAuthRoutes );
+
 // TEST
 app.get('/api/test', ( req, res ) => {
   return res.status(200).render('test')
