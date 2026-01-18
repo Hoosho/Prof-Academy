@@ -6,7 +6,7 @@ const urlRegex = /^(https?:\/\/)(www\.)?[a-zA-Z0-9\-._~:/?#\[\]@!$&'()*+,;=%]+$/
 
 
 // -------- Month Schema --------
-const MonthSchema = mongoose.Schema({
+const MonthSchema = new mongoose.Schema({
   // Basic Info
   title: {
     type: String,

@@ -56,7 +56,7 @@ export const createMonthService = async ( teacherId, {
         model: 'Month',
         id: newMonth._id
       },
-      reason: 'Month Has Been Created Successfully.',
+      reason: 'Month has been created successfully.',
       context: req.context?.context || {},
       after: newMonth.toObject()
     });
@@ -187,11 +187,11 @@ export const getMonthsService = async ( teacherId, {
  * @param { object } req
  * @param { string } teacherId
  * @param { string } monthId
- * @param { object } {  }
+ * @param { object } { title, description, thumbnail, grade, price, isFree, status }
  * @returns { string } monthTitle
 */
 export const updateMonthService = async ( req, teacherId, monthId, {
-
+  title, description, thumbnail, grade, price, isFree, status 
 }) => {
   // Start Session In DB
   const session = await mongoose.startSession();
@@ -199,14 +199,117 @@ export const updateMonthService = async ( req, teacherId, monthId, {
     // Start Transaction
     await session.startTransaction();
     
+    // Validate Teacher
+    const teacher = await Teacher.findOne({ _id: teacherId, isDeleted: false });
+    if( !teacher ) throw new ErrorResponse( '❌ لم يتم العثور علي بينات المدرس!', 404 );
+
+    // Validate Month 
+    const month = await Month.findOne({ _id: monthId, isDeleted: false });
+    if( !month ) throw new ErrorResponse( '❌ لم يتم العثور علي بينات الشهر!', 404 );
+
+    // Store Original Month Data Before Updating
+    const monthBeforeUpdate = month.toObject();
+
+    // Update Month
+    const updateMonth = await Month.findByIdAndUpdate(
+      monthId,
+      {
+        $set: {
+          title, description, thumbnail, grade, price, isFree, status 
+        }
+      },
+      {
+        new: true, session, runValidators: true, context: 'query'
+      }
+    );
+
+    // Create Audit Log - Month Has Been Updated Successfully
+    await createAuditLog({
+      actor: req.context?.actor || {},
+      action: 'MONTH.UPDAET',
+      target: {
+        model: 'Month',
+        id: newMonth._id
+      },
+      reason: 'Month has been updated successfully.',
+      context: req.context?.context || {},
+      before: monthBeforeUpdate,
+      after: updateMonth.toObject()
+    });
+
     // Commit & End Session
     await session.commitTransaction();
     await session.endSession();
+
+    // Return Month Title
+    return {
+      monthTitle: updateMonth.title
+    };
   }catch( err ){
     // Abort & End Session 
     await session.abortTransaction();
     await session.endSession();
 
     throw err;
-  }
-}
+  };
+};
+
+/**
+ * @dsec Soft Delete Month Service
+ * @param { object } req
+ * @param { string } teacherId
+ * @param { string } monthId
+ * @returns { string } monthTitle
+*/
+export const deleteMonthService = async ( req, teacherId, monthId ) => {
+  // Start Session In DB
+  const session = await mongoose.startSession();
+  try{
+    // Start Transaction
+    await session.startTransaction();
+    
+    // Validate Teacher
+    const teacher = await Teacher.findOne({ _id: teacherId, isDeleted: false });
+    if( !teacher ) throw new ErrorResponse( '❌ لم يتم العثور علي بينات المدرس!', 404 );
+
+    // Validate Month 
+    const month = await Month.findOne({ _id: monthId, isDeleted: false });
+    if( !month ) throw new ErrorResponse( '❌ لم يتم العثور علي بينات الشهر!', 404 );
+
+    // Store Original Month Data Before Delete
+    const monthBeforeSoftDelete = month.toObject();
+
+    // Soft Delete Month
+    month.isDeleted = true;
+    month.deletedAt = Date.now();
+    await month.save({ session });
+
+    // Create Audit Log - Month Soft Deleted Successfully
+    await createAuditLog({
+      actor: req.context?.actor || {},
+      action: 'MONTH.SOFT_DELETE',
+      target: {
+        model: 'Month',
+        id: month._id
+      },
+      reason: 'Month has been soft deleted successfully.',
+      before: monthBeforeSoftDelete,
+      after: month.toObject()
+    });
+    
+    // Commit & End Session
+    await session.commitTransaction();
+    await session.endSession();
+
+    // Return Month Title
+    return {
+      monthTitle: month.title
+    };
+  }catch( err ){
+    // Abort & End Session 
+    await session.abortTransaction();
+    await session.endSession();
+
+    throw err;
+  };
+};
