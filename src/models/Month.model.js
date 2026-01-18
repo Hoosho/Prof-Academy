@@ -15,12 +15,6 @@ const MonthSchema = mongoose.Schema({
     maxlength: [ 100, 'عنوان الشهر طويل جدا!' ],
     trim: true,
   },
-  slug: {
-    type: String,
-    lowercase: true,
-    trim: true,
-    index: true
-  },
   description: {
     type: String,
     maxlength: [ 500, 'وصف الشهر طويل جدا!' ],

@@ -126,7 +126,7 @@ export const getStudentsStatsService = async ( teacherId ) => {
 };
 
 /**
- * @desc Get All Students ( Table ) Service - Raled With Teacher
+ * @desc Get All Students ( Table ) Service - Related With Teacher
  * @param { object } { object, limit, search, status, grade }
  * @param { string } teacherId
  * @returns { object } { students, paginations }
