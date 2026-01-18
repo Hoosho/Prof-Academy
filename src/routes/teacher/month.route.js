@@ -12,8 +12,9 @@ import {
 } from '../../controllers/teacher/month.controller.js'
 
 // Import Validations
-// import {
-// } from '../../validations/teacher/month.validation.js';
+import {
+  createMonthValidation, getMonthsQueryValidation, monthIdValidation, updateMonthValidation
+} from '../../validations/teacher/month.validation.js';
 /**
  * @desc Create Month
  * @route POST /api/teacher/month 
@@ -22,7 +23,7 @@ router.post(
   '/api/teacher/month',
   authTeacher,
   contextMiddleware,
-  ,
+  createMonthValidation,
   createMonth
 );
 
@@ -34,7 +35,7 @@ router.get(
   '/api/teacher/months',
   authTeacher,
   contextMiddleware,
-  getStudentsQueryValidation,
+  getMonthsQueryValidation,
   getAllMonth
 );
 
@@ -46,8 +47,8 @@ router.put(
   '/api/teacher/month/:id',
   authTeacher,
   contextMiddleware,
-  ,
-  ,
+  monthIdValidation,
+  updateMonthValidation,
   updateMonth
 );
 
@@ -59,7 +60,7 @@ router.delete(
   '/api/teacher/month/:id',
   authTeacher,
   contextMiddleware,
-  ,
+  monthIdValidation,
   deleteMonth
 );
 
