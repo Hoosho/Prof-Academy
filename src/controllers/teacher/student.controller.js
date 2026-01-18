@@ -65,7 +65,6 @@ export const getAllStudents = async ( req, res, next ) => {
       teacherId, { page, limit, search, status, grade }
     );
 
-
     // Return Success Response
     return res.status(200).json({
       success: true,

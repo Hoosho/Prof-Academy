@@ -1,6 +1,7 @@
 // /src/services/teacher/student.service.js
 import mongoose from 'mongoose';
 import Student from '../../models/Student.model.js';
+import { generateStudentCode } from '../../utils/generateCode.util.js';
 import { createAuditLog } from '../../services/system/auditLog.service.js';
 import { ErrorResponse } from '../../utils/errorResponse.util.js';
 
@@ -22,49 +23,51 @@ export const createStudentService = async ( req, teacherId,
     // Start DB Transaction
     session.startTransaction();
 
-  // Check IF Phone Or Email Exist
-  const existingStudent = await Student.findOne({
-    $or: [
-      { email }, { phone }
-    ]
-  }).session( session );
-if (existingStudent) {
-  if (
-    existingStudent.isDeleted === false &&
-    teacherId.toString() === existingStudent.assignedTeacher.toString()
-  ){
-    throw new ErrorResponse('❌ هذا الطالب مسجل بالفعل من قبل!', 400);
-  };
-};
+    // Check IF Phone Or Email Exist
+    const existingStudent = await Student.findOne({
+      $or: [
+        { email }, { phone }
+      ]
+    }).session( session );
+    if (existingStudent) {
+      if (
+        existingStudent.isDeleted === false &&
+        teacherId.toString() === existingStudent.assignedTeacher.toString()
+      ){
+        throw new ErrorResponse('❌ هذا الطالب مسجل بالفعل من قبل!', 400);
+      };
+    };
 
+    // Generate Prof Code
+    const code = await generateStudentCode();
 
-  // Create Student Document
-  const [ newStudent ] = await Student.create(
-    [{
-      name, email, phone, guardianPhone, grade, cash, assignedTeacher: teacherId
-    }], { session }
-  );
+    // Create Student Document
+    const [ newStudent ] = await Student.create(
+      [{
+        code, name, email, phone, guardianPhone, grade, cash, assignedTeacher: teacherId
+      }], { session }
+    );
 
-  // Create Audit Log - Student Created Successfully
-  await createAuditLog({
-    actor: req.context?.actor || {},
-    action: 'STUDENT.CREATE',
-    target: {
-      model: 'Student',
-      id: newStudent._id
-    },
-    reason: 'Student Created Successfully',
-    context: req.context?.context || {},
-    after: newStudent.toObject()
-  });
+    // Create Audit Log - Student Created Successfully
+    await createAuditLog({
+      actor: req.context?.actor || {},
+      action: 'STUDENT.CREATE',
+      target: {
+        model: 'Student',
+        id: newStudent._id
+      },
+      reason: 'Student Created Successfully',
+      context: req.context?.context || {},
+      after: newStudent.toObject()
+    });
 
-  // Commit Transaction & End Session
-  await session.commitTransaction();
-  session.endSession();
+    // Commit Transaction & End Session
+    await session.commitTransaction();
+    session.endSession();
 
-  return {
-    studentName: newStudent.name
-  };
+    return {
+      studentName: newStudent.name
+    };
   }catch(err){
     // Abort Transaction & End Session
     await session.abortTransaction();
