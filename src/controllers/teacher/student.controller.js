@@ -22,7 +22,7 @@ export const createStudent = async ( req, res, next ) => {
     };
 
     // Take Teacher Id From Cookie
-    const teacherId = req.teacher.id
+    const teacherId = req.teacher.id;
 
     // Call Create Student Service
     const { studentName } = await createStudentService( req, teacherId, {
