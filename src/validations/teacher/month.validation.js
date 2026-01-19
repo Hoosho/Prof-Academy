@@ -108,6 +108,13 @@ export const updateMonthValidation = celebrate({
         "any.only": "❌ المرحلة الدراسية غير صحيحة",
       }),
 
+      status: Joi.string()
+        .valid("نشط", "محظور")
+        .optional()
+        .messages({
+          "any.only": "❌ حالة الطالب غير صحيحة",
+        }),
+
     thumbnail: Joi.string()
       .trim()
       .uri()
