@@ -71,9 +71,9 @@ const AttackmentSchema = new mongoose.Schema({
 });
 
 // -------- INDEXES --------
-AttachmentSchema.index({ lecture: 1, isDeleted: 1 });
-AttachmentSchema.index({ teacher: 1 });
-AttachmentSchema.index({ status: 1, createdAt: -1 });
+AttackmentSchema.index({ lecture: 1, isDeleted: 1 });
+AttackmentSchema.index({ teacher: 1 });
+AttackmentSchema.index({ status: 1, createdAt: -1 });
 
 // -------- EXPORT --------
 export default mongoose.model( 'Attachment', AttackmentSchema );

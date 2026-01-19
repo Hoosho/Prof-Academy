@@ -12,7 +12,7 @@ import mongoose from 'mongoose';
  * @param { object } { title, description, grade, thumbnail, isFree, price }
  * @returns { string } monthName
 */
-export const createMonthService = async ( teacherId, {
+export const createMonthService = async ( req, teacherId, {
   title, description, grade, thumbnail, isFree, price
 }) => {
   // Start Session In DB
@@ -130,7 +130,7 @@ export const getMonthsService = async ( teacherId, {
 })  => {
   try{
     // Sanatize Pagination
-    page = Math.max( Number( page ), 0 );
+    page = Math.max( Number( page ), 1 );
     limit = Math.min( Math.max( Number( limit ), 1 ), 50 );
     const skip = ( page - 1 ) * limit;
 
@@ -142,8 +142,8 @@ export const getMonthsService = async ( teacherId, {
 
     // Search 
     if( search.trim() ){
-      filter.$or [
-        { title: { $regex: search.trim, $option: 'i' } }
+      filter.$or = [
+        { title: { $regex: search.trim(), $options: 'i' } }
       ];
     };
 
@@ -151,7 +151,7 @@ export const getMonthsService = async ( teacherId, {
     if( status && status !== 'all' ){
       filter.status = status;
     };
-    if( status && status !== 'all'){
+    if( grade && grade !== 'all'){
       filter.grade = grade;
     };
 
