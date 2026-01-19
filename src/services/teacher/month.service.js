@@ -229,7 +229,7 @@ export const updateMonthService = async ( req, teacherId, monthId, {
       action: 'MONTH.UPDAET',
       target: {
         model: 'Month',
-        id: newMonth._id
+        id: updateMonth._id
       },
       reason: 'Month has been updated successfully.',
       context: req.context?.context || {},

@@ -101,7 +101,7 @@ export const updateMonth = async ( req, res, next ) => {
     const teacherId = req.teacher.id;
 
     // Take Month Id From Param
-    const monthId = req.param.id;
+    const monthId = req.params.id;
     if( !monthId ){
       throw new ErrorResponse( '❌ لم يتم العثور علي الطالب!', 400 );
     };
@@ -133,7 +133,7 @@ export const deleteMonth = async ( req, res, next ) => {
     const teacherId = req.teacher.id;
     
     // Take Month Id From Param
-    const monthId = req.param.id;
+    const monthId = req.params.id;
     if( !monthId ){
       throw new ErrorResponse( '❌ لم يتم العثور علي الطالب!', 400 );
     };
