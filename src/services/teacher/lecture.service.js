@@ -33,6 +33,7 @@ export const createLectureService = async ( req, teacherId, monthId, {
 
     // Normalize Lecture Data
     const lecturePayload = {
+      videoId: videoData.videoId,
       title: title || videoData?.title,
       description: description || videoData?.description,
       thumbnail: thumbnail || videoData?.thumbnail,
@@ -85,6 +86,7 @@ export const createLectureService = async ( req, teacherId, monthId, {
     // Aboart Transaction & End Session
     await session.abortTransaction();
     await session.endSession();
+
     throw err;
   };
 };

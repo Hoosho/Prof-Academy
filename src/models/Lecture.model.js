@@ -37,9 +37,9 @@ const LectureSchema = new mongoose.Schema({
   },
 
   // Video Info
-  videoUrl: {
+  videoId: {
     type: String,
-    required: [ true, 'رابط الفيديو مطلوب!' ],
+    required: [ true, 'معرف  الفيديو مطلوب!' ],
     trim: true
   },
   durationMinutes: {
@@ -47,6 +47,15 @@ const LectureSchema = new mongoose.Schema({
     required: [ true, 'مدة المحاضرة طويلة!' ],
     min: [ 1, 'مدة المحاضرة غير صحيحة!' ]
   },
+
+  // Attachments
+  attachments: [
+    {
+      type: mongoose.Schema.Types.ObjectId,
+      ref: Attachment
+    }
+  ],
+  
 
   // Stats
   stats: {
