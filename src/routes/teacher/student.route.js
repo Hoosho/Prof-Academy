@@ -32,7 +32,7 @@ router.post(
  * @route GET /api/teacher/students
 */
 router.get(
-  '/api/teacher/student',
+  '/api/teacher/students',
   authTeacher,
   contextMiddleware,
   getStudentsQueryValidation,

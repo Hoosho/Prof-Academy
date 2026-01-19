@@ -12,13 +12,13 @@ const LectureSchema = new mongoose.Schema({
     type: String,
     required: [ true, 'عنوان الحصة مطلوب1' ],
     minlength: [ 3, 'عنوان الحصة قصير جدا!' ],
-    minlength: [ 150, 'عنوان الحصة طويل جدا!' ],
+    maxlength: [ 150, 'عنوان الحصة طويل جدا!' ],
     trim: true
   },
   description: {
     type: String,
     required: [ true, 'وصف الحصة مطلوب!' ],
-    minlength: [ 150, 'وصف الحصة طويل جدا!' ],
+    maxlength: [ 150, 'وصف الحصة طويل جدا!' ],
     trim: true,
     default: ''
   },
@@ -67,5 +67,47 @@ const LectureSchema = new mongoose.Schema({
     }
   },
 
-  // Status: 
-})
+  // Status
+  status: {
+    type: String,
+    enum: [ 'نشط', 'غير نشط', 'مخفي' ],
+    default: 'نشط'
+  },
+  publishAt: {
+    type: Date,
+    default: null
+  },
+
+  // Relations
+  teacher: {
+    type: mongoose.Schema.Types.ObjectId,
+    ref: 'Teacher',
+    required: true
+  },
+  month: {
+    type: mongoose.Schema.Types.ObjectId,
+    ref: 'Month',
+    required: true
+  },
+
+  // Soft Delete
+  isDeleted: {
+    type: Boolean,
+    default: false
+  },
+  deleteAt: {
+    type: Date,
+    default: null
+  },
+}, {
+  timestamps: true
+});
+
+// -------- INDEXES --------
+LectureSchema.index({ teacher: 1, month: 1, isDeleted: 1 });
+LectureSchema.index({ month: 1, status: 1 });
+LectureSchema.index({ status: 1, publishAt: -1 });
+LectureSchema.index({ createdAt: -1 });
+
+// -------- EXPORT --------
+export default mongoose.model( 'Lecture', LectureSchema );

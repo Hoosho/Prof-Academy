@@ -38,8 +38,8 @@ export const authAdmin = ( req, res, next ) => {
 export const authTeacher = async ( req, res, next ) => {
   let token;
   try{
-    if( req.cookies && req.cookies.token ) {
-      token = req.cookies.token;
+    if( req.cookies && req.cookies.teacherToken ) {
+      token = req.cookies.teacherToken;
     };
     if( !token ) throw new ErrorResponse('❌ انت مش مسجل دخول يا استاذ!', 401 );
 
@@ -50,9 +50,10 @@ export const authTeacher = async ( req, res, next ) => {
     const teacher = await Teacher.findById( decoded.id );
     if( !teacher ) throw new ErrorResponse('❌ الاستاذ ده مش موجود!', 401 );
 
-    req.teacher.id = decoded.id;
-    req.teacher.role = decoded.role;
-
+    req.teacher = {
+      id : decoded.id,
+      role : decoded.role,
+    };
     next();
   }catch(err){
     console.log(err);
@@ -79,10 +80,10 @@ export const authStudent =  async ( req, res, next ) => {
     const student = await Student.findById( decoded.id );
     if( !student ) throw new ErrorResponse('❌ الطالب ده مش موجود!', 401 );
 
-    req.student.id = decoded.id;
-    req.student.role = decoded.role;
-    req.student.assignedTeacher = decoded.assignedTeacher;
-
+    req.student = {
+      id : decoded.id,
+      role : decoded.role,
+    };
     next();
   }catch(err){
     console.log(err);
