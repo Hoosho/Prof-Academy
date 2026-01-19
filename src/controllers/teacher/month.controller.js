@@ -66,13 +66,13 @@ export const getAllMonth = async ( req, res, next ) => {
     );
     
     // Return Success Response
-    return res.status(201).json({
+    return res.status(200).json({
       success: true,
       data: {
         stats,
         months,
         pagination,
-      }
+      }       
     });
   }catch( err ){
     console.log(err );
@@ -112,7 +112,7 @@ export const updateMonth = async ( req, res, next ) => {
     });
     
     // Return Success Response
-    return res.status(201).json({
+    return res.status(200).json({
       success: true,
       msg: `✅ تم تحديث الشهر ${ monthTitle }, بنجاح.`
     });
@@ -142,7 +142,7 @@ export const deleteMonth = async ( req, res, next ) => {
     const { monthTitle } = await deleteMonthService( req, teacherId, monthId );
     
     // Return Success Response
-    return res.status(201).json({
+    return res.status(200).json({
       success: true,
       msg: `✅ تم حذف الشهر ${ monthTitle }, بنجاح.`
     });
