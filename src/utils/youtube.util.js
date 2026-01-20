@@ -1,7 +1,7 @@
 // /src/utils/youtube.util.js
 import axios from 'axios';
 
-const getYoutubeVideoId = ( url ) => {
+export const getYoutubeVideoId = ( url ) => {
   try{
         // Get Video Id From Link
     const urlObj = new URL( url );

@@ -37,6 +37,8 @@ const AuditLogSchema = new mongoose.Schema({
       "MONTH.UPDAET",
       "MONTH.SOFT_DELETE",
       
+      // Lecture
+      "LECTURE.CREATE",
       // STUDENT
       "STUDENT.CREATE",
       "STUDENT.UPDATE",

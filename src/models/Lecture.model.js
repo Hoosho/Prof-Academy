@@ -18,7 +18,7 @@ const LectureSchema = new mongoose.Schema({
   description: {
     type: String,
     required: [ true, 'وصف الحصة مطلوب!' ],
-    maxlength: [ 150, 'وصف الحصة طويل جدا!' ],
+    maxlength: [ 800, 'وصف الحصة طويل جدا!' ],
     trim: true,
     default: ''
   },

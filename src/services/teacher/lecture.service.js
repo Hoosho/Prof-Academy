@@ -7,18 +7,18 @@ import Exam from '../../models/Exam.model.js'
 import mongoose from 'mongoose';
 import { ErrorResponse } from '../../utils/errorResponse.util.js';
 import { createAuditLog } from '../../services/system/auditLog.service.js';
-import { getYoutubeVideoInfo } from '../../utils/youtube.util.js';
+import { getYoutubeVideoId, getYoutubeVideoInfo } from '../../utils/youtube.util.js';
 
 /**
  * @desc Create New Lecture Service
  * @param { object } req
  * @param { string } teacherId
  * @param { string } monthId
- * @param { object } { title, description, thumbnail, videoUrl, durationMinutes }
+ * @param { object } { title, description, thumbnail, videoUrl, durationMinutes, attachmentCodes, examCode }
  * @returns { object } lectureTitle
 */
 export const createLectureService = async ( req, teacherId, monthId, {
-  title, description, thumbnail, grade, videoUrl, durationMinutes, attachmentCodes, examCode
+  title, description, thumbnail, videoUrl, durationMinutes, attachmentCodes, examCode
 }) => {
   // Start Session In DB
   const session = await mongoose.startSession();
@@ -32,9 +32,24 @@ export const createLectureService = async ( req, teacherId, monthId, {
     
     // Get Video Url Info ( If Need )
     let videoData = null;
-    if( !title || !description || !thumbnail || !durationMinutes ){
-      videoData = await getYoutubeVideoInfo( videoUrl );
+    let videoId = null;
+    if( videoUrl ){
+      // Get Video Id
+      videoId = getYoutubeVideoId(videoUrl);
+      if (!videoId) throw new ErrorResponse('❌ رابط YouTube غير صالح!', 400);
+      
+      // If Enter Fields Manuall
+      if( !title || !description || !thumbnail || !durationMinutes ){
+          videoData = await getYoutubeVideoInfo( videoUrl );
+          if (!videoData) throw new ErrorResponse('❌ لم يتم جلب بيانات الفيديو من YouTube!', 400);
+      };
     };
+
+    // Check Lectuer Added In This Month Before Or no
+    const existingLecture = await Lecture.findOne({
+      isDeleted: false, teacher: teacherId, month: monthId, videoId
+    });
+    if( existingLecture ) throw new ErrorResponse( '❌ تمت إضافة هذه الحصة في هذا الشهر من قبل!', 400 );
 
     // Attachments & Exam
     // Prepare Relations
@@ -70,12 +85,6 @@ export const createLectureService = async ( req, teacherId, monthId, {
 
       examId = exam._id;
     };
-
-    // Validate VideoId
-    const videoId = videoData?.videoId || null;
-    if( !videoId ) throw new ErrorResponse( '❌ لم يتم جلب معرف الفيديو من YouTube!', 400 );
-
-    
     // Normalize Lecture Data
     const lecturePayload = {
       videoId,
@@ -216,7 +225,7 @@ export const getLecturesService = async ( teacherId, monthId, {
     
     // Sanitize Pagination
     page = Math.max( Number( page ), 1 );
-    limit = Math.min ( Math.max( Number( limit ), 50) );
+    limit = Math.min( Math.max( Number( limit ), 1 ), 50 );
     const skip = ( page - 1 ) * limit;
 
     // Build Filter
@@ -242,7 +251,7 @@ export const getLecturesService = async ( teacherId, monthId, {
     // Parallel Queries
     const [ lectures, totalResults ] = await Promise.all([
       Lecture.find( filter )
-        .select(' _id title description durationMinutes attachments status createdAt updatedAt stats.viewsCount stats.rating stats.ratingsCount ')
+        .select(' _id videoId title description durationMinutes attachments status createdAt updatedAt stats.viewsCount stats.rating stats.ratingsCount ')
         .sort({ createdAt: -1 })
         .skip( skip )
         .limit( limit )
@@ -254,6 +263,7 @@ export const getLecturesService = async ( teacherId, monthId, {
     // Normalize Lectures Obj 
     const normalizedLectures = lectures.map( l => ({
       id: l._id.toString(),
+      videoId: l.videoId,
       title: l.title,
       description: l.description,
       durationMinutes: l.durationMinutes,
@@ -279,7 +289,7 @@ export const getLecturesService = async ( teacherId, monthId, {
         page,
         limit,
         totalResults,
-        totalPages: Math.ceil( totalResults / limit )
+        totalPages: Math.ceil( totalResults / limit ) 
       }
     };
   }catch( err ){

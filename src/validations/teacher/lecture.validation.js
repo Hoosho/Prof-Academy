@@ -20,7 +20,7 @@ export const createLectureValidation = celebrate({
 
     description: Joi.string()
       .trim()
-      .max(500)
+      .max(800)
       .optional()
       .messages({
         'string.max': '❌ وصف الحصة طويل جدا',
