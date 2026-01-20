@@ -1,12 +1,19 @@
-// /src/models/Attackment.model.js
+// /src/models/Attachment.model.js
 import mongoose from 'mongoose';
 
 // -------- Helpers --------
 const urlRegex = /^(https?:\/\/)(www\.)?[a-zA-Z0-9\-._~:/?#\[\]@!$&'()*+,;=%]+$/;
 
 // -------- Attachment Schema --------
-const AttackmentSchema = new mongoose.Schema({
+const AttachmentSchema = new mongoose.Schema({
   // Basic Info
+  code: {
+    type: String,
+    required: [ true, 'كود الملف مطلوب!'],
+    minlength: [0, "كود الملف لا يمكن أن يقل عن 0!"],
+    unique: [ true, 'كود الملف موجود بالفعل!'],
+    trim: true
+  },
   title: {
     type: String,
     required: [ true, 'عنوان الملف مطلوب!' ],
@@ -71,9 +78,10 @@ const AttackmentSchema = new mongoose.Schema({
 });
 
 // -------- INDEXES --------
-AttackmentSchema.index({ lecture: 1, isDeleted: 1 });
-AttackmentSchema.index({ teacher: 1 });
-AttackmentSchema.index({ status: 1, createdAt: -1 });
+AttachmentSchema.index({ code: 1 });
+AttachmentSchema.index({ lecture: 1, isDeleted: 1 });
+AttachmentSchema.index({ teacher: 1 });
+AttachmentSchema.index({ status: 1, createdAt: -1 });
 
 // -------- EXPORT --------
-export default mongoose.model( 'Attachment', AttackmentSchema );
+export default mongoose.model( 'Attachment', AttachmentSchema );

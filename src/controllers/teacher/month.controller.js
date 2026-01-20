@@ -17,9 +17,9 @@ export const createMonth = async ( req, res, next ) => {
     } = req.body || {};
 
     // Validate Required Fields
-    if( !title || !description || !grade || !price ){
-      throw new ErrorResponse( '❌ يجب إدخال جميع البينات!', 400 );
-    };
+    // if( !title || !description || !grade || !price ){
+    //   throw new ErrorResponse( '❌ يجب إدخال جميع البينات!', 400 );
+    // };
 
     // Take Teacher Id From Cookies
     const teacherId = req.teacher.id;

@@ -48,14 +48,17 @@ const LectureSchema = new mongoose.Schema({
     min: [ 1, 'مدة المحاضرة غير صحيحة!' ]
   },
 
-  // Attachments
+  // Attachments & Exam
   attachments: [
     {
       type: mongoose.Schema.Types.ObjectId,
-      ref: Attachment
+      ref: 'Attachment'
     }
   ],
-  
+  exam: {
+      type: mongoose.Schema.Types.ObjectId,
+      ref: 'Exam'
+    },
 
   // Stats
   stats: {

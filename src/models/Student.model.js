@@ -70,7 +70,10 @@ const StudentSchema = new mongoose.Schema(
 
     code: {
       type: String,
+      required: [ true, 'كود الطالب مطلوب!'],
       minlength: [0, "الكود لا يمكن أن يقل عن 0!"],
+      unique: [ true, 'كود الطالب موجود بالفعل!'],
+      trim: true
     },
 
     deviceId: {
