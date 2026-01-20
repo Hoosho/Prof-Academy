@@ -3,6 +3,7 @@ import Teacher from '../../models/Teacher.model.js';
 import Month from '../../models/Month.model.js';
 import Lecture from '../../models/Lecture.model.js';
 import Attachment from '../../models/Attachment.model.js';
+import Exam from '../../models/Exam.model.js'
 import mongoose from 'mongoose';
 import { ErrorResponse } from '../../utils/errorResponse.util.js';
 import { createAuditLog } from '../../services/system/auditLog.service.js';

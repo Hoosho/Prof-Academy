@@ -103,7 +103,7 @@ app.use( '/', adminTeacherRoutes );
 app.use( '/', teacherAuthRoutes );
 app.use( '/', teacherStudentRoutes );
 app.use( '/', teacherMonthRoutes );
-app.use( '/', teacherLectureRoutesadd . );
+app.use( '/', teacherLectureRoutes );
 // STUDENT
 app.use( '/', studentAuthRoutes );
 
