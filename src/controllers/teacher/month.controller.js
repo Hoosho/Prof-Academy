@@ -47,7 +47,7 @@ export const createMonth = async ( req, res, next ) => {
 */
 export const getAllMonth = async ( req, res, next ) => {
   try{
-    // Take Fields From Req Body
+    // Take Queries From Req Query 
     const {
       page, limit, search, status, grade
     } = req.query || {};

@@ -3,7 +3,6 @@ import Teacher from '../../models/Teacher.model.js';
 import Month from '../../models/Month.model.js';
 import Lecture from '../../models/Lecture.model.js';
 import Attachment from '../../models/Attachment.model.js';
-import Student from '../../models/Student.model.js';
 import mongoose from 'mongoose';
 import { ErrorResponse } from '../../utils/errorResponse.util.js';
 import { createAuditLog } from '../../services/system/auditLog.service.js';
@@ -148,6 +147,11 @@ export const createLectureService = async ( req, teacherId, monthId, {
 */
 export const getLectureStatsService = async ( teacherId, monthId ) => {
   try{
+    // Validate Month And Fetch Id & Title & Grade
+    const month = await Month.findById( monthId ).select(' _id ');
+    if( !month ) throw new ErrorResponse( '❌ معرف الشهر غير صالح!', 400 );
+    
+
     // Total Lectures
     const totalLectures = await Lecture.countDocuments({
       month: monthId,
@@ -196,7 +200,7 @@ export const getLectureStatsService = async ( teacherId, monthId ) => {
  * @param { string } teacherId
  * @param { string } monthId
  * @param { object } { page, limit, search, status }
- * @returns { object } { lectures, paginations }
+ * @returns { object } { month, lectures, paginations }
 */
 export const getLecturesService = async ( teacherId, monthId, {
   page = 1,
@@ -205,6 +209,10 @@ export const getLecturesService = async ( teacherId, monthId, {
   status = 'all'
 }) => {
   try{
+    // Validate Month And Fetch Id & Title & Grade
+    const month = await Month.findById( monthId ).select(' _id title grade ');
+    if( !month ) throw new ErrorResponse( '❌ معرف الشهر غير صالح!', 400 );
+    
     // Sanitize Pagination
     page = Math.max( Number( page ), 1 );
     limit = Math.min ( Math.max( Number( limit ), 50) );
@@ -261,6 +269,10 @@ export const getLecturesService = async ( teacherId, monthId, {
 
     // Return Paginated Data
     return {
+      month: {
+        title: month.title,
+        grade: month.grade
+      },
       lectures: normalizedLectures,
       pagination: {
         page,
