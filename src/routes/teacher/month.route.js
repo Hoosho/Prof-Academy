@@ -1,4 +1,4 @@
-// /src/routes/teacher/student.route.js
+// /src/routes/teacher/month.route.js
 import express from "express";
 const router = express.Router();
 

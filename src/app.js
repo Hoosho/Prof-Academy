@@ -25,6 +25,7 @@ import adminTeacherRoutes from './routes/admin/teacher.route.js';
 import teacherAuthRoutes from './routes/teacher/auth.route.js';
 import teacherStudentRoutes from './routes/teacher/student.route.js';
 import teacherMonthRoutes from './routes/teacher/month.route.js';
+import teacherLectureRoutes from './routes/teacher/lecture.route.js';
 // STUDENT
 import studentAuthRoutes from './routes/student/auth.route.js';
 // Import error handler
@@ -102,6 +103,7 @@ app.use( '/', adminTeacherRoutes );
 app.use( '/', teacherAuthRoutes );
 app.use( '/', teacherStudentRoutes );
 app.use( '/', teacherMonthRoutes );
+app.use( '/', teacherLectureRoutesadd . );
 // STUDENT
 app.use( '/', studentAuthRoutes );
 
