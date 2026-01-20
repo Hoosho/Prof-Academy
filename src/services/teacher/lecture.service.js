@@ -27,7 +27,7 @@ export const createLectureService = async ( req, teacherId, monthId, {
     session.startTransaction();
 
     // Validate Month And Fetch Id & Title & Grade
-    const month = await Month.findById( monthId ).select(' _id title grade');
+    const month = await Month.findById( monthId ).select(' _id title grade').session( session );
     if( !month ) throw new ErrorResponse( '❌ معرف الشهر غير صالح!', 400 );
     
     // Get Video Url Info ( If Need )
@@ -148,11 +148,127 @@ export const createLectureService = async ( req, teacherId, monthId, {
 */
 export const getLectureStatsService = async ( teacherId, monthId ) => {
   try{
-    // Total Lecture
+    // Total Lectures
+    const totalLectures = await Lecture.countDocuments({
+      month: monthId,
+      isDeleted: false,
+      teacher: teacherId
+    });
+    // Fetch Lectues ( Total Views & Total Ratings & Total Attachments )
+    const lectures = await Lecture.find({
+      teacher: teacherId,
+      month: monthId,
+      isDeleted: false
+    }).select(' stats.viewsCount stats.rating stats.ratingsCount attachments').lean();
 
-    // Total Views
+    let totalViews = 0;
+    let totalRatings = 0;
+    let totalRatingsCount = 0;
+    let totalAttachments = 0;
 
-    // Total 
+    lectures.forEach( l => {
+      totalViews += l.stats.viewsCount || 0;
+      totalRatings += ( l.stats.rating || 0 ) * ( l.stats.ratingsCount );
+      totalRatingsCount += l.stats.ratingsCount || 0;
+      totalAttachments += ( l.attachments?.length || 0 );
+    });
+    const averageRatings = totalRatingsCount > 0 ?
+    Number( ( totalRatings / totalRatingsCount ).toFixed( 1 ) )
+    : 0;
+
+    // Return Stats Obj
+    return {
+      stats: {
+        totalLectures,
+        totalViews,
+        averageRatings,
+        totalAttachments
+      }
+    };
+    // Total Attachment
+  }catch( err ){
+    throw err;
+  };
+};
+
+/**
+ * @desc Get Lectures Service - Related To Month
+ * @param { string } teacherId
+ * @param { string } monthId
+ * @param { object } { page, limit, search, status }
+ * @returns { object } { lectures, paginations }
+*/
+export const getLecturesService = async ( teacherId, monthId, {
+  page = 1,
+  limit = 10,
+  search = '',
+  status = 'all'
+}) => {
+  try{
+    // Sanitize Pagination
+    page = Math.max( Number( page ), 1 );
+    limit = Math.min ( Math.max( Number( limit ), 50) );
+    const skip = ( page - 1 ) * limit;
+
+    // Build Filter
+    const filter = {
+      isDeleted: false,
+      teacher: teacherId,
+      month: monthId
+    };
+
+    // Search
+    if( search.trim() ){
+      filter.$or = [
+        { title: { $regex: search.trim(), $options: 'i' } },
+        { description: { $regex: search.trim(), $options: 'i' } }
+      ]
+    };
+
+    // Stats
+    if( status && status !== 'all'){
+      filter.status = status;
+    };
+
+    // Parallel Queries
+    const [ lectures, totalResults ] = await Promise.all([
+      Lecture.find( filter )
+        .select(' _id title description durationMinutes attachments status createdAt updatedAt stats.viewsCount stats.rating stats.ratingsCount ')
+        .sort({ createdAt: -1 })
+        .skip( skip )
+        .limit( limit )
+        .lean(),
+
+        Lecture.countDocuments( filter )
+    ]);
+
+    // Normalize Lectures Obj 
+    const normalizedLectures = lectures.map( l => ({
+      id: l._id.toString(),
+      title: l.title,
+      description: l.description,
+      durationMinutes: l.durationMinutes,
+      status: l.status,
+      createdAt: l.createdAt,
+      updatedAt: l.updatedAt,
+
+      viewsCount: l.stats?.viewsCount || 0,
+      rating: l.stats?.rating || 0,
+      ratingsCount: l.stats?.ratingsCount || 0,
+
+    attachmentsCount: l.attachments?.length || 0
+    }));
+
+    // Return Paginated Data
+    return {
+      lectures: normalizedLectures,
+      pagination: {
+        page,
+        limit,
+        totalResults,
+        totalPages: Math.ceil( totalResults / limit )
+      }
+    };
   }catch( err ){
     throw err;
   };

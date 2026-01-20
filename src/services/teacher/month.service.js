@@ -143,7 +143,8 @@ export const getMonthsService = async ( teacherId, {
     // Search 
     if( search.trim() ){
       filter.$or = [
-        { title: { $regex: search.trim(), $options: 'i' } }
+        { title: { $regex: search.trim(), $options: 'i' } },
+        { description: { $regex: search.trim(), $options: 'i' } }
       ];
     };
 
