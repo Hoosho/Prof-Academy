@@ -6,7 +6,7 @@ import { ErrorResponse } from '../../utils/errorResponse.util.js';
 
 /**
  * @desc Create New Lecture
- * @route POST /api/teacher/:id/lecture
+ * @route POST /api/teacher/:monthId/lecture
  * @access Private ( only Teacher )
 */
 export const createLecture = async ( req, res, next ) =>{
@@ -20,7 +20,7 @@ export const createLecture = async ( req, res, next ) =>{
     const teacherId = req.teacher.id;
 
     // Take Month Id From Params
-    const monthId = req.params.id;
+    const monthId = req.params.monthId;
   
     // Call Create Lecture Service
     const { monthTitle, lectureTitle } = await createLectureService( req, teacherId, monthId, {
@@ -40,7 +40,7 @@ export const createLecture = async ( req, res, next ) =>{
 
 /**
  * @desc Get All Lectures
- * @route GET /api/teacher/:id/lectures
+ * @route GET /api/teacher/:monthId/lectures
  * @access Private ( only Teacher )
 */
 export const getAllLectures = async ( req, res, next ) => {
@@ -54,7 +54,7 @@ export const getAllLectures = async ( req, res, next ) => {
     const teacherId = req.teacher.id;
 
     // Take Month Id From Params
-    const monthId = req.params.id;
+    const monthId = req.params.monthId;
     if( !monthId ) throw new ErrorResponse( '❌ معرف الشهر غير موجود!', 400 );
 
     // Call Lectues Stats Service
