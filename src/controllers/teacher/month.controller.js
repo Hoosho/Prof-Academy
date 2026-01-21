@@ -89,7 +89,7 @@ export const updateMonth = async ( req, res, next ) => {
   try{
     // Take Fields From Req Body
     const {
-      title, description, grade, thumbnail, isFree, price
+      title, description, grade, status, thumbnail, isFree, price
     } = req.body || {};
 
     // Validate Required Fields
@@ -108,7 +108,7 @@ export const updateMonth = async ( req, res, next ) => {
 
     // Call Update Month Service
     const { monthTitle } = await updateMonthService( req, teacherId, monthId, {
-      title, description, grade, thumbnail, isFree, price
+      title, description, grade, status, thumbnail, isFree, price
     });
     
     // Return Success Response

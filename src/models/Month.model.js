@@ -78,7 +78,7 @@ const MonthSchema = new mongoose.Schema({
   // Status & Visibility
   status: {
     type: String,
-    enum: [ 'active', 'hidden', 'in' ],
+    enum: [ 'active', 'hidden', 'inactive' ],
     default: 'active'
   },
   publishAt: {
