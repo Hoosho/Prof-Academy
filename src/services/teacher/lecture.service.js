@@ -251,7 +251,7 @@ export const getLecturesService = async ( teacherId, monthId, {
     // Parallel Queries
     const [ lectures, totalResults ] = await Promise.all([
       Lecture.find( filter )
-        .select(' _id videoId title description durationMinutes attachments status createdAt updatedAt stats.viewsCount stats.rating stats.ratingsCount ')
+        .select(' _id videoId title description thumbnail durationMinutes attachments status createdAt updatedAt stats.viewsCount stats.rating stats.ratingsCount ')
         .sort({ createdAt: -1 })
         .skip( skip )
         .limit( limit )
@@ -266,6 +266,7 @@ export const getLecturesService = async ( teacherId, monthId, {
       videoId: l.videoId,
       title: l.title,
       description: l.description,
+      thumbnail: l.thumbnail,
       durationMinutes: l.durationMinutes,
       status: l.status,
       createdAt: l.createdAt,
