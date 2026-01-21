@@ -110,7 +110,7 @@ export const getStudentsQueryValidation = celebrate({
       }),
 
     status: Joi.string()
-      .valid("نشط", "محظور")
+      .valid("active", "hidden", "active")
       .optional()
       .messages({
         "any.only": "❌ حالة الطالب غير صحيحة",
@@ -168,7 +168,7 @@ export const updateStudentValidation = celebrate({
       }),
 
     status: Joi.string()
-      .valid("نشط", "محظور")
+      .valid("active", "hidden", "inactive")
       .optional()
       .messages({
         "any.only": "❌ حالة الطالب غير صحيحة",

@@ -33,8 +33,8 @@ export const createTeacherValidation = celebrate({
     bio: Joi.string().max(500).messages({
       "string.max": "❌ السيرة الذاتية طويلة جدًا"
     }),
-    status: Joi.string().valid("نشط", "معلق", "محظور").default("نشط").messages({
-      "any.only": "❌ الحالة يجب أن تكون نشط أو معلق أو محظور"
+    status: Joi.string().valid("active", "hidden", "inactive").default("active").messages({
+      "any.only": "❌ الحالة يجب أن تكون active أو معلق أو محظور"
     })
   })
 });
@@ -63,7 +63,7 @@ export const getTeachersQueryValidation = celebrate({
       }),
 
     status: Joi.string()
-      .valid("نشط", "محظور")
+      .valid("active", "hidden", "inactive")
       .optional()
       .messages({
         "any.only": "❌ حالة المعلم غير صحيحة",
@@ -104,8 +104,8 @@ export const updateTeacherValidation = celebrate({
     bio: Joi.string().max(500).messages({
       "string.max": "❌ السيرة الذاتية طويلة جدًا"
     }),
-    status: Joi.string().valid("نشط", "معلق", "محظور").messages({
-      "any.only": "❌ الحالة يجب أن تكون نشط أو معلق أو محظور"
+    status: Joi.string().valid("active", "hidden", "inactive").messages({
+      "any.only": "❌ الحالة يجب أن تكون active أو معلق أو محظور"
     })
   })
 });

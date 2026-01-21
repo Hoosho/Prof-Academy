@@ -78,8 +78,8 @@ const MonthSchema = new mongoose.Schema({
   // Status & Visibility
   status: {
     type: String,
-    enum: [ 'نشط', 'غير نشط', 'مخفي' ],
-    default: 'نشط'
+    enum: [ 'active', 'hidden', 'in' ],
+    default: 'active'
   },
   publishAt: {
     type: Date,

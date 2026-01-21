@@ -91,7 +91,7 @@
       const totalTeachers = await Teacher.countDocuments({ isDeleted: false }) || 0;
 
       // Total Active Teachers 
-      const totalActiveTeachers = await Teacher.countDocuments({ isDeleted: false, status: 'نشط' }) || 0;
+      const totalActiveTeachers = await Teacher.countDocuments({ isDeleted: false, status: 'active' }) || 0;
 
       // Total Suspended Teachers 
       const totalSuspendedTeachers = totalTeachers - totalActiveTeachers || 0;

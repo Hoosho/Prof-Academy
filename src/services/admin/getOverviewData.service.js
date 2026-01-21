@@ -10,7 +10,7 @@ import { ErrorResponse } from '../../utils/errorResponse.util.js';
 export const getStats = async () => {
   try{
       // Get Stats
-      const activeStudents = await Student.countDocuments({ status: 'نشط' }) || 0;
+      const activeStudents = await Student.countDocuments({ status: 'active' }) || 0;
       const totalTeachers = await Teacher.countDocuments() || 0;
       const monthlyRevenue =  0;
       const totalCourses  = 0;

@@ -49,7 +49,7 @@ const AttachmentSchema = new mongoose.Schema({
   // Status
   status: {
     type: String,
-    enum: [ 'نشط', 'غير نشط', 'مخفي' ]
+    enum: [ 'active', 'hidden', 'inactive' ]
   },
 
   // Relations

@@ -97,7 +97,7 @@ export const getStudentsStatsService = async ( teacherId ) => {
 
     // Active Students
     const totalActiveStudents = await Student.countDocuments({
-      isDeleted: false, assignedTeacher: teacherId, status : 'نشط'
+      isDeleted: false, assignedTeacher: teacherId, status : 'active'
     });
 
     // Total In Active Students

@@ -82,8 +82,8 @@ const LectureSchema = new mongoose.Schema({
   // Status
   status: {
     type: String,
-    enum: [ 'نشط', 'غير نشط', 'مخفي' ],
-    default: 'نشط'
+    enum: [ 'active', 'hidden', 'inactive' ],
+    default: 'active'
   },
   publishAt: {
     type: Date,

@@ -19,7 +19,7 @@ export const studentLoginService = async ( req, { code, deviceId } ) => {
     };
 
     // Check Status 
-    if( student.status !== 'نشط' ){
+    if( student.status !== 'active' ){
       await createAuditLog({
         actor: {
           id: student._id,

@@ -266,7 +266,7 @@ export const getLecturesService = async ( teacherId, monthId, {
       videoId: l.videoId,
       title: l.title,
       description: l.description,
-      thumbnail: l.thumbnail,
+      thumbnail: l.thumbnail, 
       durationMinutes: l.durationMinutes,
       status: l.status,
       createdAt: l.createdAt,

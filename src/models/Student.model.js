@@ -125,8 +125,8 @@ const StudentSchema = new mongoose.Schema(
 
     status: {
       type: String,
-      enum: ["نشط", "محظور"],
-      default: "نشط",
+      enum: [ 'active', 'hidden', 'inactive' ],
+      default: 'active',
     },
 
     cash: {

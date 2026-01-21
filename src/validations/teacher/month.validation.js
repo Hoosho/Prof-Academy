@@ -109,7 +109,7 @@ export const updateMonthValidation = celebrate({
       }),
 
       status: Joi.string()
-        .valid("نشط", "محظور")
+        .valid("active", "hidden", "inactive")
         .optional()
         .messages({
           "any.only": "❌ حالة الطالب غير صحيحة",
@@ -190,7 +190,7 @@ export const getMonthsQueryValidation = celebrate({
         "any.only": "❌ المرحلة الدراسية غير صحيحة",
       }),
     status: Joi.string()
-      .valid("نشط", "غير نشط", "مخفي")
+      .valid("active", "hidden", "inactive")
       .optional()
       .messages({
         "any.only": "❌ حالة الشهر غير صحيحة",

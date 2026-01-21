@@ -86,8 +86,8 @@ const TeacherSchema = new mongoose.Schema({
   },
   status: {
     type: String,
-    enum: [ 'نشط', 'معلق', 'محظور' ],
-    default: 'نشط'
+    enum: [ 'active', 'hidden', 'inactive' ],
+    default: 'active'
   },
 
 

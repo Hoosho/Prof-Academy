@@ -33,7 +33,7 @@ const AdminSchema = new mongoose.Schema({
   },
   status: {
     type: String,
-    enum: [ 'نشط', 'معلق', 'محظور' ],
+    enum: [ 'active', 'hidden', 'inactive' ],
     default: 'معلق'
   },
   lastLogin:{

@@ -78,7 +78,7 @@ export const teacherLoginService = async ( req, email, password, deviceId ) => {
   };
 
   // Check Account Status 
-  if( teacher.status !== 'نشط' ){
+  if( teacher.status !== 'active' ){
     await createAuditLog({
       actor: {
         id: teacher._id,

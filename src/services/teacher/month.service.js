@@ -23,7 +23,7 @@ export const createMonthService = async ( req, teacherId, {
 
     // Validate Teacher 
     const teacher = await Teacher.findOne({
-      _id: teacherId, isDeleted: false, status: 'نشط'
+      _id: teacherId, isDeleted: false, status: 'active'
     }).session( session );
     if( !teacher ) throw new ErrorResponse( '❌ المدرس غير موجود', 404 );
 
@@ -93,7 +93,7 @@ export const getMonthsStatsService = async ( teacherId ) => {
 
     // Active Months 
     const totalActiveMonths = await Month.countDocuments({
-      isDeleted: false, teacher: teacherId, status: 'نشط'
+      isDeleted: false, teacher: teacherId, status: 'active'
     });
 
     // Inactive Months 
@@ -101,7 +101,7 @@ export const getMonthsStatsService = async ( teacherId ) => {
 
     // Total Students 
     const totalStudents = await Student.countDocuments({
-      isDeleted: false, assignedTeacher: teacherId, status: 'نشط'
+      isDeleted: false, assignedTeacher: teacherId, status: 'active'
     });
 
     // Return Stats Obj

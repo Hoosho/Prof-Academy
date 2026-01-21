@@ -103,7 +103,7 @@ export const getLecturesQueryValidation = celebrate({
       }),
 
     status: Joi.string()
-      .valid('نشط', 'غير نشط', 'مخفي', 'all')
+      .valid('active', 'hidden', 'active', 'all')
       .optional()
       .messages({
         'any.only': '❌ حالة الحصة غير صحيحة',
