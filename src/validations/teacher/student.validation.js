@@ -17,17 +17,6 @@ export const createStudentValidation = celebrate({
         "any.required": "❌ اسم الطالب مطلوب",
       }),
 
-    email: Joi.string()
-      .email()
-      .lowercase()
-      .trim()
-      .required()
-      .messages({
-        "string.email": "❌ البريد الإلكتروني غير صحيح",
-        "string.empty": "❌ البريد الإلكتروني مطلوب",
-        "any.required": "❌ البريد الإلكتروني مطلوب",
-      }),
-
     phone: Joi.string()
       .pattern(/^\d{11}$/)
       .required()

@@ -9,12 +9,12 @@ import { ErrorResponse } from '../../utils/errorResponse.util.js';
  * @desc Create New Student
  * @param { string } req
  * @param { string } teacherId
- * @param { string } { name, email, phone, guardianPhone, grade, cash }
+ * @param { string } { name, phone, guardianPhone, grade, cash }
  * @returns  { name } studentName
 */
 export const createStudentService = async ( req, teacherId,
   {
-    name, email, phone, guardianPhone, grade, cash
+    name, phone, guardianPhone, grade, cash
   }
 ) => {
   // Start Session
@@ -23,12 +23,8 @@ export const createStudentService = async ( req, teacherId,
     // Start DB Transaction
     session.startTransaction();
 
-    // Check IF Phone Or Email Exist
-    const existingStudent = await Student.findOne({
-      $or: [
-        { email }, { phone }
-      ]
-    }).session( session );
+    // Check IF Phone Exist
+    const existingStudent = await Student.findOne({ phone }).session( session );
     if (existingStudent) {
       if (
         existingStudent.isDeleted === false &&
@@ -44,7 +40,7 @@ export const createStudentService = async ( req, teacherId,
     // Create Student Document
     const [ newStudent ] = await Student.create(
       [{
-        code, name, email, phone, guardianPhone, grade, cash, assignedTeacher: teacherId
+        code, name, phone, guardianPhone, grade, cash, assignedTeacher: teacherId
       }], { session }
     );
 
@@ -174,7 +170,7 @@ export const getStudentsService = async (
     // Parallel Queries
     const [ students, totalResults ] = await Promise.all([
       Student.find( filter )
-        .select(' _id code name email phone guardianPhone grade status cash lastLogin deviceId ')
+        .select(' _id code name phone guardianPhone grade status cash lastLogin deviceId ')
         .sort({ createdAt: -1 })
         .skip( skip )
         .limit( limit )
@@ -203,11 +199,11 @@ export const getStudentsService = async (
  * @param { object } req
  * @param { string } teacherId
  * @param { string } studentId
- * @param { object } { name, email, phone, guardianPhone, grade, cash, deviceId }
+ * @param { object } { name, phone, guardianPhone, grade, cash, deviceId }
  * @returns { string } studentName
 */
 export const updateStudentService = async (
-  req, teacherId, studentId, { name, email, phone, guardianPhone, grade, cash, deviceId }
+  req, teacherId, studentId, { name, phone, guardianPhone, grade, cash, deviceId }
 ) => {
   // Start Session
   const session = await mongoose.startSession();
@@ -229,7 +225,7 @@ export const updateStudentService = async (
       studentId,
       {
         $set: {
-          name, email, phone, guardianPhone, grade, cash, deviceId
+          name, phone, guardianPhone, grade, cash, deviceId
         }
       },
       {
