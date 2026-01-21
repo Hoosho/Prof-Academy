@@ -168,7 +168,7 @@ export const updateStudentValidation = celebrate({
       }),
 
     status: Joi.string()
-      .valid("active", "hidden", "inactive")
+      .valid('active', 'hidden', 'active', 'all')
       .optional()
       .messages({
         "any.only": "❌ حالة الطالب غير صحيحة",
