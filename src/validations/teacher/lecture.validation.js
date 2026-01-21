@@ -51,6 +51,13 @@ export const createLectureValidation = celebrate({
         'number.min': '❌ مدة الحصة غير صحيحة',
       }),
 
+      status: Joi.string()
+      .valid('active', 'hidden', 'active' )
+      .optional()
+      .messages({
+        'any.only': '❌ حالة الحصة غير صحيحة',
+      }),
+
     attachmentCodes: Joi.array()
       .items(
         Joi.string().trim().min(3)

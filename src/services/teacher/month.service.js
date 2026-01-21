@@ -210,7 +210,7 @@ export const updateMonthService = async ( req, teacherId, monthId, {
 
     // Store Original Month Data Before Updating
     const monthBeforeUpdate = month.toObject();
-    console.log( 'status before: ', month.status );
+
     // Update Month
     const updateMonth = await Month.findByIdAndUpdate(
       monthId,
@@ -223,7 +223,6 @@ export const updateMonthService = async ( req, teacherId, monthId, {
         new: true, session, runValidators: true, context: 'query'
       }
     );
-    console.log( 'status after: ', updateMonth.status );
 
     // Create Audit Log - Month Has Been Updated Successfully
     await createAuditLog({

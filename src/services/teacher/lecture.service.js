@@ -18,7 +18,7 @@ import { getYoutubeVideoId, getYoutubeVideoInfo } from '../../utils/youtube.util
  * @returns { object } lectureTitle
 */
 export const createLectureService = async ( req, teacherId, monthId, {
-  title, description, thumbnail, videoUrl, durationMinutes, attachmentCodes, examCode
+  title, description, thumbnail, videoUrl, status, durationMinutes, attachmentCodes, examCode
 }) => {
   // Start Session In DB
   const session = await mongoose.startSession();
@@ -93,6 +93,7 @@ export const createLectureService = async ( req, teacherId, monthId, {
       thumbnail: thumbnail || videoData?.thumbnail,
       durationMinutes: durationMinutes || videoData?.durationMinutes,
       grade: month.grade,
+      status,
       
       exam: examId,
       attachments: attachmentIds,
