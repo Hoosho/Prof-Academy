@@ -174,7 +174,7 @@ export const getStudentsService = async (
     // Parallel Queries
     const [ students, totalResults ] = await Promise.all([
       Student.find( filter )
-        .select(' _id code name email guardianPhone grade status cash lastLogin deviceId ')
+        .select(' _id code name email phone guardianPhone grade status cash lastLogin deviceId ')
         .sort({ createdAt: -1 })
         .skip( skip )
         .limit( limit )

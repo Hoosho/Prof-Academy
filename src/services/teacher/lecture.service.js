@@ -317,7 +317,10 @@ export const updateLectureService = async ( req, teacherId, monthId, lectureId, 
     // Start Transaction
     await session.startTransaction();
 
-
+    const month = await Month.findById( monthId ).select(' _id title grade').session( session );
+    if( !month ) throw new ErrorResponse( '❌ معرف الشهر غير صالح!', 400 );
+    
+    
     // Commit Transaction & End session
     await session.commitTransaction();
     await session.endSession();
@@ -326,3 +329,4 @@ export const updateLectureService = async ( req, teacherId, monthId, lectureId, 
     throw err;
   }
 };
+
