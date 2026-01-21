@@ -52,7 +52,7 @@ export const createLectureValidation = celebrate({
       }),
 
       status: Joi.string()
-      .valid('active', 'hidden', 'active' )
+      .valid('active', 'hidden', 'inactive' )
       .optional()
       .messages({
         'any.only': '❌ حالة الحصة غير صحيحة',

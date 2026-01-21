@@ -298,3 +298,31 @@ export const getLecturesService = async ( teacherId, monthId, {
     throw err;
   };
 };
+
+/**
+ * @dsec Update Lecture Service
+ * @param { object } req
+ * @param { string } teacherId
+ * @param { string } monthId
+ * @param { string } lectureId
+ * @param { object } {  }
+ * @returns { string } Lecture Title
+*/
+export const updateLectureService = async ( req, teacherId, monthId, lectureId, {
+  title, description, thumbnail, videoUrl, status, durationMinutes, attachmentCodes, examCode
+}) => {
+  // Start Session
+  const session = await mongoose.startSession();
+  try{
+    // Start Transaction
+    await session.startTransaction();
+
+
+    // Commit Transaction & End session
+    await session.commitTransaction();
+    await session.endSession();
+  }catch( err ){
+    // Abort Transaction & End Session
+    throw err;
+  }
+};
