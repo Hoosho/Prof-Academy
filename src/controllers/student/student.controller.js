@@ -1,8 +1,8 @@
 // /src/controllers/student/student.controller.js
 import {
   getStudentMonthsService
-} from '../../services/student/student.service';
-import { ErrorResponse } from '../../utils/errorResponse.util';
+} from '../../services/student/student.service.js';
+import { ErrorResponse } from '../../utils/errorResponse.util.js';
 
 /**
  * @desc Get Student Months
@@ -21,7 +21,7 @@ export const getStudentMonths = async ( req, res, next ) => {
     // Return Success Response 
     return res.status(200).json({
       success: true,
-      data: months
+      data: months || []
     });
   }catch( err ){
     console.log( err );

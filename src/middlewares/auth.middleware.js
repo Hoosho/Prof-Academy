@@ -68,8 +68,8 @@ export const authTeacher = async ( req, res, next ) => {
 export const authStudent =  async ( req, res, next ) => {
   let token;
   try{
-    if( req.cookies && req.cookies.token ) {
-      token = req.cookies.token;
+    if( req.cookies && req.cookies.studentToken ) {
+      token = req.cookies.studentToken;
     };
     if( !token ) throw new ErrorResponse('❌ انت مش مسجل دخول يا طالب!', 401 );
 

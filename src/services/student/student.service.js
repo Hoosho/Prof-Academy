@@ -13,14 +13,14 @@ export const getStudentMonthsService = async ( studentId ) => {
   try{
     // Check If Student Exists 
     const student = await Student.findOne({ _id: studentId, isDeleted: false })
-    .select(' assignedTeacher, grade boughtMonths ')
+    .select(' assignedTeacher grade boughtMonths ')
     .lean();
     if( !student ) throw new ErrorResponse( '❌ الطالب غير موجود!', 404 );
 
     // Check If Teacher Exists 
-    const teacher = await Teacher.findById( student.assignedTeacher )
+    const teacher = await Teacher.findOne({ _id: student.assignedTeacher, isDeleted: false })
     .select(' _id ');
-    if( !teacher ) throw new ErrorResponse( '❌ الطالب غير مشترك مع معلمّ!', 404 );
+    if( !teacher ) throw new ErrorResponse( '❌ الطالب غير مشترك مع معلم!', 404 );
 
     // Fetch All Months Related To Student
     const allMonths = await Month.find({
@@ -39,16 +39,14 @@ export const getStudentMonthsService = async ( studentId ) => {
     });
 
     // Buailt Final Res
-    const months = allMonths.map( (month ) => {
-      const boughtMonths = boughtMonthsMap.get( month._id.toString() );
-
+    const months = allMonths.map((month) => {
       return {
         monthId: month._id,
         title: month.title,
         description: month.description,
         thumbnail: month.thumbnail,
-
-        isBought: !!boughtMonthsMap.get( month._id.toString() )
+        price: month.price,
+        isBought: !!boughtMonthsMap.get(month._id.toString())
       };
     });
 
