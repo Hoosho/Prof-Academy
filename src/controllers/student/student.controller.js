@@ -1,0 +1,30 @@
+// /src/controllers/student/student.controller.js
+import {
+  getStudentMonthsService
+} from '../../services/student/student.service';
+import { ErrorResponse } from '../../utils/errorResponse.util';
+
+/**
+ * @desc Get Student Months
+ * @route /api/student/months
+ * @access Private ( Only Student )
+*/
+export const getStudentMonths = async ( req, res, next ) => {
+  try{
+    // Get Student Id From Cookie
+    const studentId = req.student.id;
+    if( !studentId ) throw new ErrorResponse( '❌ لم يتم العثور علي معرف الطالب!' );
+
+    // Call Get Student Service
+    const { months } = await getStudentMonthsService( studentId );
+
+    // Return Success Response 
+    return res.status(200).json({
+      success: true,
+      data: months
+    });
+  }catch( err ){
+    console.log( err );
+    next( err );
+  };
+};
