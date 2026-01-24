@@ -46,13 +46,14 @@ export const  getStudentMonthsService = async ( studentId ) => {
         description: month.description,
         thumbnail: month.thumbnail,
         price: month.price,
+        isFree: month.isFree,
         isBought: !!boughtMonthsMap.get(month._id.toString())
       };
     });
 
     // Return Months
     return {
-      months: months  
+      months: months
     };
   }catch( err ){
     throw err;
