@@ -84,8 +84,8 @@ export const deleteProfCode = async ( req, res, next ) => {
     const teacherId = req.teacher.id;
 
     // Call Delete Prof Code Service
-    const { result } = await deleteProfCodeService( teacherId, profCodeIds );
-  
+    const result = await deleteProfCodeService( teacherId, profCodeIds );
+
     // Return Success Res 
     return res.status(200).json({
       success: true,
