@@ -22,7 +22,12 @@ const ProfCodeSchema = new mongoose.Schema({
   expiresAt: {
     type: Date,
     required: true
-  }
+  },
+  teacher: {
+    type: mongoose.Schema.Types.ObjectId,
+    ref: 'Teacher',
+    required: [ true, 'معرف المعلم مطلوب!' ]
+  },
 }, {
   timestamps: true
 });

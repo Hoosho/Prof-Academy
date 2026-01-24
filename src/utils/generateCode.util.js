@@ -1,6 +1,10 @@
 // /src/utils/generateCode.util.js
 import Student from '../models/Student.model.js';
+import ProfCode from '../models/ProfCode.model.js';
 
+/**
+ * @desc 
+*/
 export const generateStudentCode = async () => {
   let code;
   let exists = true;
@@ -14,6 +18,29 @@ export const generateStudentCode = async () => {
     const student = await Student.findOne({ code, isDeleted: false });
     exists = !!student;
   }
+
+  return code;
+};
+
+/**
+ * @desc 
+*/
+export const generateProfCode = async ( teacherId ) => {
+  let code;
+  let exists = true;
+
+  while ( exists ){
+    const randomNumber = Math.floor(100000000 + Math.random() * 900000000); // 9 digits
+    const year = new Date().getFullYear();
+
+    code = `PROF-${year}-${randomNumber}`;
+
+    // Check If Code Already Exist For This TEacher
+    exists = await ProfCode.exists({
+      code,
+        ...( teacherId && { teacher: teacherId })
+    });
+  };
 
   return code;
 };

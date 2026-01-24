@@ -26,6 +26,7 @@ import teacherAuthRoutes from './routes/teacher/auth.route.js';
 import teacherStudentRoutes from './routes/teacher/student.route.js';
 import teacherMonthRoutes from './routes/teacher/month.route.js';
 import teacherLectureRoutes from './routes/teacher/lecture.route.js';
+import teacherProfCodeRoutes from './routes/teacher/profCode.route.js';
 // STUDENT
 import studentAuthRoutes from './routes/student/auth.route.js';
 import studentStudentRoutes from './routes/student/student.route.js';
@@ -105,6 +106,7 @@ app.use( '/', teacherAuthRoutes );
 app.use( '/', teacherStudentRoutes );
 app.use( '/', teacherMonthRoutes );
 app.use( '/', teacherLectureRoutes );
+app.use( '/', teacherProfCodeRoutes );
 // STUDENT
 app.use( '/', studentAuthRoutes );
 app.use( '/', studentStudentRoutes );
