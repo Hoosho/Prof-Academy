@@ -8,7 +8,7 @@ import { contextMiddleware } from '../../middlewares/context.middleware.js';
 
 // Import Controllers
 import {
-  createProfCodes
+  createProfCodes, getAllProfCodes
 } from '../../controllers/teacher/profCode.controller.js'
 
 // Import Validations
@@ -25,5 +25,17 @@ router.post(
   contextMiddleware,
   createProfCodes
 );
+
+/**
+ * @desc Get All Prof Codes
+ * @route POST /api/teacher/prof-code s
+*/
+router.get(
+  '/api/teacher/prof-codes',
+  authTeacher,
+  contextMiddleware,
+  getAllProfCodes
+);
+
 
 export default router;

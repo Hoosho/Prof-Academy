@@ -3,7 +3,7 @@ import Student from '../models/Student.model.js';
 import ProfCode from '../models/ProfCode.model.js';
 
 /**
- * @desc 
+ * @desc Generate Student Code
 */
 export const generateStudentCode = async () => {
   let code;
@@ -23,7 +23,7 @@ export const generateStudentCode = async () => {
 };
 
 /**
- * @desc 
+ * @desc Generate Prof Codes 
 */
 export const generateProfCode = async ( teacherId ) => {
   let code;

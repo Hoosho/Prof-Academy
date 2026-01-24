@@ -19,6 +19,7 @@ export const createProfCodesService = async ( teacherId, { count, value, expires
       const newCodes = new ProfCode({
         code,
         value,
+        
         expiresAt,
         teacher: teacherId,
         status: 'active'
@@ -26,8 +27,98 @@ export const createProfCodesService = async ( teacherId, { count, value, expires
       await newCodes.save();
       codes.push( newCodes );
     };
+  }catch( err ){
+    throw err;
+  };
+};
 
-    return codes;
+/**
+ * @desc Get Prof Codes Stats
+ * @param { string } teacherId
+ * @returns { object } { stats }
+*/
+export const getProfCodesStatsService = async ( teacherId ) => {
+  try{
+    // Total Prof Codes
+    const totalProfCodes = await ProfCode.countDocuments({ teacher: teacherId });
+    
+    // Total Used Prof Codes
+    const totalUsedProfCodes = await ProfCode.countDocuments({ teacher: teacherId, status: 'used' });
+    
+    // Total Active Prof Codes
+    const totalActiveProfCodes = await ProfCode.countDocuments({ teacher: teacherId, status: 'active' });
+    
+    // Total Expired Prof Codes
+    const totalExpiredProfCodes = await ProfCode.countDocuments({ teacher: teacherId, status: 'expired' });
+
+    // Return Stats Obj
+    return {
+      stat: {
+        totalProfCodes,
+        totalUsedProfCodes,
+        totalActiveProfCodes,
+        totalExpiredProfCodes
+      }
+    };
+  }catch( err ){
+    throw err;
+  };
+};
+
+/**
+ * @desc Get All Prof Codes Related To Teacher 
+ * @param { string } teacherId
+ * @param { object } { page, limit, status, search } 
+ * @returns { object } {}
+*/
+export const getProfCodes = async ( teacherId, {
+    page = 1, limit = 20, search = '', status = 'all'
+}) => {
+  try{
+    // Sanatize Pagination
+    page = Math.max( Number( page ), 1 );
+    limit = Math.min( Math.min( Number( limit ), 10 ), 50 );
+    const skip = ( page - 1) * limit;
+
+    // Built Filter
+    const filter = {
+      teacher: teacherId
+    };
+
+    // Search 
+    if( search.trim() ){
+      filter.$or = [
+        { code: { $regex: search.trim() }, $options: 'i' }
+      ];
+    };
+
+    // Status 
+    if( status && status !== 'all'){
+      filter.status = status;
+    };
+
+    // Parallel Queries
+    const [ profCodes, totalResults ] = await Promise.all([
+      ProfCode.find( filter )
+      .select(' _id code value status expiresAt')
+      .sort({ createdAt: -1 })
+      .skip( skip )
+      .limit( limit )
+      .lean(),
+
+      ProfCode.countDocuments( filter )
+    ]);
+
+    // Return Prof Code Data Paginated
+    return {
+      profCodes,
+      pagination: {
+        page,
+        limit,
+        totalResults,
+        totalPages: Math.ceil( totalResults / limit )
+      }
+    };
   }catch( err ){
     throw err;
   };
