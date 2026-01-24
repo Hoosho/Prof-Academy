@@ -3,6 +3,7 @@ import ProfCode from '../../models/ProfCode.model.js';
 import { ErrorResponse } from '../../utils/errorResponse.util.js';
 import { createAuditLog } from '../system/auditLog.service.js';
 import { generateProfCode } from '../../utils/generateCode.util.js';
+import mongoose from 'mongoose';
 
 /**
  * @desc Create Prof Codes Service
@@ -53,7 +54,7 @@ export const getProfCodesStatsService = async ( teacherId ) => {
 
     // Return Stats Obj
     return {
-      stat: {
+      stats: {
         totalProfCodes,
         totalUsedProfCodes,
         totalActiveProfCodes,
@@ -69,15 +70,15 @@ export const getProfCodesStatsService = async ( teacherId ) => {
  * @desc Get All Prof Codes Related To Teacher 
  * @param { string } teacherId
  * @param { object } { page, limit, status, search } 
- * @returns { object } {}
+ * @returns { object } { profCodes, pagination }
 */
-export const getProfCodes = async ( teacherId, {
+export const getProfCodesService = async ( teacherId, {
     page = 1, limit = 20, search = '', status = 'all'
 }) => {
   try{
     // Sanatize Pagination
     page = Math.max( Number( page ), 1 );
-    limit = Math.min( Math.min( Number( limit ), 10 ), 50 );
+    limit = Math.min( Math.min( Number( limit ), 20 ), 50 );
     const skip = ( page - 1) * limit;
 
     // Built Filter
@@ -118,6 +119,34 @@ export const getProfCodes = async ( teacherId, {
         totalResults,
         totalPages: Math.ceil( totalResults / limit )
       }
+    };
+  }catch( err ){
+    throw err;
+  };
+};
+
+/**
+ * @desc Delete Prof Code Service
+ * @param { string } teacherId 
+ * @param { string } 
+ * @returns { }
+*/
+export const deleteProfCodeService = async ( teacherId, profCodeIds = [] ) => {
+  try{
+    // Check If Prof Code IDs Provided 
+    if( !profCodeIds ){
+      throw new ErrorResponse( 'لم يتم تحديد اي كود!', 400 );
+    };
+
+    // Delete Many Prof Codes
+    const result = await ProfCode.deleteMany({
+      _id: { $in: profCodeIds },
+      teacher: teacherId
+    });
+
+    // Return Deleted Count
+    return{ 
+      deletedCount: result.deletedCount
     };
   }catch( err ){
     throw err;

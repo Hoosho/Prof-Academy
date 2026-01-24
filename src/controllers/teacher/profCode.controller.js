@@ -1,6 +1,6 @@
 // /src/controllers/teacher/profCode.controller.js
 import {
-  createProfCodesService, getProfCodesStatsService, getProfCodes
+  createProfCodesService, getProfCodesStatsService, getProfCodesService, deleteProfCodeService
 } from '../../services/teacher/profCode.service.js';
 
 /**
@@ -35,7 +35,7 @@ export const createProfCodes = async ( req, res, next ) => {
 /**
  * @desc Get All Prof Codes 
  * @route GET /api/teacher/prof-code
- * @access Private ( Only Student )
+ * @access Private ( Only Teacher )
 */
 export const getAllProfCodes = async ( req, res, next ) => {
   try{
@@ -46,12 +46,12 @@ export const getAllProfCodes = async ( req, res, next ) => {
 
     // Take Teacher Id From Cookies
     const teacherId = req.teacher.id; 
-    
+
     // Call Get Prof Codes Stats Service
     const { stats } = await getProfCodesStatsService( teacherId );
 
     // Call Get Prof Codes Service
-    const { profCodes, pagination } = await getAllProfCodes( teacherId, {
+    const { profCodes, pagination } = await getProfCodesService( teacherId, {
       paeg, limit, search, status
     });
 
@@ -68,4 +68,34 @@ export const getAllProfCodes = async ( req, res, next ) => {
     console.log( err );
     next( err );
   }
+};
+
+/**
+ * @desc Delete Prof Codes Service
+ * @route DELETE /api/teacher/prof-code
+ * @access Private ( Only Teacher )
+*/
+export const deleteProfCode = async ( req, res, next ) => {
+  try{
+    // Take Fileds From Req Body
+    const { profCodeIds } = req.body || {};
+
+    // Take Teacher Id From Cookies
+    const teacherId = req.teacher.id;
+
+    // Call Delete Prof Code Service
+    const { result } = await deleteProfCodeService( teacherId, profCodeIds );
+  
+    // Return Success Res 
+    return res.status(200).json({
+      success: true,
+      msg: `تم حذف ${ result.deletedCount } بنجاح!`,
+      data: {
+        ...result
+      }
+    });
+  }catch( err ){
+    console.log( err );
+    next( err );
+  };
 };

@@ -8,34 +8,48 @@ import { contextMiddleware } from '../../middlewares/context.middleware.js';
 
 // Import Controllers
 import {
-  createProfCodes, getAllProfCodes
+  createProfCodes, getAllProfCodes, deleteProfCode
 } from '../../controllers/teacher/profCode.controller.js'
 
 // Import Validations
-// import {
-// } from '../../validations/teacher/student.validation.js'
+import {
+  createProfCodesValidation, getProfCodesValidation, deleteProfCodesValidation
+} from '../../validations/teacher/profCode.validation.js'
 
 /**
- * @desc Create Prof Code
+ * @desc Create Prof Code Route
  * @route POST /api/teacher/prof-code 
 */
 router.post(
   '/api/teacher/prof-code',
   authTeacher,
   contextMiddleware,
+  createProfCodesValidation,
   createProfCodes
 );
 
 /**
- * @desc Get All Prof Codes
- * @route POST /api/teacher/prof-code s
+ * @desc Create Prof Codes Route
+ * @route POST /api/teacher/prof-codes
 */
 router.get(
   '/api/teacher/prof-codes',
   authTeacher,
   contextMiddleware,
+  getProfCodesValidation,
   getAllProfCodes
 );
 
+/**
+ * @desc Delete Prof Codes Route 
+ * @route DELETE /api/teacher/prof-code
+*/
+router.delete(
+  '/api/teacher/prof-code',
+  authTeacher,
+  contextMiddleware,
+  deleteProfCodesValidation,
+  deleteProfCode
+);
 
 export default router;
