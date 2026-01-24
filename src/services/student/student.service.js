@@ -139,7 +139,7 @@ export const buyMonthService = async ( req, studentId, monthId ) => {
 
     // Create Audit Log - Month Has Been Paid Successfully
     await createAuditLog({
-      actor: req?.actor?.context || {},
+      actor: req?.context?.actor || {},
       action: 'BUY_MONTH',
       target: {
         model: 'Student',
@@ -149,6 +149,7 @@ export const buyMonthService = async ( req, studentId, monthId ) => {
       before: studentBeforeUpdate,
       after: student.toObject()
     });
+
 
     // Update Month Stats
     await Month.updateOne(
