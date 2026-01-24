@@ -8,12 +8,13 @@ import { authStudent } from '../../middlewares/auth.middleware.js'
 
 // Import Controllers
 import {
-  getStudentMonths
+  getStudentMonths, buyMonth
 } from '../../controllers/student/student.controller.js'
 
 // Import Validations
-// import {
-// } from '../../validations/student/auth.validation.js';
+import {
+  buyMonthValidation
+} from '../../validations/student/student.validation.js';
 
 /**
  * @desc Get Student Months Route
@@ -23,6 +24,18 @@ router.get(
   '/api/student/months',
   authStudent,
   getStudentMonths
+);
+
+/**
+ * @desc Student Buy Month Route
+ * @route POST /api/student/buy-month/:monthId
+*/
+router.post(
+  '/api/student/buy-month/:monthId',
+  authStudent,
+  contextMiddleware,
+  buyMonthValidation,
+  buyMonth,
 );
 
 export default router;

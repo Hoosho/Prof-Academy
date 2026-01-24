@@ -1,6 +1,6 @@
 // /src/controllers/student/student.controller.js
 import {
-  getStudentMonthsService
+  getStudentMonthsService, buyMonthService 
 } from '../../services/student/student.service.js';
 import { ErrorResponse } from '../../utils/errorResponse.util.js';
 
@@ -22,6 +22,37 @@ export const getStudentMonths = async ( req, res, next ) => {
     return res.status(200).json({
       success: true,
       data: months || []
+    });
+  }catch( err ){
+    console.log( err );
+    next( err );
+  };
+};
+
+/**
+ * @desc Buy Month
+ * @route POST /api/student/buy-month/:monthId
+ * @access Private ( Only Student )
+*/
+export const buyMonth = async ( req, res, next ) => {
+  try{
+    // Take Fields From Req Body
+    const monthId = req.params.monthId || {};
+
+    // Take Student Id From Cookies 
+    const studentId = req.student.id;
+
+    // Call Buy Month Service
+    const { monthTitle } = await buyMonthService( req, studentId, monthId );
+
+    // Return Success Response
+    return res.status(200).json({
+      success: true,
+      msg: `✅ تم شراء شهر ${ monthTitle } بنجاح.`,
+      data: {
+        monthId,
+        monthTitle
+      }
     });
   }catch( err ){
     console.log( err );

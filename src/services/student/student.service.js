@@ -163,7 +163,6 @@ export const buyMonthService = async ( req, studentId, monthId ) => {
 
     // Return MonthTitle
     return {
-      monthId: month._id,
       monthTitle: month.title
     };
   }catch( err ){
