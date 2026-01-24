@@ -7,9 +7,9 @@ import mongoose from 'mongoose';
 
 /**
  * @desc Create Prof Codes Service
+ * @param { object } req
  * @param { string } teacherId
  * @param { object } { count, value, expiresAt }
- * @returns { object }
 */
 export const createProfCodesService = async ( teacherId, { count, value, expiresAt }) => {
   try{
@@ -27,6 +27,19 @@ export const createProfCodesService = async ( teacherId, { count, value, expires
       });
       await newCodes.save();
       codes.push( newCodes );
+
+      // Create Audit Log - Prof Code Has Been Created Successfully
+      await createAuditLog({
+        actor: req?.context?.actor || {},
+        action: 'PROF_CODE.CREATE',
+        action: {
+          model: 'profCode',
+          id: newCodes._id
+        },
+        reason: `Creaed ${ count } successfully.`,
+        context: req?.context?.context || {},
+        after: newCodes.toObject()
+      });
     };
   }catch( err ){
     throw err;
@@ -127,23 +140,49 @@ export const getProfCodesService = async ( teacherId, {
 
 /**
  * @desc Delete Prof Code Service
+ * @desc { object } req
  * @param { string } teacherId 
- * @param { string } 
- * @returns { }
+ * @param { string } profCodeIds
+ * @returns { string } deletedCount
 */
-export const deleteProfCodeService = async ( teacherId, profCodeIds = [] ) => {
+export const deleteProfCodeService = async ( req, teacherId, profCodeIds = [] ) => {
+  // Start Session In DB
+  const session = await mongoose.startSession();
   try{
+    // Start Transaction 
+    await session.startTransaction();
+
     // Check If Prof Code IDs Provided 
-    if( !profCodeIds ){
-      throw new ErrorResponse( 'لم يتم تحديد اي كود!', 400 );
+    if (!Array.isArray(profCodeIds) || profCodeIds.length === 0){
+      throw new ErrorResponse( '❌ لم يتم تحديد اي كود!', 400 );
     };
+
+    const existingProfCodes = await ProfCode.find({
+      _id: profCodeIds,
+      teacher: teacherId,
+      status: 'active'
+    }).session({ session })
+    if (existingProfCodes.length === 0) throw new ErrorResponse( '❌ لم يتم العقور علي اي كود!', 404 );
 
     // Delete Many Prof Codes
     const result = await ProfCode.deleteMany({
       _id: { $in: profCodeIds },
       teacher: teacherId
-    });
+    }).session({ session });
 
+    // Create Audit Log - Prof Code Has Been Deleted Successfully
+    await createAuditLog({
+      actor: req?.context?.actor || {},
+      action: 'PROF_CODE.DELETE',
+      action: {
+        model: 'profCode',
+        id: newCodes._id
+      },
+      reason: `Creaed ${ count } successfully.`,
+      context: req?.context?.context || {},
+      after: newCodes.toObject()
+    });
+  
     // Return Deleted Count
     return{ 
       deletedCount: result.deletedCount

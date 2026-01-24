@@ -1,12 +1,13 @@
 // /src/services/student/student.service.js
+import mongoose from 'mongoose';
 import Student from '../../models/Student.model.js';
 import Payment from '../../models/Payment.model.js';
 import Month from '../../models/Month.model.js';
 import Teacher from '../../models/Teacher.model.js';
-import mongoose from 'mongoose';
+import ProfCode from '../../models/ProfCode.model.js';
 import { ErrorResponse } from '../../utils/errorResponse.util.js';
 import { createAuditLog } from '../system/auditLog.service.js';
-
+``
 /**
  * @desc Get Student Months Service
  * @param { string } studentId
@@ -61,6 +62,76 @@ export const  getStudentMonthsService = async ( studentId ) => {
     throw err;
   };
 };  
+
+/**
+ * @desc Charge Wallet Service
+ * @param { string } studentId
+ * @param { string } profCode
+ * @returns { string } profCodeValue
+*/
+export const chargeWalletService = async ( studentId, profCode ) => {
+  // Satrt Session
+  const session = mongoose.startSession();
+  try{
+    // Start Transaction
+    await session.startTransaction();
+
+    // check IF Student Exists
+    const student = await Student.findOne({
+      _id: studentId,
+      status: 'active',
+      isDeleted: false,
+    }).session( session );
+    if( !student ) throw new ErrorResponse('❌ الطالب غير موجود', 404);
+
+    // Check IF Prof Code Exist
+    const profCode = await ProfCode.findOne({
+      code: profCode,
+      status: active,
+      teacher: student.assignedTeacher,
+    });
+    if( !profCode ) throw new ErrorResponse( '❌ الكود غير صالح أو مستخدم', 400 );
+
+    // Save Prof Code Before Used 
+    const profCodeBeforeUsed = profCode.toObject();
+    // Check IF Prof Code Expired 
+    if( profCode.expiresAt < new Date() ){
+      throw new ErrorResponse( '❌ الكود منتهي الصلاحية!', 400 );
+    };
+
+    // Charge Wallet 
+    student.cash += profCode.value;
+    await student.save({ session });
+
+    // Update Prof Code
+    profCode.status = 'used';
+    await profCode.save({ session });
+
+    // Create Audit Log - Wallet Has Been Charged Successfully
+    await createAuditLog({
+      actor: req?.context?.actor || {},
+      action: 'WALLET_CHARGE',
+      action: {
+        model: 'profCode',
+        id: profCode._id
+      },
+      reason: 'Wallet has been charged successfully',
+      context: req?.context?.context || {},
+      before: profCodeBeforeUsed,
+      after: profCode.toObject()
+    });
+
+    // Commit Transaction & End Session
+    await session.commitTransaction();
+    await session.endSession();
+  }catch( err ){
+    // Abort Transaction & End Session
+    await session.abortTransaction();
+    await session.endSession();
+
+    throw err;;
+  };
+};
 
 /**
  * @desc Buy Month Service

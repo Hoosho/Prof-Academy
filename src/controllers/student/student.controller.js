@@ -1,6 +1,6 @@
 // /src/controllers/student/student.controller.js
 import {
-  getStudentMonthsService, buyMonthService 
+  getStudentMonthsService, chargeWalletService, buyMonthService
 } from '../../services/student/student.service.js';
 import { ErrorResponse } from '../../utils/errorResponse.util.js';
 
@@ -26,6 +26,33 @@ export const getStudentMonths = async ( req, res, next ) => {
   }catch( err ){
     console.log( err );
     next( err );
+  };
+};
+
+/**
+ * @desc Charge Wallet
+ * @route POST /api/student/charge-wallet
+ * @access Private ( Only Student )
+*/
+export const chargeWallet = async ( req, res, next ) => {
+  try{
+    // Take Fields From Req Body
+    const { profCode } = req.body || {};
+
+    // Take Student Id From Cookies
+    const studentId = req.student.id;
+
+    // Call Charge Wallet Service
+    const { profCodeValue } = await chargeWalletService( studentId, profCode );
+
+    // Return Success Response
+    return res.status( 200 ).json({
+      success: true,
+      msg: `✅ تم شحن المحفظة بقيمة ${ profCodeValue || '' } بنجاح`,
+    });
+  }catch( err ){
+    console.log( err );
+    throw err;
   };
 };
 
@@ -58,32 +85,5 @@ export const buyMonth = async ( req, res, next ) => {
   }catch( err ){
     console.log( err );
     next( err );
-  };
-};
-
-/**
- * @desc Charge Wallet
- * @route POST /api/student/charge-wallet
- * @access Private ( Only Student )
-*/
-export const chargeWallet = async ( req, res, next ) => {
-  try{
-    // Take Fields From Req Body
-    const { profCode } = req.body || {};
-
-    // Take Student Id From Cookies
-    const studentId = req.student.id;
-
-    // Call Charge Wallet Service
-    const { profCodeValue } = await chargeWalletService( studentId, profCode );
-
-    // Return Success Response
-    return res.status( 200 ).json({
-      success: true,
-      msg: `✅ تم شحن المحفظة بقيمة ${ profCodeValue || '' } بنجاح`,
-    });
-  }catch( err ){
-    console.log( err );
-    throw err;
   };
 };
