@@ -32,7 +32,7 @@ export const createProfCodesService = async ( req, teacherId, { count, value, ex
       await createAuditLog({
         actor: req?.context?.actor || {},
         action: 'PROF_CODE.CREATE',
-        action: {
+        target: {
           model: 'profCode',
           id: newCodes._id
         },
@@ -174,7 +174,7 @@ export const deleteProfCodeService = async ( req, teacherId, profCodeIds = [] ) 
     await createAuditLog({
       actor: req?.context?.actor || {},
       action: 'PROF_CODE.DELETE',
-      action: {
+      target: {
         model: 'profCode',
         id: newCodes._id
       },

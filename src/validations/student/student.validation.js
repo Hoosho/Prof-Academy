@@ -3,7 +3,7 @@ import { Joi, celebrate, Segments } from "celebrate";
 
 export const chargeWalletValidation = celebrate({
   [Segments.BODY]: Joi.object({
-    profCode: Joi.string()
+    code: Joi.string()
       .trim()
       .uppercase()
       .min(6)

@@ -70,9 +70,9 @@ export const  getStudentMonthsService = async ( studentId ) => {
  * @param { string } profCode
  * @returns { string } profCodeValue
 */
-export const chargeWalletService = async ( req, studentId, profCode ) => {
+export const chargeWalletService = async ( req, studentId, code ) => {
   // Satrt Session
-  const session = mongoose.startSession();
+  const session = await mongoose.startSession();
   try{
     // Start Transaction
     await session.startTransaction();
@@ -87,8 +87,8 @@ export const chargeWalletService = async ( req, studentId, profCode ) => {
 
     // Check IF Prof Code Exist
     const profCode = await ProfCode.findOne({
-      code: profCode,
-      status: active,
+      code,
+      status: 'active',
       teacher: student.assignedTeacher,
     });
     if( !profCode ) throw new ErrorResponse( '❌ الكود غير صالح أو مستخدم', 400 );
@@ -112,7 +112,7 @@ export const chargeWalletService = async ( req, studentId, profCode ) => {
     await createAuditLog({
       actor: req?.context?.actor || {},
       action: 'WALLET_CHARGE',
-      action: {
+      target: {
         model: 'profCode',
         id: profCode._id
       },
@@ -125,6 +125,11 @@ export const chargeWalletService = async ( req, studentId, profCode ) => {
     // Commit Transaction & End Session
     await session.commitTransaction();
     await session.endSession();
+
+    // Return Prof Code Value
+    return {
+      profCodeValue: profCode.value
+    };
   }catch( err ){
     // Abort Transaction & End Session
     await session.abortTransaction();

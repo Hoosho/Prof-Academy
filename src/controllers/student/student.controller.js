@@ -37,13 +37,13 @@ export const getStudentMonths = async ( req, res, next ) => {
 export const chargeWallet = async ( req, res, next ) => {
   try{
     // Take Fields From Req Body
-    const { profCode } = req.body || {};
+    const { code } = req.body || {};
 
     // Take Student Id From Cookies
     const studentId = req.student.id;
 
     // Call Charge Wallet Service
-    const { profCodeValue } = await chargeWalletService( req, studentId, profCode );
+    const { profCodeValue } = await chargeWalletService( req, studentId, code );
 
     // Return Success Response
     return res.status( 200 ).json({

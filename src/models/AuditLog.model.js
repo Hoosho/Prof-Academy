@@ -35,7 +35,7 @@ const AuditLogSchema = new mongoose.Schema({
       // PROF CODE
       'PROF_CODE.CREATE',
       'PROF_CODE.DELETE',
-      
+
       // MONTH
       "MONTH.CREATE",
       "MONTH.UPDAET",
@@ -48,7 +48,7 @@ const AuditLogSchema = new mongoose.Schema({
       "STUDENT.UPDATE",
       "STUDENT.SOFT_DELETE",
       "STUDENT.DELETE",
-
+      'WALLET_CHARGE',
       'BUY_MONTH',
 
       // AUTH
