@@ -45,6 +45,8 @@ const AuditLogSchema = new mongoose.Schema({
       "STUDENT.SOFT_DELETE",
       "STUDENT.DELETE",
 
+      'BUY_MONTH',
+
       // AUTH
       'AUTH.LOGIN.CREDENTIALS.SUCCESS',
       'AUTH.LOGIN.CREDENTIALS.FAIL',

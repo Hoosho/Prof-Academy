@@ -45,10 +45,10 @@ const BoughtMonthSchema = new mongoose.Schema({
   paymentStatus: {
     type: String,
     enum: {
-      values: ["ناجحة", "معلقة", "فاشلة"],
+      values: ["paid", "pending", "failed"],
       message: "حالة الدفع غير صحيحة!",
     },
-    default: "معلقة",
+    default: "failed",
   },
 });
 
