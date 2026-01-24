@@ -19,7 +19,7 @@ export const createProfCodes = async ( req, res, next ) => {
     const teacherId = req.teacher.id;
   
     // Call Create Prof Codes Service
-    await createProfCodesService( teacherId, { count, value, expiresAt });
+    await createProfCodesService( req, teacherId, { count, value, expiresAt });
 
     // Return Success Res 
     return res.status(201).json({

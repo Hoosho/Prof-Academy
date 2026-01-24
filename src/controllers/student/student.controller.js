@@ -43,7 +43,7 @@ export const chargeWallet = async ( req, res, next ) => {
     const studentId = req.student.id;
 
     // Call Charge Wallet Service
-    const { profCodeValue } = await chargeWalletService( studentId, profCode );
+    const { profCodeValue } = await chargeWalletService( req, studentId, profCode );
 
     // Return Success Response
     return res.status( 200 ).json({

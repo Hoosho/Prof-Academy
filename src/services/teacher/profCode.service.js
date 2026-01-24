@@ -11,7 +11,7 @@ import mongoose from 'mongoose';
  * @param { string } teacherId
  * @param { object } { count, value, expiresAt }
 */
-export const createProfCodesService = async ( teacherId, { count, value, expiresAt }) => {
+export const createProfCodesService = async ( req, teacherId, { count, value, expiresAt }) => {
   try{
     const codes = [];
 

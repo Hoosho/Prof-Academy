@@ -65,11 +65,12 @@ export const  getStudentMonthsService = async ( studentId ) => {
 
 /**
  * @desc Charge Wallet Service
+ * @param { object } req
  * @param { string } studentId
  * @param { string } profCode
  * @returns { string } profCodeValue
 */
-export const chargeWalletService = async ( studentId, profCode ) => {
+export const chargeWalletService = async ( req, studentId, profCode ) => {
   // Satrt Session
   const session = mongoose.startSession();
   try{
