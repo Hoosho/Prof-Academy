@@ -38,7 +38,8 @@ export const buyMonth = async ( req, res, next ) => {
   try{
     // Take Fields From Req Body
     const monthId = req.params.monthId || {};
-
+    console.log('monthId from params:', req.params.monthId, typeof req.params.monthId);
+    
     // Take Student Id From Cookies 
     const studentId = req.student.id;
 

@@ -146,6 +146,7 @@ export const buyMonthService = async ( req, studentId, monthId ) => {
         id: student._id
       },
       reason: 'Student has been paid successfully.',
+      context: req?.context?.context || {},
       before: studentBeforeUpdate,
       after: student.toObject()
     });
