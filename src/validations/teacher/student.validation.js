@@ -163,6 +163,16 @@ export const updateStudentValidation = celebrate({
         "any.only": "❌ حالة الطالب غير صحيحة",
       }),
 
+    deviceId: Joi.string()
+      .alphanum()
+      .length(32)
+      .allow('') // يسمح بالـ empty string
+      .messages({
+        "string.base": "❌ Device ID يجب أن يكون نص",
+        "string.empty": "❌ Device ID مطلوب أو فارغ",
+        "string.length": "❌ Device ID يجب أن يكون 32 حرف بالضبط",
+      }),
+
     cash: Joi.number()
       .min(0)
       .optional()

@@ -24,7 +24,7 @@ export const createStudentService = async ( req, teacherId,
     session.startTransaction();
 
     // Check IF Phone Exist
-    const existingStudent = await Student.findOne({ phone }).session( session );
+    const existingStudent = await Student.findOne({ assignedTeacher: teacherId, phone }).session( session );
     if (existingStudent) {
       if (
         existingStudent.isDeleted === false &&
