@@ -17,9 +17,9 @@ export const buyMonthValidation = celebrate({
       .required()
       .custom(objectId)
       .messages({
-        "string.base": "❌ الكود يجب أن يكون نص",
-        "string.empty": "❌ الكود مطلوب",
-        "any.required": "❌ الكود مطلوب",
+        "string.base": "❌ معرف الشهر يجب أن يكون نص",
+        "string.empty": "❌ معرف الشهر مطلوب",
+        "any.required": "❌ معرف الشهر مطلوب",
       }),
   }),
 });
