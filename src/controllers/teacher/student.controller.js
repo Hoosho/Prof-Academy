@@ -13,11 +13,11 @@ export const createStudent = async ( req, res, next ) => {
   try{
     // Take Fields From Req Body
     const {
-      name, email, phone, guardianPhone, grade, cash,
+      name, phone, guardianPhone, grade, cash,
     } = req.body || {};
 
     // Validate Require Fields 
-    if( !name || !email || !phone || !guardianPhone || !grade || !cash ){
+    if( !name || !phone || !guardianPhone || !grade || !cash ){
       throw new ErrorResponse( '❌ يجب إدخال جميع البينات!', 400 );
     };
 
@@ -26,7 +26,7 @@ export const createStudent = async ( req, res, next ) => {
 
     // Call Create Student Service
     const { studentName } = await createStudentService( req, teacherId, {
-      name, email, phone, guardianPhone, grade, cash
+      name, phone, guardianPhone, grade, cash
     });
 
     // Return Success Response
@@ -89,11 +89,11 @@ export const updateTeacher = async ( req, res, next ) => {
   try{
     // Take Fields From Req Body
     const {
-      name, email, phone, guardianPhone, grade, cash, deviceId
+      name, phone, guardianPhone, grade, cash, deviceId
     } = req.body || {};
 
     // Validate Require Fields
-    if( !name || !email || !phone || !guardianPhone || !grade || !cash || !deviceId ){
+    if( !name || !phone || !guardianPhone || !grade || !cash || !deviceId ){
       throw new ErrorResponse( '❌ يجب إدخال جميع البينات!', 400 );
     };
     // Take Teacher Id From Cookies
@@ -107,7 +107,7 @@ export const updateTeacher = async ( req, res, next ) => {
 
     // Call Update Teacher Service
     const { teacherName } = await updateStudentService( req, teacherId, studentId, 
-      { name, email, phone, guardianPhone, grade, cash, deviceId }
+      { name, phone, guardianPhone, grade, cash, deviceId }
     );
   
     // Return Success Response

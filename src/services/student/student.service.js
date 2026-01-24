@@ -9,16 +9,16 @@ import { ErrorResponse } from '../../utils/errorResponse.util.js';
  * @param { string } studentId
  * @returns { object } months
 */
-export const getStudentMonthsService = async ( studentId ) => {
+export const  getStudentMonthsService = async ( studentId ) => {
   try{
     // Check If Student Exists 
-    const student = await Student.findOne({ _id: studentId, isDeleted: false })
+    const student = await Student.findOne({ _id: studentId, status: 'active', isDeleted: false })
     .select(' assignedTeacher grade boughtMonths ')
     .lean();
     if( !student ) throw new ErrorResponse( '❌ الطالب غير موجود!', 404 );
 
     // Check If Teacher Exists 
-    const teacher = await Teacher.findOne({ _id: student.assignedTeacher, isDeleted: false })
+    const teacher = await Teacher.findOne({ _id: student.assignedTeacher, status: 'active', isDeleted: false })
     .select(' _id ');
     if( !teacher ) throw new ErrorResponse( '❌ الطالب غير مشترك مع معلم!', 404 );
 
@@ -51,8 +51,14 @@ export const getStudentMonthsService = async ( studentId ) => {
     });
 
     // Return Months
-    return months;
+    return {
+      months: months  
+    };
   }catch( err ){
     throw err;
   };
-};
+};  
+
+// remove inactive months in studetns   
+// fix student login
+// git student months
