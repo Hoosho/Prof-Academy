@@ -29,7 +29,7 @@ export const  getStudentMonthsService = async ( studentId ) => {
       status: 'active',
       isDeleted: false
     })
-    .select(' _id title description price thumbnail ')
+    .select(' _id title description isFree price thumbnail ')
     .lean();
 
     // Build Bought Months Map
@@ -37,7 +37,6 @@ export const  getStudentMonthsService = async ( studentId ) => {
     student.boughtMonths.forEach( ( bm ) => {
       boughtMonthsMap.set( bm.monthId.toString(), true );
     });
-
     // Buailt Final Res
     const months = allMonths.map((month) => {
       return {
