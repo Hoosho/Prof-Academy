@@ -86,8 +86,12 @@ const AuditLogSchema = new mongoose.Schema({
     },
     id: {
       type: mongoose.Schema.Types.ObjectId,
-      required: true
+      required: true 
     },
+
+    ids: [{
+      type: mongoose.Schema.Types.ObjectId
+    }]
   },
 
   // State Before & After Change 

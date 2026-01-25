@@ -161,14 +161,14 @@ export const deleteProfCodeService = async ( req, teacherId, profCodeIds = [] ) 
       _id: profCodeIds,
       teacher: teacherId,
       status: 'active'
-    }).session({ session })
+    }).session( session )
     if (existingProfCodes.length === 0) throw new ErrorResponse( '❌ لم يتم العقور علي اي كود!', 404 );
 
     // Delete Many Prof Codes
     const result = await ProfCode.deleteMany({
       _id: { $in: profCodeIds },
       teacher: teacherId
-    }).session({ session });
+    }).session( session );
 
     // Create Audit Log - Prof Code Has Been Deleted Successfully
     await createAuditLog({
@@ -176,18 +176,25 @@ export const deleteProfCodeService = async ( req, teacherId, profCodeIds = [] ) 
       action: 'PROF_CODE.DELETE',
       target: {
         model: 'profCode',
-        id: newCodes._id
+        id: profCodeIds[0],
+        ids: profCodeIds
       },
-      reason: `Creaed ${ count } successfully.`,
-      context: req?.context?.context || {},
-      after: newCodes.toObject()
+      reason: `Deleted ${result.deletedCount} prof codes`,
+      context: req?.context?.context || {}
     });
-  
+
+    
+    // Commit Transaction & End Sessino
+    await session.commitTransaction();
+    await session.endSession();
     // Return Deleted Count
     return{ 
       deletedCount: result.deletedCount
     };
   }catch( err ){
+    // Abort Transaction & End Session 
+    await session.abortTransaction();
+    await session.endSession();
     throw err;
   };
 };

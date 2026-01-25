@@ -79,12 +79,15 @@ export const deleteProfCode = async ( req, res, next ) => {
   try{
     // Take Fileds From Req Body
     const { profCodeIds } = req.body || {};
+    console.log( 'req.body: ', req.body )
+    console.log('profCodeIds:', profCodeIds);
+    console.log('isArray:', Array.isArray(profCodeIds));
 
     // Take Teacher Id From Cookies
     const teacherId = req.teacher.id;
 
     // Call Delete Prof Code Service
-    const result = await deleteProfCodeService( teacherId, profCodeIds );
+    const result = await deleteProfCodeService( req, teacherId, profCodeIds );
 
     // Return Success Res 
     return res.status(200).json({
