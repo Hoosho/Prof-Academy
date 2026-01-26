@@ -30,6 +30,8 @@ import teacherProfCodeRoutes from './routes/teacher/profCode.route.js';
 // STUDENT
 import studentAuthRoutes from './routes/student/auth.route.js';
 import studentStudentRoutes from './routes/student/student.route.js';
+import studentLectureRoutes from './routes/student/lecture.routes.js'
+
 // Import error handler
 import { errorHandler } from './middlewares/errorHandler.middleware.js';
 
@@ -110,6 +112,7 @@ app.use( '/', teacherProfCodeRoutes );
 // STUDENT
 app.use( '/', studentAuthRoutes );
 app.use( '/', studentStudentRoutes );
+app.use( '/', studentLectureRoutes );
 
 // TEST
 app.get('/api/test', ( req, res ) => {
