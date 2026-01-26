@@ -36,6 +36,11 @@ const AuditLogSchema = new mongoose.Schema({
       'PROF_CODE.CREATE',
       'PROF_CODE.DELETE',
 
+      // ATTACHMENT
+      'ATTACHMENT.CREATE',
+      'ATTACHMENT.UPDATE',
+      'ATTACHMENT.SORT.DELETE',
+      
       // MONTH
       "MONTH.CREATE",
       "MONTH.UPDAET",

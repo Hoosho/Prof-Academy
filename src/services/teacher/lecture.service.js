@@ -241,7 +241,7 @@ export const getLecturesService = async ( teacherId, monthId, {
       filter.$or = [
         { title: { $regex: search.trim(), $options: 'i' } },
         { description: { $regex: search.trim(), $options: 'i' } }
-      ]
+      ];
     };
 
     // Stats

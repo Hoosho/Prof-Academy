@@ -37,7 +37,7 @@ const AttachmentSchema = new mongoose.Schema({
   },
   fileType: {
     type: String,
-    enum: [ 'pdf', 'doc', 'docx', 'ppt', 'pptx', 'image', 'other' ],
+    enum: [ 'pdf', 'doc', 'docx', 'image', 'xls', 'xlsx', 'csv' ],
     default: 'pdf'
   },
   fileSizeMB: {
