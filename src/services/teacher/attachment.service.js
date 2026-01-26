@@ -115,9 +115,9 @@ export const getAttachmentStatsService = async ( teacherId ) => {
               }
             },
             
-            // Last Upload At
-            lastUploadAt: { $max: '$createdAt' }
-          }
+          },
+          // Last Upload At
+          lastUploadAt: { $max: '$createdAt' }
         },
       }
     ]);
