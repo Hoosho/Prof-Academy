@@ -50,7 +50,7 @@ export const createAttachmentService = async ( req, teacherId, {
 
     // Create Audit Log - Attachment Has Been Created Successfully
     await createAuditLog({
-      actor``: req?.context?.actor || {},
+      actor: req?.context?.actor || {},
       action: 'ATTACHMENT.CREATE',
       target: {
         model: 'Attachment',
