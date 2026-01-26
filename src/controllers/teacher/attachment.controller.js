@@ -22,7 +22,7 @@ export const createAttachment = async ( req, res, next ) => {
     // Call Create Attachment Service
     const {
       attachmentId, attachmentCode, attachmentTitle
-    } = await createAttachment( req, teacherId, {
+    } = await createAttachmentService( req, teacherId, {
       title, description, fileUrl, fileType, fileSizeMb, status
     });
 
