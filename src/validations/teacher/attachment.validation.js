@@ -52,16 +52,6 @@ export const createAttachmentValidation = celebrate({
         'any.required': '❌ حجم الملف مطلوب',
       }),
 
-    relation: Joi.string()
-      .hex()
-      .length(24)
-      .required()
-      .messages({
-        'string.hex': '❌ Lecture ID غير صالح',
-        'string.length': '❌ Lecture ID غير صالح',
-        'any.required': '❌ يجب ربط الملف بمحاضرة',
-      }),
-
     status: Joi.string()
       .valid('active', 'hidden', 'inactive')
       .default('active')

@@ -9,11 +9,11 @@ import { createAuditLog } from '../../services/system/auditLog.service.js';
  * @desc Create New Attachment Service
  * @param { object } req
  * @param { string } teacherId
- * @param { object } { title, description, fileUrl, fileType, fileSizeMb, status }
+ * @param { object } { title, description, fileUrl, fileType, fileSizeMB, status }
  * @retunrs { string } attachmentTitle
 */
 export const createAttachmentService = async ( req, teacherId, {
-  title, description, fileUrl, fileType, fileSizeMb, status
+  title, description, fileUrl, fileType, fileSizeMB, status
 }) => {
   // Start Session In DB
   const session = await mongoose.startSession();
@@ -26,7 +26,7 @@ export const createAttachmentService = async ( req, teacherId, {
       _id: teacherId,
       status: 'active',
       isDeleted : false
-    });
+    }).session( session );
     if( !teacher ) throw new ErrorResponse( '❌ المعلم غير موجود!', 404 );
 
     // Generate Attachment Code
@@ -34,22 +34,23 @@ export const createAttachmentService = async ( req, teacherId, {
 
     // Check If Attachmnt Is Exists
     const existingAttachment = await Attachment.findOne({
-      teacher: teacherId, fileSizeMb
-    });
+      teacher: teacherId, fileSizeMB
+    }).session( session );
     if( existingAttachment ) throw new ErrorResponse( '❌ تمت إضافة هذا الملحق من قبل!!', 400 );
 
     // Create Attachment
-    const attachment = await Attachment.create(
-      [{
+    const [ attachment ] = await Attachment.create([
+      {
         teacher: teacherId,
-        code, title, description, fileUrl, fileType, fileSizeMb, status
-      }],
-      { session }
-    );
+        code, title, description, fileUrl, fileType, fileSizeMB, status
+      },
+    ], {
+      session
+    });
 
     // Create Audit Log - Attachment Has Been Created Successfully
     await createAuditLog({
-      acotr: req?.context?.actor || {},
+      actor``: req?.context?.actor || {},
       action: 'ATTACHMENT.CREATE',
       target: {
         model: 'Attachment',

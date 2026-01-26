@@ -18,7 +18,7 @@ const AttachmentSchema = new mongoose.Schema({
     type: String,
     required: [ true, 'عنوان الملف مطلوب!' ],
     minlength: [ 3, 'عنوان الملف قصير جدا!' ],
-    minlength: [ 150, 'عنوان الملف طويل جدا!' ],
+    maxlength: [ 150, 'عنوان الملف طويل جدا!' ],
     trim: true
   },
   description: {
@@ -42,7 +42,7 @@ const AttachmentSchema = new mongoose.Schema({
   },
   fileSizeMB: {
     type: Number,
-    min: 9,
+    max: 9,
     default: 0
   },
 
@@ -56,7 +56,6 @@ const AttachmentSchema = new mongoose.Schema({
   relation: {
     type: mongoose.Schema.Types.ObjectId,
     ref: 'Lecture',
-    required: true
   },
   teacher: {
     type: mongoose.Schema.Types.ObjectId,
@@ -78,7 +77,6 @@ const AttachmentSchema = new mongoose.Schema({
 });
 
 // -------- INDEXES --------
-AttachmentSchema.index({ code: 1 });
 AttachmentSchema.index({ lecture: 1, isDeleted: 1 });
 AttachmentSchema.index({ teacher: 1 });
 AttachmentSchema.index({ status: 1, createdAt: -1 });

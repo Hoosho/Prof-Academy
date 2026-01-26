@@ -13,17 +13,17 @@ export const createAttachment = async ( req, res, next ) => {
   try{
     // Take Failds From Req Body
     const {
-      title, description, fileUrl, fileType, fileSizeMb, status
+      title, description, fileUrl, fileType, fileSizeMB, status
     } = req.body || {};
 
     // Take Teacher Id From cookies 
     const teacherId = req.teacher.id;
-
+    
     // Call Create Attachment Service
     const {
       attachmentId, attachmentCode, attachmentTitle
     } = await createAttachmentService( req, teacherId, {
-      title, description, fileUrl, fileType, fileSizeMb, status
+      title, description, fileUrl, fileType, fileSizeMB, status
     });
 
     // Return Success Response

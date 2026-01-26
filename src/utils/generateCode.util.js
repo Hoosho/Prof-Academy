@@ -1,6 +1,6 @@
 // /src/utils/generateCode.util.js
 import Student from '../models/Student.model.js';
-import Attachment from '../models/Attachment.model.js'
+import Attachment from '../models/Attachment.model.js';
 import ProfCode from '../models/ProfCode.model.js';
 
 /**
@@ -59,7 +59,7 @@ export const generateAttachmentCode = async () => {
 
     code = `PROF-ATT-${year}-${randomNumber}`;
 
-    const attachment = await Student.findOne({ code, isDeleted: false });
+    const attachment = await Attachment.findOne({ code, isDeleted: false });
     exists = !!attachment;
   };
 
