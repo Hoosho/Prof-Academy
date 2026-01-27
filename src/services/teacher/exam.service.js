@@ -31,9 +31,9 @@ export const creaetExamService = async ( req, teacherId, {
     if( !teacher ) throw new ErrorResponse( '❌ المعلم غير موجود!', 404 );
 
     // Validate Questions Exist
-    if( !questions || Array.isArray( questions ) || questions.length === 0 ){
-      throw new ErrorResponse( '❌ يجب أن يحتوي الإختبار علي سؤال واحد علي الأقل!', 400 );
-    };
+    if (!questions || !Array.isArray(questions) || questions.length === 0) {
+      throw new ErrorResponse('❌ يجب أن يحتوي الإختبار علي سؤال واحد علي الأقل!', 400);
+    }
 
     // Validate Total Marks
     if( totalMarks <= 0 ) throw new ErrorResponse( '❌ مجموع الدراجات يجب أن يكون أكبر من صفر!', 400 );
@@ -43,10 +43,10 @@ export const creaetExamService = async ( req, teacherId, {
       grade,
       isDeleted: false
     }).session( session );
-    if( !existingExam ) throw new ErrorResponse( '❌ تم إنشاء نفس الإختبار من قبل!', 400 );
+    if( existingExam ) throw new ErrorResponse( '❌ تم إنشاء نفس الإختبار من قبل!', 400 );
 
     // Generate Exam Code
-    const code = generateExamCode;
+    const code = await generateExamCode();
 
     // Normalize Exam Data
     const examPayload = {
@@ -70,9 +70,9 @@ export const creaetExamService = async ( req, teacherId, {
       'teacher', 'code', 'title', 'grade', 'status', 'durationMinutes' , 'totalMarks', 'questions' 
     ];
 
-    for( field of requiredFields ){
-      if( !examPayload[ field ]){
-        throw new ErrorResponse( `❌ البيانات غير مكتملة: ${ field }`, 400 );
+    for (const field of requiredFields) {
+      if (!examPayload[field]) {
+        throw new ErrorResponse(`❌ البيانات غير مكتملة: ${field}`, 400);
       };
     };
 
@@ -102,7 +102,7 @@ export const creaetExamService = async ( req, teacherId, {
     return {
       examId: exam._id,
       examCode: exam.code,
-      examTitle: examTitle
+      examTitle: exam.title
     };
   }catch( err ){
     // Abort Transaction && End Session

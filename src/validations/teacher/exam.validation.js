@@ -8,7 +8,7 @@ export const createExamValidation = celebrate({
     title: Joi.string()
       .trim()
       .min(3)
-      .max(150)
+      .max(120)
       .required()
       .messages({
         'string.base': '❌ عنوان الاختبار يجب أن يكون نص',
@@ -20,12 +20,12 @@ export const createExamValidation = celebrate({
 
     grade: Joi.string()
       .valid(
-        'First Preparatory',
-        'Second Preparatory',
-        'Third Preparatory',
-        'First Secondary',
-        'Second Secondary',
-        'Third Secondary'
+        "الصف الاول الاعدادي",
+        "الصف الثاني الاعدادي",
+        "الصف الثالث الاعدادي",
+        "الصف الاول الثانوي",
+        "الصف الثاني الثانوي",
+        "الصف الثالث الثانوي"
       )
       .required()
       .messages({
@@ -34,30 +34,34 @@ export const createExamValidation = celebrate({
       }),
 
     status: Joi.string()
-      .valid('active', 'inactive')
+      .valid('active', 'inactive', 'hidden')
       .required()
       .messages({
-        'any.only': '❌ حالة الاختبار يجب أن تكون active أو inactive',
+        'any.only': '❌ حالة الاختبار غير صحيحة',
         'any.required': '❌ حالة الاختبار مطلوبة',
       }),
 
     durationMinutes: Joi.number()
       .integer()
       .min(1)
+      .max(180)
       .required()
       .messages({
         'number.base': '❌ مدة الاختبار يجب أن تكون رقم',
         'number.min': '❌ مدة الاختبار لا يمكن أن تقل عن دقيقة واحدة',
+        'number.max': '❌ مدة الاختبار لا يمكن أن تزيد عن 180 دقيقة',
         'any.required': '❌ مدة الاختبار مطلوبة',
       }),
 
     totalMarks: Joi.number()
       .integer()
       .min(1)
+      .max(120)
       .required()
       .messages({
         'number.base': '❌ مجموع الدرجات يجب أن يكون رقم',
         'number.min': '❌ مجموع الدرجات يجب أن يكون أكبر من صفر',
+        'number.max': '❌ مجموع الدرجات لا يمكن أن تزيد عن 120',
         'any.required': '❌ مجموع الدرجات مطلوب',
       }),
 
@@ -66,8 +70,8 @@ export const createExamValidation = celebrate({
         Joi.object({
           text: Joi.string()
             .trim()
-            .min(3)
-            .max(300)
+            .min(5)
+            .max(250)
             .required()
             .messages({
               'string.base': '❌ نص السؤال يجب أن يكون نص',
@@ -77,19 +81,21 @@ export const createExamValidation = celebrate({
               'any.required': '❌ نص السؤال مطلوب',
             }),
           type: Joi.string()
-            .valid('mcq') // دلوقتي MCQ only
+            .valid('mcq')
             .required()
             .messages({
               'any.only': '❌ نوع السؤال غير مدعوم',
               'any.required': '❌ نوع السؤال مطلوب',
             }),
           options: Joi.array()
-            .items(Joi.string().trim().required())
-            .length(4)
+            .items(Joi.string().trim().min(1).max(150).required())
+            .min(2)
+            .max(4)
             .required()
             .messages({
               'array.base': '❌ خيارات السؤال يجب أن تكون مصفوفة',
-              'array.length': '❌ السؤال يجب أن يحتوي على 4 خيارات',
+              'array.min': '❌ يجب أن يكون على الأقل خيارين',
+              'array.max': '❌ لا يمكن أن يزيد عن 4 خيارات',
               'any.required': '❌ خيارات السؤال مطلوبة',
             }),
           correctIndex: Joi.number()
@@ -106,10 +112,12 @@ export const createExamValidation = celebrate({
         })
       )
       .min(1)
+      .max(120)
       .required()
       .messages({
         'array.base': '❌ يجب أن يحتوي الاختبار على أسئلة',
         'array.min': '❌ يجب أن يحتوي الاختبار على سؤال واحد على الأقل',
+        'array.max': '❌ لا يمكن أن يزيد عدد الأسئلة عن 120',
         'any.required': '❌ الأسئلة مطلوبة',
       }),
   }),
@@ -139,7 +147,7 @@ export const getExamsValidation = celebrate({
       }),
 
     status: Joi.string()
-      .valid('active', 'inactive')
+      .valid('active', 'inactive', 'hidden')
       .messages({
         'any.only': '❌ حالة الاختبارات غير صحيحة',
       }),

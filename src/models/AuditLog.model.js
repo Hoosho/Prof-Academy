@@ -41,6 +41,8 @@ const AuditLogSchema = new mongoose.Schema({
       'ATTACHMENT.UPDATE',
       'ATTACHMENT.SORT.DELETE',
       
+      // EXAM
+      'EXAM.CREATE',
       // MONTH
       "MONTH.CREATE",
       "MONTH.UPDAET",
