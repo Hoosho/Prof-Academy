@@ -21,7 +21,7 @@ export const createExam = async ( req, res, next ) => {
 
     // Call Create Exam Service 
     const {
-      examId, examTitle
+      examId, examCode, examTitle
     } = await creaetExamService( req, teacherId, {
       title, grade, status, durationMinutes, totalMarks, questions
     });
@@ -32,6 +32,7 @@ export const createExam = async ( req, res, next ) => {
       msg: `✅ تم إنشاء امتحان ${ examTitle } بنجاح`,
       data: {
         examId,
+        examCode,
         examTitle
       }
     });

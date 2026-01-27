@@ -6,11 +6,11 @@ const QuestionsSchema = new mongoose.Schema({
   type: {
     type: String,
     enum: {
-      values: [ 'msq' ],
+      values: [ 'mcq' ],
       message: ' نوع السؤال غير صحيح! ' 
     },
     required: [ true, '❌ نوع الاختبار مطلوب' ],
-    default: 'msq'
+    default: 'mcq'
   },
   text: {
     type: String,
@@ -40,10 +40,10 @@ const QuestionsSchema = new mongoose.Schema({
 
   correctIndex: {
     type: Number,
-    required: [ ture, '❌ رقم الإجابة الصحيحة مطلوب!'],
+    required: [ true, '❌ رقم الإجابة الصحيحة مطلوب!'],
     validate: {
       validator: function( val ){
-        return Number.isInteger( val ) && val >= 9;
+        return Number.isInteger(val) && val >= 0;
       },
       message: '❌ رقم الإجابة الصحيحة غير صالح!'
     }, 
@@ -71,8 +71,8 @@ const ExamSchema = new mongoose.Schema({
   },
   type: {
     type: String,
-    enum: [ 'msq', 'truefalse', 'short' ],
-    default: 'msq'
+    enum: [ 'mcq', 'truefalse', 'short' ],
+    default: 'mcq'
   },
   grade: {
     type: String,
@@ -112,12 +112,10 @@ const ExamSchema = new mongoose.Schema({
 
   questions: {
     type: [ QuestionsSchema ],
-    validate: [
-      {
-        validateor: ( v ) => Array.isArray( v ) && v.length > 0 && v.length <= 120,
-        message: "❌ لازم يكون في 1-120 سؤال بالاختبار",
-      }
-    ]
+    validate: {
+      validator: (v) => Array.isArray(v) && v.length > 0 && v.length <= 120,
+      message: "❌ لازم يكون في 1-120 سؤال بالاختبار",
+    }
   },
   teacher: {
     type: mongoose.Schema.Types.ObjectId,
@@ -132,14 +130,13 @@ const ExamSchema = new mongoose.Schema({
   },
   deletedAt: {
     type: Date,
-    default: Date.now
+    default: null
   }
 }, {
-  timeStamps: true
+  timestamps: true
 });
 
 // Indexes
-
 ExamSchema.index({ teacher: 1, status: 1, grade: 1, isDeleted: 1 });
 ExamSchema.index({ code: 1 });
 ExamSchema.index({ title: 'text' });

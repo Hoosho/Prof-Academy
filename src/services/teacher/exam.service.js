@@ -4,7 +4,7 @@ import Exam from '../../models/Exam.model.js';
 import Teacher from '../../models/Teacher.model.js';
 import { ErrorResponse } from '../../utils/errorResponse.util.js';
 import { createAuditLog } from '../../services/system/auditLog.service.js';
-
+import { generateExamCode } from '../../utils/generateCode.util.js';
 
 /**
  * @desc Create A New Exam ( MSQ Only )
@@ -37,8 +37,6 @@ export const creaetExamService = async ( req, teacherId, {
 
     // Validate Total Marks
     if( totalMarks <= 0 ) throw new ErrorResponse( '❌ مجموع الدراجات يجب أن يكون أكبر من صفر!', 400 );
-
-
     // Check IF Exam Created Before
     const existingExam = await Exam.findOne({
       title,
@@ -47,9 +45,13 @@ export const creaetExamService = async ( req, teacherId, {
     }).session( session );
     if( !existingExam ) throw new ErrorResponse( '❌ تم إنشاء نفس الإختبار من قبل!', 400 );
 
+    // Generate Exam Code
+    const code = generateExamCode;
+
     // Normalize Exam Data
     const examPayload = {
       teacher: teacherId,
+      code,
       title: title?.trim(),
       grade,
       status: status || 'active',
@@ -65,7 +67,7 @@ export const creaetExamService = async ( req, teacherId, {
 
     // Final Validation
     const requiredFields = [
-      'teacher', 'title', 'grade', 'status', 'durationMinutes' , 'totalMarks', 'questions' 
+      'teacher', 'code', 'title', 'grade', 'status', 'durationMinutes' , 'totalMarks', 'questions' 
     ];
 
     for( field of requiredFields ){
@@ -99,6 +101,7 @@ export const creaetExamService = async ( req, teacherId, {
     // Return Title && Id
     return {
       examId: exam._id,
+      examCode: exam.code,
       examTitle: examTitle
     };
   }catch( err ){

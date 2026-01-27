@@ -2,7 +2,7 @@
 import Student from '../models/Student.model.js';
 import Attachment from '../models/Attachment.model.js';
 import ProfCode from '../models/ProfCode.model.js';
-
+import Exam from '../models/Exam.model.js';
 /**
  * @desc Generate Student Code
 */
@@ -61,6 +61,26 @@ export const generateAttachmentCode = async () => {
 
     const attachment = await Attachment.findOne({ code, isDeleted: false });
     exists = !!attachment;
+  };
+
+  return code;
+};
+
+/**
+ * @desc Generate Exam Code
+*/
+export const generateExamCode = async () => {
+  let code;
+  let exists = true;
+
+  while (exists) {
+    const randomNumber = Math.floor(100000 + Math.random() * 900000); // 6 digits
+    const year = new Date().getFullYear();
+
+    code = `PROF-EXAM-${year}-${randomNumber}`;
+
+    const exam = await Exam.findOne({ code, isDeleted: false });
+    exists = !!exam;
   };
 
   return code;
