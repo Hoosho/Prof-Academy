@@ -189,6 +189,7 @@ export const getAttachmentService = async ( teacherId, {
     // Parallel Queries
     const [ attachments, totalResults ] = await Promise.all([
       Attachment.find( filter )
+      // Created At Updated At
       .select(' _id code title description fileUrl fileType fileSizeMB status ')
       .sort({ createdAt: -1 })
       .skip( skip )

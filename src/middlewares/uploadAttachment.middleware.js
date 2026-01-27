@@ -1,18 +1,8 @@
 // /src/middlewares/uploadAttachment.middleware.js
 import multer from 'multer';
-import { CloudinaryStorage } from 'multer-storage-cloudinary';
-import cloudinary from '../config/cloudinary.config.js';
 
 // Storage
-const storage = new CloudinaryStorage({
-  cloudinary,
-  params: ( req, file ) => ({
-      folder: `attachments/${req.teacher.id}`,
-      resource_type: 'raw',
-      format: 'pdf',
-      public_id: file.originalname.replace(/\.[^/.]+$/, "")
-  }),
-});
+const storage = multer.diskStorage({});
 
 const fileFilter = ( req, file, cb ) => {
   if( file.mimetype !== 'application/pdf' ){

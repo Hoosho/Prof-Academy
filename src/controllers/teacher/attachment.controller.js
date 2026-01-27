@@ -3,7 +3,7 @@ import {
   createAttachmentService, getAttachmentStatsService, getAttachmentService
 } from '../../services/teacher/attachment.service.js';
 import { ErrorResponse } from '../../utils/errorResponse.util.js';
-
+import cloudinary from '../../config/cloudinary.config.js';
 /**
  * @desc Creaet New Attachment 
  * @route POST /api/teacher/attachment
@@ -16,15 +16,26 @@ export const createAttachment = async ( req, res, next ) => {
       title, description, fileType, status
     } = req.body || {};
 
-    // Take File Url Form Req File Path
-    const fileUrl = req.file.path;
-    
-    // Take File Size Mb From Cloudainary Respone 
-    const fileSizeMB = +(req.file.size / (1024 * 1024)).toFixed(2);
-
     // Take Teacher Id From cookies 
     const teacherId = req.teacher.id;
     
+    // Check File Uploaded
+    if( !req.file ) throw new ErrorResponse( '❌ حدث خطأ اثنار رفع الملف!', 400 );
+
+    
+    const result = await cloudinary.uploader.upload( req.file.path , {
+      resource_type: 'raw',
+      folder: `attachment/${ teacherId }`,
+      public_id: req.file.originalname.replace(/\.[^/.]+$/, "")
+    });
+    
+    // Take File Url Form Req File Path
+    const fileUrl = result.secure_url;
+
+    // Take File Size Mb From Cloudainary Respone 
+    const fileSizeMB = +(req.file.size / (1024 * 1024)).toFixed(2);
+
+
     // Call Create Attachment Service
     const {
       attachmentId, attachmentCode, attachmentTitle
