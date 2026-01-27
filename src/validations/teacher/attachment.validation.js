@@ -27,15 +27,6 @@ export const createAttachmentValidation = celebrate({
         'string.max': '❌ وصف الملف طويل جدًا',
       }),
 
-    fileUrl: Joi.string()
-      .uri()
-      .required()
-      .messages({
-        'string.base': '❌ رابط الملف يجب أن يكون نص',
-        'string.uri': '❌ رابط الملف غير صالح',
-        'any.required': '❌ رابط الملف مطلوب',
-      }),
-
     fileType: Joi.string()
       .valid('pdf', 'doc', 'docx', 'image', 'xls', 'xlsx', 'csv')
       .default('pdf')

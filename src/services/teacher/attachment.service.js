@@ -29,6 +29,8 @@ export const createAttachmentService = async ( req, teacherId, {
     }).session( session );
     if( !teacher ) throw new ErrorResponse( '❌ المعلم غير موجود!', 404 );
 
+    // Check File Size Biggern Than 10 Mb
+    if( fileSizeMB > 10) throw new ErrorResponse( '❌ مساحة الملف اكبر من 10 ميجا!', 400 )
     // Generate Attachment Code
     const code = await generateAttachmentCode();
 

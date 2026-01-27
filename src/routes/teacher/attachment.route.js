@@ -5,7 +5,7 @@ const router = express.Router();
 // Import Middlewares
 import { authTeacher } from '../../middlewares/auth.middleware.js'
 import { contextMiddleware } from '../../middlewares/context.middleware.js';
-
+import { uploadAttachment } from '../../middlewares/uploadAttachment.middleware.js';
 // Import Controllers
 import {
   createAttachment, getAllAttachments
@@ -24,6 +24,7 @@ router.post(
   '/api/teacher/attachment',
   authTeacher,
   contextMiddleware,
+  uploadAttachment.single('file'),
   createAttachmentValidation,
   createAttachment
 );

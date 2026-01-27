@@ -13,8 +13,14 @@ export const createAttachment = async ( req, res, next ) => {
   try{
     // Take Failds From Req Body
     const {
-      title, description, fileUrl, fileType, fileSizeMB, status
+      title, description, fileType, status
     } = req.body || {};
+
+    // Take File Url Form Req File Path
+    const fileUrl = req.file.path;
+    
+    // Take File Size Mb From Cloudainary Respone 
+    const fileSizeMB = +(req.file.size / (1024 * 1024)).toFixed(2);
 
     // Take Teacher Id From cookies 
     const teacherId = req.teacher.id;
