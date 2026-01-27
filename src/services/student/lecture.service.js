@@ -4,6 +4,8 @@ import Month from '../../models/Month.model.js';
 import Lecture from '../../models/Lecture.model.js';
 import { ErrorResponse } from '../../utils/errorResponse.util.js';
 import { createAuditLog } from '../../services/system/auditLog.service.js';
+import Exam from '../../models/Exam.model.js';
+import Attachment from '../../models/Attachment.model.js';
 
 /**
  * @desc Get Lecture For One Month Service
@@ -19,7 +21,7 @@ export const getLecturesForMonthService = async ( studentId, monthId ) => {
       status: 'active',
       isDeleted: false
     })
-    .select(' boughtMonths wathedLectures assignedTeacher ')
+    .select(' boughtMonths watchedLectures assignedTeacher ')
     .lean();
     if( !student ) throw new ErrorResponse( '❌ الطالب غير موجود!', 404 );
 
@@ -45,22 +47,69 @@ export const getLecturesForMonthService = async ( studentId, monthId ) => {
       isDeleted: false
     })
     .sort({ createdAt: -1 })
-    .select('_id title description thumbnail grade videoId durationMinutes')
+    .select(' _id title description thumbnail grade videoId durationMinutes exam attachments ')
     .lean();
-    if( !lectures ) throw new ErrorResponse( '❌ المحاضرات غير موجود!', 404 );
+    if( !lectures.length ) throw new ErrorResponse( '❌ المحاضرات غير موجود!', 404 );
 
     // Map On Boughted Lectures Related To Month Id
-    const lecturesMap = lectures.map( ( l ) => {
-      return {
-        id: l._id,
-        title: l.title,
-        description: l.description,
-        thumbnail: l.thumbnail,
-        grade: l.grade,
-        videoId: l.videoId,
-        durationMinute: l.durationMinutes
-      }
-    });   
+    const lecturesMap = await Promise.all(
+      lectures.map( async ( l ) => {  
+        // Fetch Exam If exists
+        let examData = null;
+        if( l.exam ){   
+          const exam = await Exam.findOne({
+            _id: l.exam,
+            status: 'active',
+            isDeleted: false,
+            teacher: student.assignedTeacher
+          })
+          .select(' _id code title durationMinutes questions ')
+          .lean()
+
+          if( exam ){
+            examData = {
+              id: exam._id,
+              title: exam.title,
+              totalQuestions: exam.questions.length,
+              durationMinutes: exam.durationMinutes
+            };
+          };
+        };
+
+        // Fetch Attachments If exist 
+        let attachmentsData = [];
+        if( Array.isArray( l.attachments ) && l.attachments.length > 0  ){
+          const attachments = await Attachment.find({
+            _id: { $in: l.attachments },
+            isDeleted: false,
+            status: 'active',
+            teacher: student.assignedTeacher
+          })
+          .select(' _id title fileType fileSizeMB fileUrl ')
+          .lean()
+          attachmentsData = attachments.map( ( att ) => ({
+            id: att._id,
+            title: att.title,
+            fileType: att.fileType,
+            fileSizeMB: att.fileSizeMB,
+            fileUrl: att.fileUrl
+          }));
+        };
+
+        // Return Lecture Data 
+        return {
+          id: l._id,
+          title: l.title,
+          description: l.description,
+          thumbnail: l.thumbnail,
+          grade: l.grade,
+          videoId: l.videoId,
+          durationMinute: l.durationMinutes,
+          exam: examData,
+          attachments: attachmentsData
+        }
+      })
+    ); 
 
     // Prepare Response
     return {

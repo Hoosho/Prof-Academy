@@ -62,7 +62,7 @@ export const GetAllExams = async ( req, res, next ) => {
 
     // Call Get Exams Service 
     const { exams, pagination } = await getExamsService( teacherId, {
-      page, limit, status, search
+      page, limit, status, grade, search
     });
 
     // Return Success Response 

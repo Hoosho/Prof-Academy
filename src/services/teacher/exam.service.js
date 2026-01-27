@@ -204,11 +204,11 @@ export const getExamsStatsService = async ( teacherId ) => {
 /**
  * @desc Get All Exams Service
  * @param { string } teacherId
- * @param { object } { page, limit, status, search }
+ * @param { object } { page, limit, status, grade, search }
  * @returns { object } { exams, pagination }
 */
 export const getExamsService = async ( teacherId, {
-  page = 1, limit = 10, status = 'all', search = ''
+  page = 1, limit = 10, status = 'all', grade = 'all', search = ''
 }) => {
   try{
     // Sanitize Pagination
@@ -229,11 +229,14 @@ export const getExamsService = async ( teacherId, {
       ]
     };
 
-    // Status
+    // Status && Grade
     if( status && status !== 'all' ){
       filter.status = status;
     };
-
+    if( grade && grade !== 'all' ){
+      filter.grade = grade;
+    };
+    
     // Parallel Queries
     const [ exams, totalResults ] = await Promise.all([
       Exam.find( filter )

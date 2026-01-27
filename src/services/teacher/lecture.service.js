@@ -329,4 +329,3 @@ export const updateLectureService = async ( req, teacherId, monthId, lectureId, 
     throw err;
   }
 };
-
