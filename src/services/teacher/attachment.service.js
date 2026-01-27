@@ -151,7 +151,7 @@ export const getAttachmentStatsService = async ( teacherId ) => {
   };
 };
 /**
- * @desc 
+ * @desc Get All Attachments Service
  * @param { string } teacherId
  * @param { object } { page, limit, status, fileType, search }
  * @returns { object } { attachments, pagination }
@@ -190,7 +190,7 @@ export const getAttachmentService = async ( teacherId, {
     const [ attachments, totalResults ] = await Promise.all([
       Attachment.find( filter )
       // Created At Updated At
-      .select(' _id code title description fileUrl fileType fileSizeMB status ')
+      .select(' _id code title description fileUrl fileType fileSizeMB status createdAt updatedAt ')
       .sort({ createdAt: -1 })
       .skip( skip )
       .limit( limit )
@@ -199,6 +199,7 @@ export const getAttachmentService = async ( teacherId, {
       Attachment.countDocuments( filter )
     ]);
 
+    // Normaize Attachments Data
     const normalizedAttachment = attachments.map( ( att ) => ({
       id: att._id.toString(),
       code: att.code,
@@ -206,9 +207,12 @@ export const getAttachmentService = async ( teacherId, {
       description: att.description,
       fileUrl: att.fileUrl,
       fileSizeMb: att.fileSizeMB,
-      status: att.status
+      status: att.status,
+      createdAt: att.createdAt,
+      updatedAt: att.updatedAt
     }));
 
+    // Retrurn Data Paginated
     return {
       attachments: normalizedAttachment,
       pagination: {

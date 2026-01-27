@@ -54,6 +54,14 @@ const QuestionsSchema = new mongoose.Schema({
 
 // Exmas Model 
 const ExamSchema = new mongoose.Schema({
+  // Basic Info
+  code: {
+    type: String,
+    required: [ true, 'كود الملف مطلوب!'],
+    minlength: [0, "كود الملف لا يمكن أن يقل عن 0!"],
+    unique: [ true, 'كود الملف موجود بالفعل!'],
+    trim: true
+  },
   title: {
     type: String,
     required: [ true, '❌ عنوان الاختبار مطلوب!' ],
@@ -131,7 +139,9 @@ const ExamSchema = new mongoose.Schema({
 });
 
 // Indexes
+
 ExamSchema.index({ teacher: 1, status: 1, grade: 1, isDeleted: 1 });
+ExamSchema.index({ code: 1 });
 ExamSchema.index({ title: 'text' });
 
 // Export Exam Model
