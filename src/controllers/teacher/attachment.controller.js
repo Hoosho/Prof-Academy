@@ -23,11 +23,17 @@ export const createAttachment = async ( req, res, next ) => {
     if( !req.file ) throw new ErrorResponse( '❌ حدث خطأ اثنار رفع الملف!', 400 );
 
     
-    const result = await cloudinary.uploader.upload( req.file.path , {
+    const cleanName = req.file.originalname
+      .replace(/\.[^/.]+$/, "")   // يشيل الامتداد
+      .replace(/\s+/g, "_");      // يشيل المسافات (اختياري بس مهم)
+
+    const result = await cloudinary.uploader.upload(req.file.path, {
       resource_type: 'raw',
-      folder: `attachment/${ teacherId }`,
-      public_id: req.file.originalname.replace(/\.[^/.]+$/, "")
+      folder: `attachments/${teacherId}`,
+      public_id: cleanName,   // من غير .pdf
+      format: 'pdf'           // الامتداد هنا
     });
+
     
     // Take File Url Form Req File Path
     const fileUrl = result.secure_url;
