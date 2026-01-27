@@ -34,15 +34,6 @@ export const createAttachmentValidation = celebrate({
         'any.only': '❌ نوع الملف غير مدعوم',
       }),
 
-    fileSizeMB: Joi.number()
-      .min(0)
-      .required()
-      .messages({
-        'number.base': '❌ حجم الملف يجب أن يكون رقم',
-        'number.min': '❌ حجم الملف لا يمكن أن يكون أقل من 0',
-        'any.required': '❌ حجم الملف مطلوب',
-      }),
-
     status: Joi.string()
       .valid('active', 'hidden', 'inactive')
       .default('active')
