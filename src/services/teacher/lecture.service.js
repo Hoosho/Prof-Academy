@@ -93,7 +93,7 @@ export const createLectureService = async ( req, teacherId, monthId, {
       thumbnail: thumbnail || videoData?.thumbnail,
       durationMinutes: durationMinutes || videoData?.durationMinutes,
       grade: month.grade,
-      status,
+      status, 
       
       exam: examId,
       attachments: attachmentIds,

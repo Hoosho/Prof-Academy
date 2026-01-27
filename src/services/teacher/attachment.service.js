@@ -140,7 +140,7 @@ export const getAttachmentStatsService = async ( teacherId ) => {
       stats: {
         totalAttachments: stats[0].totalAttachments,
         activeAttachments: stats[0].activeAttachments,
-        totalSizeMb: Number( stats[0].totalSizeMb.toFixed( 1 ) ),
+        totalSizeMb: Number((stats[0]?.totalSizeMb || 0).toFixed(1)),
         lastUploadAt: stats[0].lastUploadAt
       }
     };
