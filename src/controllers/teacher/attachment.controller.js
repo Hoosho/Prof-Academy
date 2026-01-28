@@ -4,6 +4,8 @@ import {
 } from '../../services/teacher/attachment.service.js';
 import { ErrorResponse } from '../../utils/errorResponse.util.js';
 import cloudinary from '../../config/cloudinary.config.js';
+import path from 'path';
+
 /**
  * @desc Creaet New Attachment 
  * @route POST /api/teacher/attachment
@@ -23,17 +25,16 @@ export const createAttachment = async ( req, res, next ) => {
     if( !req.file ) throw new ErrorResponse( '❌ حدث خطأ اثنار رفع الملف!', 400 );
 
     
-    const cleanName = req.file.originalname
-      .replace(/\.[^/.]+$/, "")   // يشيل الامتداد
-      .replace(/\s+/g, "_");      // يشيل المسافات (اختياري بس مهم)
-
+    const originalName = req.file.originalname;
+    const cleanName = path
+      .parse(originalName)
+      .name
+      .replace(/[^a-zA-Z0-9_-]/g, '_');
     const result = await cloudinary.uploader.upload(req.file.path, {
       resource_type: 'raw',
       folder: `attachments/${teacherId}`,
-      public_id: cleanName,   // من غير .pdf
-      format: 'pdf'           // الامتداد هنا
+      public_id: cleanName,
     });
-
     
     // Take File Url Form Req File Path
     const fileUrl = result.secure_url;
