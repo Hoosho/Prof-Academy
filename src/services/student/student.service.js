@@ -252,3 +252,51 @@ export const buyMonthService = async ( req, studentId, monthId ) => {
     throw err;
   };
 };
+
+
+/**
+ * @desc Get Profile Service
+ * @param { string } studentId
+ * @returns { object } { student }
+*/
+export const getProfileService = async ( studentId ) => {
+  try{
+    // Check IF Student Exists
+    const student = await Student.findOne({
+      _id: studentId,
+      status: 'active',
+      isDeleted: false
+    });
+    if( !student ) throw new ErrorResponse( '❌ الطالب غير موجود!', 404 );
+    const teacher = await Teacher.findOne({
+      _id: student.assignedTeacher,
+      status: 'active',
+      isDeleted: false
+    }).select(' name ').lean();
+
+    // Join Date
+    const monthNames = [
+      'يناير','فبراير','مارس','أبريل','مايو','يونيو',
+      'يوليو','أغسطس','سبتمبر','أكتوبر','نوفمبر','ديسمبر'
+    ];
+    const joinDate = new Date(student.createdAt);
+    
+    // Return Student Data 
+    return {
+      student: {
+        teacherName: teacher.name,
+        code: student.code,
+        name: student.name,
+        grade: student.grade,
+        memberSince: `عضو منذ ${monthNames[joinDate.getMonth()]} ${joinDate.getFullYear()}`,
+        status: student.status,
+        cash: student.cash,
+        avatar: student.avatar,
+        phone: student.phone,
+        guardianPhone: student.guardianPhone,
+      }
+    }
+  }catch( err ){
+    throw err;
+  };
+};

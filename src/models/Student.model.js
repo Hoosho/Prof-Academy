@@ -114,7 +114,7 @@ const StudentSchema = new mongoose.Schema(
 
     lastLogin: {
       type: Date,
-      default: Date.now,
+      default: null,
     },
 
     role: {
