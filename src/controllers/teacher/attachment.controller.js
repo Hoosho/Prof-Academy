@@ -4,7 +4,6 @@ import {
 } from '../../services/teacher/attachment.service.js';
 import { ErrorResponse } from '../../utils/errorResponse.util.js';
 import cloudinary from '../../config/cloudinary.config.js';
-import path from 'path';
 
 /**
  * @desc Creaet New Attachment 

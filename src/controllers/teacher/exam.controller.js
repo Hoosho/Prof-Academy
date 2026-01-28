@@ -51,7 +51,7 @@ export const GetAllExams = async ( req, res, next ) => {
   try{
     // Take Fields From Queries
     const {
-      page, limit, status, search
+      page, limit, status, grade, search
     } = req.query || {};
 
     // Take Teacher Id From Queries 
