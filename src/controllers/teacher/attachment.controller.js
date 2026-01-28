@@ -35,7 +35,7 @@ export const createAttachment = async ( req, res, next ) => {
     });
         
     // Take File Url Form Req File Path
-    const fileUrl = `${fileUrl}?attachment=true`;
+    const fileUrl = `${result.secure_url}.pdf`;
 
     // Take File Size Mb From Cloudainary Respone 
     const fileSizeMB = +(req.file.size / (1024 * 1024)).toFixed(2);
