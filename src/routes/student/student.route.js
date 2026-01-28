@@ -65,7 +65,7 @@ router.get(
  * @desc Update Student Route
  * @route PUT /api/student/student
 */
-router.get(
+router.put(
   '/api/student/student',
   authStudent,
   updateStudent

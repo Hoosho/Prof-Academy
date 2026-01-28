@@ -11,7 +11,7 @@ import Attachment from '../../models/Attachment.model.js';
  * @desc Get Lecture For One Month Service
  * @param { string } studntId
  * @param { string } monthId
- * @returns { object }
+ * @returns { object } { monthTitle, lecturesCount, lecturesMap }
 */
 export const getLecturesForMonthService = async ( studentId, monthId ) => {
   try{
