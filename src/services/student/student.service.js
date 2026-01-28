@@ -253,7 +253,6 @@ export const buyMonthService = async ( req, studentId, monthId ) => {
   };
 };
 
-
 /**
  * @desc Get Profile Service
  * @param { string } studentId
@@ -300,6 +299,54 @@ export const getProfileService = async ( studentId ) => {
     throw err;
   };
 };
+
+/**
+ * @desc Update Student Service
+ * @param { object } req
+ * @param { string } studentId
+ * @param { object } { name, phone, guardianPhone }
+ * @returns { object } { studentName }
+*/
+export const updateStudentService = async ( req, studentId, {
+  name, phone, guardianPhone
+}) => {
+  try{
+    // Check IF Student Exists
+    const student = await Student.findOne({
+      _id: studentId,
+      status: 'active',
+      isDeleted: false
+    });
+    if( !student ) throw new ErrorResponse( '❌ الطالب غير موجود!', 404 );
+
+    // If Profile Changes 
+    if( req.file ){      
+      const result = await cloudinary.uploader.upload(
+        req.file.path, {
+          folder: `students/profiles/${ studentId }`,
+          public_id: student.name,
+          transformation: [{ width: 300, height: 300, crop: fill }]
+        }
+      );
+      student.avatar = result.secure_url;
+      await student.save();
+    };
+    
+    // Update Student
+    student.name = name;
+    student.phone = phone;
+    student.guardianPhone = guardianPhone;
+    await student.save();
+    
+    // Return Student Name 
+    return {
+      studentName: student.name
+    };
+  }catch( err ){
+    throw err;
+  };
+};
+
 
 /**
  * @desc Auth Me Service

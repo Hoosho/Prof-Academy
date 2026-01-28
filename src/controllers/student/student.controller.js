@@ -1,7 +1,7 @@
 // /src/controllers/student/student.controller.js
 import {
   getStudentMonthsService, chargeWalletService, buyMonthService,
-  getProfileService, authMeService
+  getProfileService, updateStudentService, authMeService
 } from '../../services/student/student.service.js';
 import { ErrorResponse } from '../../utils/errorResponse.util.js';
 import cloudinary from '../../config/cloudinary.config.js';
@@ -90,32 +90,70 @@ export const buyMonth = async ( req, res, next ) => {
   };
 };
 
-export const updateStudent = async ( req, res, next ) => {
+/**
+ * @desc Get Student Data
+ * @route GET /api/student/profile
+ * @access Public Private ( Only Student )
+*/
+export const getProfile = async ( req, res, next ) => {
   try{
-    // Take Avatar From Req File
-    if( !req.file ) throw new ErrorResponse( '❌ حديث خطأ اثنار رفع الصورة!', 400 );
-  
     // Take Student Id From Cookies 
     const studentId = req.student.id;
-    
+
     // Call Get Profile Service
-    const {  } = await getProfileService( studentId );
-
-    const result = await cloudinary.uploader.upload(
-      req.file.path, {
-        folder: `students/profiles/${ studentId }`,
-        public_id: className,
-        transformation: [{ width: 300, height: 300, crop: fill }]
+    const { student } = await getProfileService( studentId );
+    
+    // Return Success Response 
+    return res.status(200).json({
+      success: true,
+      data: {
+        student
       }
-    );
-    const avatar = result.secure_url;
-
+    });
   }catch( err ){
     console.log( err );
     next( err );
   };
 };
 
+/**
+ * @desc Update Student 
+ * @route PUT /api/student/student
+ * @access Private ( Only Student )
+*/
+export const updateStudent = async ( req, res, next ) => {
+  try{
+    // Take Fields From Req Body
+    const {
+      name, phone, guardianPhone
+    } = req.body || {};
+
+
+    // Take Student Id From Cookies 
+    const studentId = req.student.id;
+    
+    // Call Get Profile Service
+    const { studentName } = await updateStudentService( req, studentId, {
+      name, phone, guardianPhone
+    });
+
+    // Return Success Response
+    return res.status(200).json({
+      success: true,
+      msg: `✅ تم تحديث بينات الطالب ${ studentName } بنجاح.`
+    });
+  }catch( err ){
+    console.log( err );
+    next( err );
+  };
+};
+
+
+/**
+ * @desc Auth Me 
+ * @route GET /api/auth/me
+ * @access Private ( Only Student )
+*/
 export const authMe = async ( req, res, next ) => {
   try{
     // Get Student Id From Cookies 
@@ -131,32 +169,6 @@ export const authMe = async ( req, res, next ) => {
         student
       }
     })
-  }catch( err ){
-    console.log( err );
-    next( err );
-  };
-};
-
-/**
- * @desc Get Student Data
- * @route GET /api/student/profile
- * @access Public Private ( Only Student )
-*/
-export const getProfile = async ( req, res, next ) => {
-  try{
-    // Take Student Id From Cookies 
-    const studentId = req.student.id;
-
-    // Call Get Profile Service
-    const { student } = await getProfileService( studentId );
-
-    // Return Success Response 
-    return res.status(200).json({
-      success: true,
-      data: {
-        student
-      }
-    });
   }catch( err ){
     console.log( err );
     next( err );

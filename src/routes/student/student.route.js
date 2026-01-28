@@ -8,7 +8,7 @@ import { authStudent } from '../../middlewares/auth.middleware.js'
 
 // Import Controllers
 import {
-  getStudentMonths, chargeWallet, buyMonth, getProfile, authMe
+  getStudentMonths, chargeWallet, buyMonth, getProfile, updateStudent, authMe
 } from '../../controllers/student/student.controller.js'
 
 // Import Validations
@@ -59,6 +59,16 @@ router.get(
   '/api/student/profile',
   authStudent,
   getProfile
+);
+
+/**
+ * @desc Update Student Route
+ * @route PUT /api/student/student
+*/
+router.get(
+  '/api/student/student',
+  authStudent,
+  updateStudent
 );
 
 /**
