@@ -1,7 +1,7 @@
 // /src/controllers/student/student.controller.js
 import {
   getStudentMonthsService, chargeWalletService, buyMonthService,
-  getProfileService
+  getProfileService, authMeService
 } from '../../services/student/student.service.js';
 import { ErrorResponse } from '../../utils/errorResponse.util.js';
 import cloudinary from '../../config/cloudinary.config.js';
@@ -94,7 +94,6 @@ export const updateStudent = async ( req, res, next ) => {
   try{
     // Take Avatar From Req File
     if( !req.file ) throw new ErrorResponse( '❌ حديث خطأ اثنار رفع الصورة!', 400 );
-
   
     // Take Student Id From Cookies 
     const studentId = req.student.id;
@@ -111,6 +110,27 @@ export const updateStudent = async ( req, res, next ) => {
     );
     const avatar = result.secure_url;
 
+  }catch( err ){
+    console.log( err );
+    next( err );
+  };
+};
+
+export const authMe = async ( req, res, next ) => {
+  try{
+    // Get Student Id From Cookies 
+    const studentId = req.student.id;
+    
+    // Call Auth Me Service
+    const { student } = await authMeService( studentId );
+
+    // Return Success Response 
+    return res.status(200).json({
+      success: true,
+      data: {
+        student
+      }
+    })
   }catch( err ){
     console.log( err );
     next( err );
