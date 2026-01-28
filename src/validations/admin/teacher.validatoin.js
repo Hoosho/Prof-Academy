@@ -106,8 +106,17 @@ export const updateTeacherValidation = celebrate({
     }),
     status: Joi.string().valid("active", "hidden", "inactive").messages({
       "any.only": "❌ الحالة يجب أن تكون active أو معلق أو محظور"
-    })
-  })
+    }),
+    deviceId: Joi.string()
+      .alphanum()
+      .length(32)
+      .allow('') // يسمح بالـ empty string
+      .messages({
+        "string.base": "❌ Device ID يجب أن يكون نص",
+        "string.empty": "❌ Device ID مطلوب أو فارغ",
+        "string.length": "❌ Device ID يجب أن يكون 32 حرف بالضبط",
+      }),
+  })  
 });
 
 /**
