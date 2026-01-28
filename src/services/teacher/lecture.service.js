@@ -1,5 +1,4 @@
 // /src/services/teacher/lectuere.service.js
-import Teacher from '../../models/Teacher.model.js';
 import Month from '../../models/Month.model.js';
 import Lecture from '../../models/Lecture.model.js';
 import Attachment from '../../models/Attachment.model.js';
@@ -81,6 +80,9 @@ export const createLectureService = async ( req, teacherId, monthId, {
 
       if( !exam ){
         throw new ErrorResponse( '❌ كود الامتحان غير صحيح!');
+      };
+      if ( exam.grade !== month.grade ){
+        throw new ErrorResponse( `❌ هذا الاختبار ليس للصف ${ month.grade || '' }!`, 400 );
       };
 
       examId = exam._id;

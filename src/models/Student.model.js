@@ -145,6 +145,16 @@ const StudentSchema = new mongoose.Schema(
     watchedLectures: [WatchedLectureSchema],
     achievements: [AchievementsSchema],
   
+    examsTaken: [
+      {
+        exam: {
+          type: mongoose.Schema.Types.ObjectId,
+          ref: 'Exam'
+        },
+        submittedAt: Date
+      }
+    ],
+
     // Soft Delete
     isDeleted: {
       type: Boolean,
