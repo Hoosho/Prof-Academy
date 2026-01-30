@@ -15,6 +15,8 @@ const TeacherSchema = new mongoose.Schema({
   email: {
     type: String,
     required: [ true, 'الإيميل مطلوب!' ],
+    minlength: [ 5, 'الإيميل قصير جدا!' ],
+    maxlength: [ 60, 'الإيميل طويل جدا!' ],
     lowercase: true,
     trim: true,
     validate: {
@@ -39,7 +41,10 @@ const TeacherSchema = new mongoose.Schema({
   },
   subject: {
     type: String,
-    required: [ true, 'المادة مطلوبة!' ] 
+    required: [ true, 'المادة مطلوبة!' ],
+    minlength: [ 5, 'المادة قصير جدا!' ],
+    maxlength: [ 35, 'المادة طويل جدا!' ],
+    trim: true
   },
   avatar: {
     type: String,

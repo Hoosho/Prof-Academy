@@ -12,8 +12,10 @@ export const createTeacherValidation = celebrate({
       "string.max": "❌ الاسم طويل جدًا",
       "any.required": "❌ الاسم مطلوب"
     }),
-    email: Joi.string().email().required().messages({
-      "string.email": "❌ البريد الإلكتروني غير صالح",
+    email: Joi.string().min(5).max(60).email().required().messages({
+      "string.base": "❌ البريد الإلكتروني غير صالح",
+      "string.min": "❌ الإيميل قصير جدًا",
+      "string.max": "❌ الإيميل طويل جدًا",
       "any.required": "❌ البريد الإلكتروني مطلوب"
     }),
     phone: Joi.string().pattern(/^\d{11}$/).required().messages({
@@ -24,13 +26,14 @@ export const createTeacherValidation = celebrate({
       "string.min": "❌ كلمة المرور قصيرة جدًا",
       "any.required": "❌ كلمة المرور مطلوبة"
     }),
-    subject: Joi.string().required().messages({
-      "any.required": "❌ المادة مطلوبة"
-    }),
-    avatar: Joi.string().uri().messages({
-      "string.uri": "❌ رابط الصورة غير صالح"
+    subject: Joi.string().min(3).max(35).trim().required().messages({
+      "string.base": "❌ المادة يجب أن يكون نص",
+      "string.min": "❌ المادة قصيرة جدًا",
+      "string.max": "❌ المادة طويلة جدًا",
+      "any.required": "❌ المادة مطلوبة",
     }),
     bio: Joi.string().max(500).messages({
+      "string.base": "❌ السيرة الذاتية يجب أن يكون نص",
       "string.max": "❌ السيرة الذاتية طويلة جدًا"
     }),
     status: Joi.string().valid("active", "hidden", "inactive").default("active").messages({
@@ -41,7 +44,7 @@ export const createTeacherValidation = celebrate({
 
 /**
  * ✅ Get Teacher Queries Validation
- */
+*/
 export const getTeachersQueryValidation = celebrate({
   [Segments.QUERY]: Joi.object({
     page: Joi.number()
@@ -80,31 +83,41 @@ export const getTeachersQueryValidation = celebrate({
 });
 /**
  * ✅ Update Teacher Validation
- */
+*/
 export const updateTeacherValidation = celebrate({
   [Segments.BODY]: Joi.object({
-    name: Joi.string().min(3).max(50).trim().messages({
+    name: Joi.string().min(3).max(50).required().trim().messages({
       "string.base": "❌ الاسم يجب أن يكون نص",
+      "string.empty": "❌ الاسم مطلوب",
       "string.min": "❌ الاسم قصير جدًا",
-      "string.max": "❌ الاسم طويل جدًا"
+      "string.max": "❌ الاسم طويل جدًا",
+      "any.required": "❌ الاسم مطلوب"
     }),
-    email: Joi.string().email().messages({
-      "string.email": "❌ البريد الإلكتروني غير صالح"
+    email: Joi.string().min(5).max(60).email().required().messages({
+      "string.base": "❌ البريد الإلكتروني غير صالح",
+      "string.min": "❌ الإيميل قصير جدًا",
+      "string.max": "❌ الإيميل طويل جدًا",
+      "any.required": "❌ البريد الإلكتروني مطلوب"
     }),
-    phone: Joi.string().pattern(/^\d{11}$/).messages({
-      "string.pattern.base": "❌ رقم الهاتف يجب أن يكون 11 رقم"
+    phone: Joi.string().pattern(/^\d{11}$/).required().messages({
+      "string.pattern.base": "❌ رقم الهاتف يجب أن يكون 11 رقم",
+      "any.required": "❌ رقم الهاتف مطلوب"
     }),
-    password: Joi.string().min(6).messages({
-      "string.min": "❌ كلمة المرور قصيرة جدًا"
+    password: Joi.string().min(6).required().messages({
+      "string.min": "❌ كلمة المرور قصيرة جدًا",
+      "any.required": "❌ كلمة المرور مطلوبة"
     }),
-    subject: Joi.string(),
-    avatar: Joi.string().uri().messages({
-      "string.uri": "❌ رابط الصورة غير صالح"
+    subject: Joi.string().min(3).max(35).trim().required().messages({
+      "string.base": "❌ المادة يجب أن يكون نص",
+      "string.min": "❌ المادة قصيرة جدًا",
+      "string.max": "❌ المادة طويلة جدًا",
+      "any.required": "❌ المادة مطلوبة",
     }),
     bio: Joi.string().max(500).messages({
+      "string.base": "❌ السيرة الذاتية يجب أن يكون نص",
       "string.max": "❌ السيرة الذاتية طويلة جدًا"
     }),
-    status: Joi.string().valid("active", "hidden", "inactive").messages({
+    status: Joi.string().valid("active", "hidden", "inactive").default("active").messages({
       "any.only": "❌ الحالة يجب أن تكون active أو معلق أو محظور"
     }),
     deviceId: Joi.string()
@@ -116,12 +129,12 @@ export const updateTeacherValidation = celebrate({
         "string.empty": "❌ Device ID مطلوب أو فارغ",
         "string.length": "❌ Device ID يجب أن يكون 32 حرف بالضبط",
       }),
-  })  
+  })
 });
 
 /**
  * ✅ Teacher ID Validation (For Update/Delete)
- */
+*/
 export const teacherIdValidation = celebrate({
   [Segments.PARAMS]: Joi.object({
     id: Joi.string().hex().length(24).required().messages({

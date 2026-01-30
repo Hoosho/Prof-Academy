@@ -126,7 +126,7 @@ export const getMonthsStatsService = async ( teacherId ) => {
  * @returns { object } { months, paginations }
 */
 export const getMonthsService = async ( teacherId, {
-    page = 1, limit = 10, search = '', status = 'all', grade = 'all'
+  page = 1, limit = 10, search = '', status = 'all', grade = 'all'
 })  => {
   try{
     // Sanatize Pagination

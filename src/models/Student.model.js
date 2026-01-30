@@ -66,6 +66,8 @@ const StudentSchema = new mongoose.Schema(
       type: String,
       required: [true, "اسم الطالب مطلوب!"],
       minlength: [3, "اسم الطالب لا يمكن أن يقل عن 3 أحرف!"],
+      maxlength: [50, "اسم الطالب لا يمكن أن يزيد عن 50 أحرف!"],
+      trim: true
     },
 
     code: {
@@ -131,8 +133,9 @@ const StudentSchema = new mongoose.Schema(
 
     cash: {
       type: Number,
+      min: [ 0, "الرصيد لا يمكن أن يقل عن 0!" ],
       default: 0,
-      min: [0, "الرصيد لا يمكن أن يقل عن 0!"],
+      max: [ 2000, "الرصيد لا يمكن أن يزيد عن 2000!" ],
     },
     assignedTeacher: {
       type: mongoose.Schema.Types.ObjectId,

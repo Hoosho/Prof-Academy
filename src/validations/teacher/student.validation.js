@@ -9,11 +9,13 @@ export const createStudentValidation = celebrate({
     name: Joi.string()
       .trim()
       .min(3)
+      .max(50)
       .required()
       .messages({
         "string.base": "❌ اسم الطالب يجب أن يكون نص",
         "string.empty": "❌ اسم الطالب مطلوب",
-        "string.min": "❌ اسم الطالب لا يمكن أن يقل عن 3 أحرف",
+        "string.min": "❌ اسم الطالب قصير جدا",
+        "string.max": "❌ اسم الطالب طويل جدا",
         "any.required": "❌ اسم الطالب مطلوب",
       }),
 
@@ -52,10 +54,12 @@ export const createStudentValidation = celebrate({
 
     cash: Joi.number()
       .min(0)
+      .max(2000)
       .required()
       .messages({
         "number.base": "❌ الرصيد يجب أن يكون رقم",
         "number.min": "❌ الرصيد لا يمكن أن يقل عن 0",
+        "number.max": "❌ الرصيد لا يمكن أن يزيد عن 2000",
         "any.required": "❌ الرصيد مطلوب",
       }),
   }),
@@ -99,7 +103,7 @@ export const getStudentsQueryValidation = celebrate({
       }),
 
     status: Joi.string()
-      .valid("active", "hidden", "active")
+      .valid("active", "hidden", "inactive")
       .optional()
       .messages({
         "any.only": "❌ حالة الطالب غير صحيحة",
@@ -123,23 +127,32 @@ export const updateStudentValidation = celebrate({
     name: Joi.string()
       .trim()
       .min(3)
-      .optional()
+      .max(50)
+      .required()
       .messages({
-        "string.min": "❌ اسم الطالب لا يمكن أن يقل عن 3 أحرف",
+        "string.base": "❌ اسم الطالب يجب أن يكون نص",
+        "string.empty": "❌ اسم الطالب مطلوب",
+        "string.min": "❌ اسم الطالب قصير جدا",
+        "string.max": "❌ اسم الطالب طويل جدا",
+        "any.required": "❌ اسم الطالب مطلوب",
       }),
 
     phone: Joi.string()
       .pattern(/^\d{11}$/)
-      .optional()
+      .required()
       .messages({
         "string.pattern.base": "❌ رقم هاتف الطالب يجب أن يكون 11 رقم",
+        "string.empty": "❌ رقم هاتف الطالب مطلوب",
+        "any.required": "❌ رقم هاتف الطالب مطلوب",
       }),
 
     guardianPhone: Joi.string()
       .pattern(/^\d{11}$/)
-      .optional()
+      .required()
       .messages({
         "string.pattern.base": "❌ رقم هاتف ولي الأمر يجب أن يكون 11 رقم",
+        "string.empty": "❌ رقم هاتف ولي الأمر مطلوب",
+        "any.required": "❌ رقم هاتف ولي الأمر مطلوب",
       }),
 
     grade: Joi.string()
@@ -151,18 +164,28 @@ export const updateStudentValidation = celebrate({
         "الصف الثاني الثانوي",
         "الصف الثالث الثانوي"
       )
-      .optional()
+      .required()
       .messages({
         "any.only": "❌ الصف الدراسي غير صحيح",
+        "any.required": "❌ الصف الدراسي مطلوب",
       }),
 
+    cash: Joi.number()
+      .min(0)
+      .max(2000)
+      .required()
+      .messages({
+        "number.base": "❌ الرصيد يجب أن يكون رقم",
+        "number.min": "❌ الرصيد لا يمكن أن يقل عن 0",
+        "number.max": "❌ الرصيد لا يمكن أن يزيد عن 2000",
+        "any.required": "❌ الرصيد مطلوب",
+      }),
     status: Joi.string()
-      .valid('active', 'hidden', 'active', 'all')
+      .valid( 'active', 'hidden', 'active' )
       .optional()
       .messages({
         "any.only": "❌ حالة الطالب غير صحيحة",
       }),
-
     deviceId: Joi.string()
       .alphanum()
       .length(32)
@@ -172,19 +195,7 @@ export const updateStudentValidation = celebrate({
         "string.empty": "❌ Device ID مطلوب أو فارغ",
         "string.length": "❌ Device ID يجب أن يكون 32 حرف بالضبط",
       }),
-
-    cash: Joi.number()
-      .min(0)
-      .optional()
-      .messages({
-        "number.base": "❌ الرصيد يجب أن يكون رقم",
-        "number.min": "❌ الرصيد لا يمكن أن يقل عن 0",
-      }),
-  })
-    .min(1)
-    .messages({
-      "object.min": "❌ يجب إرسال حقل واحد على الأقل للتحديث",
-    }),
+  }),
 });
 
 /**

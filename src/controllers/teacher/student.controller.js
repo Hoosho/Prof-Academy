@@ -15,12 +15,7 @@ export const createStudent = async ( req, res, next ) => {
     const {
       name, phone, guardianPhone, grade, cash,
     } = req.body || {};
-
-    // Validate Require Fields 
-    if( !name || !phone || !guardianPhone || !grade || !cash ){
-      throw new ErrorResponse( '❌ يجب إدخال جميع البينات!', 400 );
-    };
-
+    
     // Take Teacher Id From Cookie
     const teacherId = req.teacher.id;
 
@@ -89,13 +84,9 @@ export const updateTeacher = async ( req, res, next ) => {
   try{
     // Take Fields From Req Body
     const {
-      name, phone, guardianPhone, grade, cash, deviceId
+      name, phone, guardianPhone, status, grade, cash, deviceId
     } = req.body || {};
 
-    // Validate Require Fields
-    if( !name || !phone || !guardianPhone || !grade || !cash || !deviceId ){
-      throw new ErrorResponse( '❌ يجب إدخال جميع البينات!', 400 );
-    };
     // Take Teacher Id From Cookies
     const teacherId = req.teacher.id;
     
@@ -106,14 +97,14 @@ export const updateTeacher = async ( req, res, next ) => {
     };
 
     // Call Update Teacher Service
-    const { teacherName } = await updateStudentService( req, teacherId, studentId, 
-      { name, phone, guardianPhone, grade, cash, deviceId }
+    const { studentPhone } = await updateStudentService( req, teacherId, studentId, 
+      { name, phone, guardianPhone, status, grade, cash, deviceId }
     );
   
     // Return Success Response
     return res.status(200).json({
       success: true,
-      msg: `✅ تم تحديث بينات الطالب ${ teacherName }, بنجاح.`
+      msg: `✅ تم تحديث بينات الطالب ${ studentPhone }, بنجاح.`
     });
   }catch(err){
     console.log(err);
@@ -138,12 +129,12 @@ export const deleteStudent = async ( req, res, next ) => {
     };
 
     // Call Delete Student Service
-    const { teacherName } = await deleteStudentService( teacherId, studentId );
+    const { studentPhone } = await deleteStudentService( req, teacherId, studentId );
 
     // Return Success Response 
     return res.status(200).json({
       success: true,
-      msg: `✅ تم مسح بينات الطالب ${ teacherName }, بنجاح`
+      msg: `✅ تم مسح بينات الطالب ${ studentPhone }, بنجاح`
     });
   }catch(err){
     console.log(err);

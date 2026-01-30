@@ -1,6 +1,7 @@
 // /src/services/teacher/student.service.js
 import mongoose from 'mongoose';
 import Student from '../../models/Student.model.js';
+import Teacher from '../../models/Teacher.model.js';
 import { generateStudentCode } from '../../utils/generateCode.util.js';
 import { createAuditLog } from '../../services/system/auditLog.service.js';
 import { ErrorResponse } from '../../utils/errorResponse.util.js';
@@ -24,15 +25,26 @@ export const createStudentService = async ( req, teacherId,
     session.startTransaction();
 
     // Check IF Phone Exist
-    const existingStudent = await Student.findOne({ assignedTeacher: teacherId, phone }).session( session );
-    if (existingStudent) {
-      if (
-        existingStudent.isDeleted === false &&
-        teacherId.toString() === existingStudent.assignedTeacher.toString()
-      ){
-        throw new ErrorResponse('❌ هذا الطالب مسجل بالفعل من قبل!', 400);
-      };
+    const existingStudent = await Student.findOne({
+      assignedTeacher: teacherId,
+      phone,
+      isDeleted: false
+    }).session( session );
+    if ( existingStudent ) {
+      throw new ErrorResponse('❌ هذا الطالب مسجل بالفعل من قبل!', 400);
     };
+
+    // Check IF Student Phone Equal Guardian Phone
+    if( phone.toString() === guardianPhone.toString() ){
+      throw new ErrorResponse( '❌ مينفعش رقم الطالب يكون رقم ولي الامر!', 400 );
+    };
+
+    // Check If Student Phone Equal Teacher Phone
+    const teacherExists  = await Teacher.findOne({
+      phone,
+      isDeleted: false
+    }).session( session ).select(' phone ').lean();
+    if( teacherExists ) throw new ErrorResponse('❌ هذا الطالب مسجل بالفعل من قبل!', 400); 
 
     // Generate Prof Code
     const code = await generateStudentCode();
@@ -68,11 +80,6 @@ export const createStudentService = async ( req, teacherId,
     // Abort Transaction & End Session
     await session.abortTransaction();
     session.endSession();
-
-    // Prevent Race Condition
-    if( err.code === 11000 ){
-      throw new ErrorResponse( '❌ تمت إضافة هذا الطالب من قبل!' )
-    };
 
     console.log(err);
     throw err;
@@ -151,9 +158,10 @@ export const getStudentsService = async (
       assignedTeacher: teacherId
     };
 
+    // Search
     if( search.trim() ){
       filter.$or = [
-        { code: { $regex: search.trim(), $options: 'i' } },
+        { code : { $regex: search.trim(), $options: 'i' } },
         { name: { $regex: search.trim(), $options: 'i' } },
         { phone: { $regex: search.trim(), $options: 'i' } },
       ];
@@ -199,12 +207,13 @@ export const getStudentsService = async (
  * @param { object } req
  * @param { string } teacherId
  * @param { string } studentId
- * @param { object } { name, phone, guardianPhone, grade, cash, deviceId }
+ * @param { object } { name, phone, guardianPhone, status, grade, cash, deviceId }
  * @returns { string } studentName
 */
 export const updateStudentService = async (
-  req, teacherId, studentId, { name, phone, guardianPhone, grade, cash, deviceId }
-) => {
+  req, teacherId, studentId, {
+    name, phone, guardianPhone, status, grade, cash, deviceId
+  }) => {
   // Start Session
   const session = await mongoose.startSession();
   try{
@@ -213,7 +222,7 @@ export const updateStudentService = async (
 
     // Fetch Student Id & teacherId
     const student = await Student.findOne({
-      _id: studentId, assignedTeacher: teacherId
+      _id: studentId, assignedTeacher: teacherId, isDeleted: false
     }).session( session );
     if( !student ) throw new ErrorResponse( '❌ هذا الطالب غير موجود!', 404 );
 
@@ -225,7 +234,7 @@ export const updateStudentService = async (
       studentId,
       {
         $set: {
-          name, phone, guardianPhone, grade, cash, deviceId
+          name, phone, guardianPhone, status, grade, cash, deviceId
         }
       },
       {
@@ -281,7 +290,7 @@ export const deleteStudentService = async ( req, teacherId, studentId ) => {
 
     // Check If Student Exists
     const student = await Student.findOne({
-      isDeleted: false, _id: studentId, assignedTeacher: teacherId
+      _id: studentId, isDeleted: false, assignedTeacher: teacherId
     }).session( session );
     if( !student ) throw new ErrorResponse( '❌ هذا الطالب غير موجود!', 404 );
 

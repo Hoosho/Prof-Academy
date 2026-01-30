@@ -16,7 +16,6 @@ import { createAuditLog } from '../system/auditLog.service.js';
 export const adminLoginService = async ( req, username, password ) => {
 
   // Check If Admin Found 
-  console.log(await Admin.find());
   const admin =  await Admin.findOne({ username })
     .select('+password +otpCode +otpExpires');
   if( !admin ) throw new ErrorResponse( '❌ اسم المستخدم أو الباسورد غلط', 401 );
