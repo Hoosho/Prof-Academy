@@ -153,7 +153,7 @@ export const submitExamService = async ( req, studentId, examId, answers ) => {
     return {
       exam: {
         id: exam._id,
-        titla: exam.title,
+        title: exam.title,
         correctAnswers,
         totalMarks: exam.totalMarks,
         submittedAt: new Date(),

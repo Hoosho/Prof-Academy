@@ -8,12 +8,12 @@ import { authStudent } from '../../middlewares/auth.middleware.js'
 
 // Import Controllers
 import {
-  getExam
+  getExam, submitExam
 } from '../../controllers/student/exam.controller.js'
 
 // Import Validations
 import {
-  examIdValidation
+  examIdValidation, submitExamValidation
 } from '../../validations/student/exam.validation.js';
 
 /**
@@ -25,6 +25,19 @@ router.get(
   authStudent,
   examIdValidation,
   getExam
+);
+
+/**
+ * @desc Submit Exam Route
+ * @route POST /api/student/exam/:examId
+*/
+router.post(
+  '/api/student/exam/:examId',
+  authStudent,
+  examIdValidation,
+  contextMiddleware,
+  submitExamValidation,
+  submitExam
 );
 
 export default router;
