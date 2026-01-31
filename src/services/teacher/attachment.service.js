@@ -174,7 +174,8 @@ export const getAttachmentService = async ( teacherId, {
     // Search 
     if( search.trim() ){
       filter.$or = [
-        { title: { $regex: search.trim(), $options: 'i' } }
+        { title: { $regex: search.trim(), $options: 'i' } },
+        { code: { $regex: search.trim(), $options: 'i' } }
       ];
     };
 

@@ -25,7 +25,7 @@ const AttachmentSchema = new mongoose.Schema({
     type: String,
     default: '',
     trim: true,
-    maxlength: [ 150, 'وصف الملف طويل جدا!' ]
+    maxlength: [ 800, 'وصف الملف طويل جدا!' ]
   },
   fileUrl: {
     type: String,

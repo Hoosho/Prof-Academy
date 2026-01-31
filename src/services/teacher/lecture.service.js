@@ -1,4 +1,5 @@
 // /src/services/teacher/lectuere.service.js
+import Teacher from '../../models/Teacher.model.js'
 import Month from '../../models/Month.model.js';
 import Lecture from '../../models/Lecture.model.js';
 import Attachment from '../../models/Attachment.model.js';
@@ -32,17 +33,20 @@ export const createLectureService = async ( req, teacherId, monthId, {
     // Get Video Url Info ( If Need )
     let videoData = null;
     let videoId = null;
-    if( videoUrl ){
-      // Get Video Id
+
+    if (videoUrl) {
       videoId = getYoutubeVideoId(videoUrl);
       if (!videoId) throw new ErrorResponse('❌ رابط YouTube غير صالح!', 400);
-      
-      // If Enter Fields Manuall
-      if( !title || !description || !thumbnail || !durationMinutes ){
-          videoData = await getYoutubeVideoInfo( videoUrl );
-          if (!videoData) throw new ErrorResponse('❌ لم يتم جلب بيانات الفيديو من YouTube!', 400);
-      };
-    };
+
+      const videoData = await getYoutubeVideoInfo(videoUrl);
+      if (!videoData) throw new ErrorResponse('❌ لم يتم جلب بيانات الفيديو من YouTube!', 400);
+
+      if (!title) title = videoData.title;
+      if (!description) description = videoData.description;
+      if (!thumbnail) thumbnail = videoData.thumbnail;
+      if (!durationMinutes) durationMinutes = videoData.durationMinutes;
+    }
+
 
     // Check Lectuer Added In This Month Before Or no
     const existingLecture = await Lecture.findOne({
@@ -307,7 +311,7 @@ export const getLecturesService = async ( teacherId, monthId, {
  * @param { string } teacherId
  * @param { string } monthId
  * @param { string } lectureId
- * @param { object } {  }
+ * @param { object } { title, description, thumbnail, videoUrl, status, durationMinutes, attachmentCodes, examCode }
  * @returns { string } Lecture Title
 */
 export const updateLectureService = async ( req, teacherId, monthId, lectureId, {
@@ -319,15 +323,199 @@ export const updateLectureService = async ( req, teacherId, monthId, lectureId, 
     // Start Transaction
     await session.startTransaction();
 
-    const month = await Month.findById( monthId ).select(' _id title grade').session( session );
+    // Check If Teacher Exist 
+    const teacher = await Teacher.findOne({
+      _id: teacherId,
+      status: 'active',
+      isDeleted: false
+    }).session( session );
+    if( !teacher ) throw new ErrorResponse( '❌ المعلم غير موجود!', 400 );
+
+    // Check If Monts Exists 
+    const month = await Month.findOne({
+      _id: monthId,
+      status: 'active',
+      teacher: teacherId,
+      isDeleted: false
+    }).select(' _id title grade').session( session );
     if( !month ) throw new ErrorResponse( '❌ معرف الشهر غير صالح!', 400 );
     
+    // Check IF Lectute Exist 
+    const lecture = await Lecture.findOne({
+      _id: lectureId,
+      status: 'active',
+      teacher: teacherId,
+      isDeleted: false
+    }).session( session );
+    if( !lecture ) throw new ErrorResponse( '❌ المحاضرة غير موجودة!', 400 );
+
+    // If Video Has Been Changed
+    let videoData = null;
+    let videoId = null;
+
+    if (videoUrl) {
+      videoId = getYoutubeVideoId(videoUrl);
+      if (!videoId) {
+        throw new ErrorResponse('❌ رابط YouTube غير صالح!', 400);
+      }
+
+      const videoData = await getYoutubeVideoInfo(videoUrl);
+      if (!videoData) {
+        throw new ErrorResponse('❌ لم يتم جلب بيانات الفيديو من YouTube!', 400);
+      }
+
+      if (!title) title = videoData.title;
+      if (!description) description = videoData.description;
+      if (!thumbnail) thumbnail = videoData.thumbnail;
+      if (!durationMinutes) durationMinutes = videoData.durationMinutes;
+    }
+
+    // If Teacher Enter Attachments Or Exams
+    let attachmentIds = [];
+    let examId  = null;
+
+    // Fetch Attachments
+    if( attachmentCodes?.length ){
+      const attachments = await Attachment.find({
+        code: { $in: attachmentCodes },
+        teacher: teacherId,
+        isDeleted: false
+      }).session( session );
+
+      if( attachments.length !== attachmentCodes.length ){
+        throw new ErrorResponse('❌ واحد أو أكثر من أكواد الملفات غير صحيحة', 400);
+      };
+
+      attachmentIds = attachments.map( a => a._id )
+    };
+
+    // Fetch Exam
+    if( examCode ){
+      const exam = await Exam.findOne({
+        code: examCode,
+        teacher: teacherId,
+        isDeleted: false
+      }).session( session );
+
+      if( !exam ){
+        throw new ErrorResponse( '❌ كود الامتحان غير صحيح!');
+      };
+      if ( exam.grade !== month.grade ){
+        throw new ErrorResponse( `❌ هذا الاختبار ليس للصف ${ month.grade || '' }!`, 400 );
+      };
+
+      examId = exam._id;
+    };
+
+    const updateData = {};
+    if( title ) updateData.title = title;
+    if( description ) updateData.description = description;
+    if( thumbnail ) updateData.thumbnail = thumbnail;
+    if( videoId ) updateData.videoId = videoId;
+    if( status ) updateData.status = status;
+    if( durationMinutes ) updateData.durationMinutes = durationMinutes;
+    if (attachmentIds.length) updateData.attachments = attachmentIds;
+    if (examId) updateData.exam = examId;
+
+    // Update Lecture 
+    const updateLecture = await Lecture.findByIdAndUpdate(
+      lectureId,
+      {
+        $set: updateData
+      },
+      {
+        new: true, session, runValidators: true, context: 'query' 
+      }
+    );
     
+    // Final Validation
+    const requiredFields = [
+      'videoId', 'title', 'description', 'durationMinutes', 'teacher', 'month'
+    ];
+
+
+    for( const field of requiredFields ){
+      if( !updateLecture[ field ]){
+        throw new ErrorResponse( `❌ البيانات غير مكتملة: ${ field }`, 400 );
+      };
+    };
+
+
     // Commit Transaction & End session
     await session.commitTransaction();
     await session.endSession();
   }catch( err ){
     // Abort Transaction & End Session
+    await session.abortTransaction();
+    await session.endSession();
+    
     throw err;
-  }
+  };
+};
+
+/**
+ * @dsec Delete Lecture Service
+ * @param { object } req
+ * @param { string } teacherId
+ * @param { string } monthId
+ * @param { string } lectureId
+ * @returns { string } Lecture Title
+*/
+export const deleteLectureService = async ( req, teacherId, monthId, lectureId, {
+  title, description, thumbnail, videoUrl, status, durationMinutes, attachmentCodes, examCode
+}) => {
+  // Start Session
+  const session = await mongoose.startSession();
+  try{
+    // Start Transaction
+    await session.startTransaction();
+
+    // Check If Teacher Exist 
+    const teacher = await Teacher.findOne({
+      _id: teacherId,
+      status: 'active',
+      isDeleted: false
+    }).session( session );
+    if( !teacher ) throw new ErrorResponse( '❌ المعلم غير موجود!', 400 );
+
+    // Check If Monts Exists 
+    const month = await Month.findOne({
+      _id: monthId,
+      status: 'active',
+      teacher: teacherId,
+      isDeleted: false
+    }).select(' _id title grade').session( session );
+    if( !month ) throw new ErrorResponse( '❌ معرف الشهر غير صالح!', 400 );
+    
+    // Check IF Lectute Exist 
+    const lecture = await Lecture.findOne({
+      _id: lectureId,
+      status: 'active',
+      teacher: teacherId,
+      isDeleted: false
+    }).session( session );
+    if( !lecture ) throw new ErrorResponse( '❌ المحاضرة غير موجودة!', 400 );
+
+    // Save Lecture Before Has Been Deleted 
+    const lectureBeforeDelete = lecture.toObject();
+
+    // Soft Delete Lecture
+    lecture.isDeleted = true;
+    lecture.deleteAt = Date.now;
+    await lecture.save({ session });
+
+    // Commit Transaction & End session
+    await session.commitTransaction();
+    await session.endSession();
+
+    return {
+      lectureTitle: lecture.title
+    }
+  }catch( err ){
+    // Abort Transaction & End Session
+    await session.abortTransaction();
+    await session.endSession();
+    
+    throw err;
+  };
 };

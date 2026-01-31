@@ -20,7 +20,7 @@ export const createAttachmentValidation = celebrate({
 
     description: Joi.string()
       .trim()
-      .max(150)
+      .max(800)
       .allow('')
       .messages({
         'string.base': '❌ وصف الملف يجب أن يكون نص',
