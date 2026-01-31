@@ -148,15 +148,56 @@ const StudentSchema = new mongoose.Schema(
     watchedLectures: [WatchedLectureSchema],
     achievements: [AchievementsSchema],
   
-    examsTaken: [
-      {
-        exam: {
-          type: mongoose.Schema.Types.ObjectId,
-          ref: 'Exam'
-        },
-        submittedAt: Date
+  examsTaken: [
+    {
+      exam: {
+        type: mongoose.Schema.Types.ObjectId,
+        ref: 'Exam',
+        required: true
+      },
+
+      title: {
+        type: String,
+        trim: true,
+        maxlength: 120
+      },
+
+      totalQuestions: {
+        type: Number,
+        required: true,
+        min: 1
+      },
+
+      correctAnswers: {
+        type: Number,
+        required: true,
+        min: 0
+      },
+
+      totalMarks: {
+        type: Number,
+        required: true,
+        min: 0
+      },
+
+      score: {
+        type: Number, // percentage
+        min: 0,
+        max: 100
+      },
+
+      status: {
+        type: String,
+        enum: [ 'passed', 'inProgress', 'failed' ],
+        default: 'failed'
+      },
+
+      submittedAt: {
+        type: Date,
+        default: null
       }
-    ],
+    }
+  ],
 
     // Soft Delete
     isDeleted: {

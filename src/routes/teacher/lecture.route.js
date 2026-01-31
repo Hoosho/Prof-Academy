@@ -8,12 +8,12 @@ import { contextMiddleware } from '../../middlewares/context.middleware.js';
 
 // Import Controllers
 import {
-  createLecture, getAllLectures
+  createLecture, getAllLectures, updateLectuer, deleteLectuer
 } from '../../controllers/teacher/lecture.controller.js'
 
 // Import Validations
 import {
-  monthIdValidation, createLectureValidation,getLecturesQueryValidation, lectureIdValidation
+  monthIdValidation, createLectureValidation,getLecturesQueryValidation, lectureIdValidation, updateLectureValidation
 } from '../../validations/teacher/lecture.validation.js';
 
 /**
@@ -40,6 +40,33 @@ router.get(
   monthIdValidation,
   getLecturesQueryValidation,
   getAllLectures
+);
+
+/**
+ * @desc Update Lecture Route  
+ * @route PUT /api/teacher/:monthId/lecture/:lectureId
+*/
+router.put(
+  '/api/teacher/:monthId/lecture/:lectureId',
+  authTeacher,
+  contextMiddleware,
+  monthIdValidation,
+  lectureIdValidation,
+  updateLectureValidation,
+  updateLectureValidation
+);
+
+/**
+ * @desc Delete Lecture Route  
+ * @route DELETE /api/teacher/:monthId/lecture/:lectureId
+*/
+router.delete(
+  '/api/teacher/:monthId/lecture/:lectureId',
+  authTeacher,
+  contextMiddleware,
+  monthIdValidation,
+  lectureIdValidation,
+  deleteLectuer
 );
 
 export default router;

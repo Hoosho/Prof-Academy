@@ -124,6 +124,7 @@ export const updateLectuer = async ( req, res, next ) => {
     next( err );
   };
 };
+
 /**
  * @desc Delete Lecture
  * @route PUT /api/teacher/:monthId/lecture/:lectureId

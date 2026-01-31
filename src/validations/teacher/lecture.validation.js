@@ -155,3 +155,81 @@ export const lectureIdValidation = celebrate({
       }),
   }),
 });
+
+export const updateLectureValidation = celebrate({
+  [Segments.BODY]: Joi.object({
+    title: Joi.string()
+      .trim()
+      .min(3)
+      .max(150)
+      .required()
+      .messages({
+        'any.required': '❌ عنوان الحصة مطلوب',
+        'string.empty': '❌ عنوان الحصة لا يمكن أن يكون فارغ',
+        'string.min': '❌ عنوان الحصة قصير جدا',
+        'string.max': '❌ عنوان الحصة طويل جدا',
+      }),
+
+    description: Joi.string()
+      .trim()
+      .max(800)
+      .required()
+      .messages({
+        'any.required': '❌ وصف الحصة مطلوب',
+        'string.empty': '❌ وصف الحصة لا يمكن أن يكون فارغ',
+        'string.max': '❌ وصف الحصة طويل جدا',
+      }),
+
+    videoUrl: Joi.string()
+      .trim()
+      .uri()
+      .required()
+      .messages({
+        'any.required': '❌ رابط الفيديو مطلوب',
+        'string.empty': '❌ رابط الفيديو لا يمكن أن يكون فارغ',
+        'string.uri': '❌ رابط الفيديو غير صالح',
+      }),
+
+    durationMinutes: Joi.number()
+      .min(1)
+      .required()
+      .messages({
+        'any.required': '❌ مدة الحصة مطلوبة',
+        'number.base': '❌ مدة الحصة يجب أن تكون رقم',
+        'number.min': '❌ مدة الحصة غير صحيحة',
+      }),
+
+    status: Joi.string()
+      .valid('active', 'hidden', 'inactive')
+      .required()
+      .messages({
+        'any.required': '❌ حالة الحصة مطلوبة',
+        'any.only': '❌ حالة الحصة غير صحيحة',
+      }),
+
+    // =====================
+    // OPTIONAL FIELDS
+    // =====================
+    thumbnail: Joi.string()
+      .trim()
+      .uri()
+      .optional()
+      .allow('')
+      .messages({
+        'string.uri': '❌ رابط الصورة المصغرة غير صالح',
+      }),
+
+    attachmentCodes: Joi.array()
+      .items(
+        Joi.string().trim().min(3)
+      )
+      .optional(),
+
+    examCode: Joi.string()
+      .trim()
+      .optional()
+      .allow('', null),
+
+  })
+  .unknown(false),
+});
