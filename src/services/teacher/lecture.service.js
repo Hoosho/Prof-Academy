@@ -312,7 +312,7 @@ export const getLecturesService = async ( teacherId, monthId, {
  * @param { string } monthId
  * @param { string } lectureId
  * @param { object } { title, description, thumbnail, videoUrl, status, durationMinutes, attachmentCodes, examCode }
- * @returns { string } Lecture Title
+ * @returns { string } { lecture }
 */
 export const updateLectureService = async ( req, teacherId, monthId, lectureId, {
   title, description, thumbnail, videoUrl, status, durationMinutes, attachmentCodes, examCode
@@ -417,8 +417,10 @@ export const updateLectureService = async ( req, teacherId, monthId, lectureId, 
     if (attachmentIds.length) updateData.attachments = attachmentIds;
     if (examId) updateData.exam = examId;
 
+    // Lecture Before Update
+    const lectureBeforeUpdate = lecture.toObject();
     // Update Lecture 
-    const updateLecture = await Lecture.findByIdAndUpdate(
+    const updatedLecture = await Lecture.findByIdAndUpdate(
       lectureId,
       {
         $set: updateData
@@ -435,15 +437,36 @@ export const updateLectureService = async ( req, teacherId, monthId, lectureId, 
 
 
     for( const field of requiredFields ){
-      if( !updateLecture[ field ]){
+      if( !updatedLecture[ field ]){
         throw new ErrorResponse( `❌ البيانات غير مكتملة: ${ field }`, 400 );
       };
     };
 
+    // Create Audit Log - Lecture Has Been Updated Successfully 
+    await createAuditLog({
+      actor: req?.context?.actor,
+      action: 'LECTURE.UPDATE',
+      target: {
+        model: 'Lecture',
+        id: lecture._id
+      },
+      reason: 'Lecture has been updated successfully.',
+      context: req?.context?.context,
+      before: lectureBeforeUpdate,
+      after: updatedLecture.toObject()
+    });
 
     // Commit Transaction & End session
     await session.commitTransaction();
     await session.endSession();
+    
+    // Return Lecture Id & Title  
+    return {
+      lecture: {
+        id: updatedLecture._id,
+        title: updatedLecture.title
+      }
+    };
   }catch( err ){
     // Abort Transaction & End Session
     await session.abortTransaction();
@@ -459,11 +482,9 @@ export const updateLectureService = async ( req, teacherId, monthId, lectureId, 
  * @param { string } teacherId
  * @param { string } monthId
  * @param { string } lectureId
- * @returns { string } Lecture Title
+ * @returns { string } { lecture }
 */
-export const deleteLectureService = async ( req, teacherId, monthId, lectureId, {
-  title, description, thumbnail, videoUrl, status, durationMinutes, attachmentCodes, examCode
-}) => {
+export const deleteLectureService = async ( req, teacherId, monthId, lectureId ) => {
   // Start Session
   const session = await mongoose.startSession();
   try{
@@ -504,13 +525,30 @@ export const deleteLectureService = async ( req, teacherId, monthId, lectureId, 
     lecture.deleteAt = Date.now;
     await lecture.save({ session });
 
+    // Created Audit Log - Lecture Has Been Deleted Successfully.
+    await createAuditLog({
+      actor: req?.context?.actor,
+      action: 'LECTURE.DELETED',
+      target: {
+        model: 'Lecture',
+        id: lecture._id
+      },
+      reason: 'Lecture has been deleted successfully.',
+      context: req?.context?.context,
+      before: lectureBeforeDelete,
+      after: lecture.toObject()
+    });
     // Commit Transaction & End session
     await session.commitTransaction();
     await session.endSession();
 
+    // Return Lecture Id & Title
     return {
-      lectureTitle: lecture.title
-    }
+      lecture: {
+        id: lecture._id,
+        title: lecture.title
+      }
+    };
   }catch( err ){
     // Abort Transaction & End Session
     await session.abortTransaction();

@@ -50,6 +50,9 @@ const AuditLogSchema = new mongoose.Schema({
       
       // Lecture
       "LECTURE.CREATE",
+      'LECTURE.UPDATE',
+      'LECTURE.DELETE',
+      
       // STUDENT
       "STUDENT.CREATE",
       "STUDENT.UPDATE",
