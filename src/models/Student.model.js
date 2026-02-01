@@ -153,7 +153,7 @@ const StudentSchema = new mongoose.Schema(
       exam: {
         type: mongoose.Schema.Types.ObjectId,
         ref: 'Exam',
-        required: true
+        // required: true
       },
 
       title: {
@@ -164,19 +164,19 @@ const StudentSchema = new mongoose.Schema(
 
       totalQuestions: {
         type: Number,
-        required: true,
+        // required: true,
         min: 1
       },
 
       correctAnswers: {
         type: Number,
-        required: true,
+        // required: true,
         min: 0
       },
 
       totalMarks: {
         type: Number,
-        required: true,
+        // required: true,
         min: 0
       },
 
