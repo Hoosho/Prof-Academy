@@ -142,8 +142,17 @@ export const monthIdValidation = celebrate({
  * ✅ Lecture ID Validation
  * ============================
  */
-export const lectureIdValidation = celebrate({
+export const lectureParamsValidation = celebrate({
   [Segments.PARAMS]: Joi.object({
+    monthId: Joi.string()
+      .hex()
+      .length(24)
+      .required()
+      .messages({
+        'string.hex': '❌ معرف الشهر غير صحيح',
+        'string.length': '❌ معرف الشهر غير صحيح',
+        'any.required': '❌ معرف الشهر مطلوب',
+      }),
     lectureId: Joi.string()
       .hex()
       .length(24)

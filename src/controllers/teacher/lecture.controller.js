@@ -83,47 +83,47 @@ export const getAllLectures = async ( req, res, next ) => {
   };
 };
 
-/**
- * @desc Update Lecture
- * @route PUT /api/teacher/:monthId/lecture/:lectureId
- * @access Private ( Only Teacher )
-*/
-export const updateLectuer = async ( req, res, next ) => {
-  try{
-    // Take Fields From Req Body
-    const {
-      title, description, thumbnail, videoUrl, status, durationMinutes, attachmentCodes, examCode
-    } = req.body || {};
-    
-    // Take Teacher Id From Cookies 
-    const teacherId = req.teacher.id;
-    
-    // Take Lecture & Month Id From Req Params
-    const {
-      monthId, lectureId
-    } = req.params || {};
+  /**
+   * @desc Update Lecture
+   * @route PUT /api/teacher/:monthId/lecture/:lectureId
+   * @access Private ( Only Teacher )
+  */
+  export const updateLectuer = async ( req, res, next ) => {
+    try{
+      // Take Fields From Req Body
+      const {
+        title, description, thumbnail, videoUrl, status, durationMinutes, attachmentCodes, examCode
+      } = req.body || {};
+      
+      // Take Teacher Id From Cookies 
+      const teacherId = req.teacher.id;
+      
+      // Take Lecture & Month Id From Req Params
+      const {
+        monthId, lectureId
+      } = req.params || {};
 
-    if( !monthId ) throw new ErrorResponse( '❌ معرف الشهر غير موجود!', 404 );
-    if( !lectureId ) throw new ErrorResponse( '❌ معرف المحاضرة غير موجود!', 404 );
+      if( !monthId ) throw new ErrorResponse( '❌ معرف الشهر غير موجود!', 404 );
+      if( !lectureId ) throw new ErrorResponse( '❌ معرف المحاضرة غير موجود!', 404 );
 
-    // Call Update Lecture Service
-    const { lecture } = await updateLectureService( req, teacherId, monthId, lectureId, {
-      title, description, thumbnail, videoUrl, status, durationMinutes, attachmentCodes, examCode
-    });
+      // Call Update Lecture Service
+      const { lecture } = await updateLectureService( req, teacherId, monthId, lectureId, {
+        title, description, thumbnail, videoUrl, status, durationMinutes, attachmentCodes, examCode
+      });
 
-    // Return Success Response 
-    return res.status(200).json({
-      success: true,
-      msg: `✅ تم تحديث محاضرة ${ lecture.title } بنجاح.`,
-      data: {
-        lecture
-      }
-    });
-  }catch( err ){
-    console.log( err );
-    next( err );
+      // Return Success Response 
+      return res.status(200).json({
+        success: true,
+        msg: `✅ تم تحديث محاضرة ${ lecture.title } بنجاح.`,
+        data: {
+          lecture
+        }
+      });
+    }catch( err ){
+      console.log( err );
+      next( err );
+    };
   };
-};
 
 /**
  * @desc Delete Lecture

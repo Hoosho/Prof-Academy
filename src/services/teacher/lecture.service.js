@@ -289,6 +289,7 @@ export const getLecturesService = async ( teacherId, monthId, {
     // Return Paginated Data
     return {
       month: {
+        id: month._id,
         title: month.title,
         grade: month.grade
       },

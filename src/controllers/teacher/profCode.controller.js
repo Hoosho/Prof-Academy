@@ -79,10 +79,7 @@ export const deleteProfCode = async ( req, res, next ) => {
   try{
     // Take Fileds From Req Body
     const { profCodeIds } = req.body || {};
-    console.log( 'req.body: ', req.body )
-    console.log('profCodeIds:', profCodeIds);
-    console.log('isArray:', Array.isArray(profCodeIds));
-
+    
     // Take Teacher Id From Cookies
     const teacherId = req.teacher.id;
 

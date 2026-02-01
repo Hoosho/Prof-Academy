@@ -13,7 +13,7 @@ import {
 
 // Import Validations
 import {
-  monthIdValidation, createLectureValidation,getLecturesQueryValidation, lectureIdValidation, updateLectureValidation
+  monthIdValidation, createLectureValidation,getLecturesQueryValidation, lectureParamsValidation, updateLectureValidation
 } from '../../validations/teacher/lecture.validation.js';
 
 /**
@@ -42,19 +42,18 @@ router.get(
   getAllLectures
 );
 
-/**
- * @desc Update Lecture Route  
- * @route PUT /api/teacher/:monthId/lecture/:lectureId
-*/
-router.put(
-  '/api/teacher/:monthId/lecture/:lectureId',
-  authTeacher,
-  contextMiddleware,
-  monthIdValidation,
-  lectureIdValidation,
-  updateLectureValidation,
-  updateLectureValidation
-);
+  /**
+   * @desc Update Lecture Route  
+   * @route PUT /api/teacher/:monthId/lecture/:lectureId
+  */
+  router.put(
+    '/api/teacher/:monthId/lecture/:lectureId',
+    authTeacher,
+    contextMiddleware,
+    lectureParamsValidation,
+    updateLectureValidation,
+    updateLectuer
+  );
 
 /**
  * @desc Delete Lecture Route  
@@ -64,8 +63,7 @@ router.delete(
   '/api/teacher/:monthId/lecture/:lectureId',
   authTeacher,
   contextMiddleware,
-  monthIdValidation,
-  lectureIdValidation,
+  lectureParamsValidation,
   deleteLectuer
 );
 
