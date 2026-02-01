@@ -335,7 +335,6 @@ export const updateLectureService = async ( req, teacherId, monthId, lectureId, 
     // Check If Monts Exists 
     const month = await Month.findOne({
       _id: monthId,
-      status: 'active',
       teacher: teacherId,
       isDeleted: false
     }).select(' _id title grade').session( session );
@@ -344,8 +343,8 @@ export const updateLectureService = async ( req, teacherId, monthId, lectureId, 
     // Check IF Lectute Exist 
     const lecture = await Lecture.findOne({
       _id: lectureId,
-      status: 'active',
-      teacher: teacherId,
+      teacher: teacherId, 
+      month: monthId,
       isDeleted: false
     }).session( session );
     if( !lecture ) throw new ErrorResponse( '❌ المحاضرة غير موجودة!', 400 );
@@ -503,7 +502,6 @@ export const deleteLectureService = async ( req, teacherId, monthId, lectureId )
     // Check If Monts Exists 
     const month = await Month.findOne({
       _id: monthId,
-      status: 'active',
       teacher: teacherId,
       isDeleted: false
     }).select(' _id title grade').session( session );
@@ -512,8 +510,8 @@ export const deleteLectureService = async ( req, teacherId, monthId, lectureId )
     // Check IF Lectute Exist 
     const lecture = await Lecture.findOne({
       _id: lectureId,
-      status: 'active',
       teacher: teacherId,
+      month: monthId,
       isDeleted: false
     }).session( session );
     if( !lecture ) throw new ErrorResponse( '❌ المحاضرة غير موجودة!', 400 );
@@ -523,13 +521,13 @@ export const deleteLectureService = async ( req, teacherId, monthId, lectureId )
 
     // Soft Delete Lecture
     lecture.isDeleted = true;
-    lecture.deleteAt = Date.now;
+    lecture.deleteAt = Date.now();
     await lecture.save({ session });
 
     // Created Audit Log - Lecture Has Been Deleted Successfully.
     await createAuditLog({
       actor: req?.context?.actor,
-      action: 'LECTURE.DELETED',
+      action: 'LECTURE.DELETE',
       target: {
         model: 'Lecture',
         id: lecture._id
