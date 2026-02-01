@@ -128,7 +128,7 @@ export const authMeService = async ( studentId ) => {
     return {
       student: {
         name: student.name,
-        avatar: student.avatar,
+        avatar: student.avatar || '',
       }
     };
   }catch( err ){

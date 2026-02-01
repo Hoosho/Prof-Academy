@@ -234,17 +234,17 @@ export const authMeService = async ( adminId ) => {
   try{
     // Check IF Student Exists
     const teacher = await Teacher.findOne({
-      _id: teacherId,
+      _id: adminId,
       status: 'active',
       isDeleted: false
-    });
+    }).select(' _id name avatar').lean();
     if( !teacher ) throw new ErrorResponse( '❌ المستخدم غير موجود!', 404 );
 
     // Return Student Data 
     return {
       teacher: {
         name: teacher.name,
-        avatar: teacher.avatar
+        avatar: teacher.avatar || ''
       }
     };
   }catch( err ){
