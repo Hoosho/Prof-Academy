@@ -86,13 +86,13 @@ export const getProfCodesStatsService = async ( teacherId ) => {
  * @returns { object } { profCodes, pagination }
 */
 export const getProfCodesService = async ( teacherId, {
-    page = 1, limit = 20, search = '', status = 'all'
+  page = 1, limit = 20, search = '', status = 'all'
 }) => {
   try{
     // Sanatize Pagination
     page = Math.max( Number( page ), 1 );
-    limit = Math.min( Math.min( Number( limit ), 20 ), 50 );
-    const skip = ( page - 1) * limit;
+    limit = Math.min( Math.max( Number( limit ), 1 ), 50 );
+    const skip = ( page - 1 ) * limit;
 
     // Built Filter
     const filter = {

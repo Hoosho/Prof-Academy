@@ -41,7 +41,7 @@ export const getAllProfCodes = async ( req, res, next ) => {
   try{
     // Take Fields From Queries
     const {
-      paeg, limit, search, status
+      page, limit, search, status
     } = req.query || {};
 
     // Take Teacher Id From Cookies
@@ -52,7 +52,7 @@ export const getAllProfCodes = async ( req, res, next ) => {
 
     // Call Get Prof Codes Service
     const { profCodes, pagination } = await getProfCodesService( teacherId, {
-      paeg, limit, search, status
+      page, limit, search, status
     });
 
     // Return Success Res With Data
