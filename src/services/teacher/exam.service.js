@@ -119,65 +119,47 @@ export const creaetExamService = async ( req, teacherId, {
  * @returns { object } { stats }
 */
 export const getExamsStatsService = async ( teacherId ) => {
-  try{
+  try {
+    // Match Exams For This Teacher That Are Not Deleted
     const stats = await Exam.aggregate([
       {
         $match: {
-          teacher: teacherId,
+          teacher: new mongoose.Types.ObjectId(teacherId),
           isDeleted: false
         }
       },
       {
-        $facet: {
+        $group: {
+          _id: null,
 
-          // Total Exams 
-          totalExams: [
-            {
-              $count: 'count'
+          // Count Total Exams
+          totalExams: { $sum: 1 },
+
+          // Count Total Active Exams
+          totalActiveExams: {
+            $sum: {
+              $cond: [ { $eq: [ '$status', 'active' ] }, 1, 0 ]
             }
-          ],
+          },
 
-          // Total Active Exams 
-          totalActiveExams: [
-            {
-              $match: {
-                status: 'active'
-              }
-            },
-            {
-              $count: 'count'
+          // Count Total Inactive Exams
+          totalInactiveExams: {
+            $sum: {
+              $cond: [ { $eq: [ '$status', 'inactive' ] }, 1, 0 ]
             }
-          ],
+          },
 
-          // Total Inactive Exams 
-          totalInactiveExams: [
-            {
-              $match: {
-                status: 'inactive'
-              }
-            },
-            {
-              $count: 'count'
-            }
-          ],
-
-          // Total Questions 
-          totalQuestions: [
-            {
-              $unwind: '$questions'
-            },
-            {
-              $count: 'count'
-            }
-          ]
-
+          // Count Total Questions Across All Exams
+          totalQuestions: {
+            $sum: { $size: { $ifNull: [ '$questions', [] ] } }
+          }
         }
       }
     ]);
 
-    // Fallback If No Exams
-    if( !stats.length ){
-      return{
+    // Return Default If No Exams Found
+    if (!stats.length) {
+      return {
         stats: {
           totalExams: 0,
           totalActiveExams: 0,
@@ -185,21 +167,23 @@ export const getExamsStatsService = async ( teacherId ) => {
           totalQuestions: 0
         }
       };
-    };
+    }
 
-    // Return Stats Obj
+    // Return Stats Object
     return {
       stats: {
-        totalExams: stats[0].totalExams[0]?.count || 0,
-        totalActiveExams: stats[0].totalActiveExams[0]?.count || 0,
-        totalInactiveExams: stats[0].totalInactiveExams[0]?.count || 0,
-        totalQuestions: stats[0].totalQuestions[0]?.count || 0,
+        TotalExams: stats[0].totalExams,
+        TotalActiveExams: stats[0].totalActiveExams,
+        TotalInactiveExams: stats[0].totalInactiveExams,
+        TotalQuestions: stats[0].totalQuestions
       }
     };
-  }catch( err ){
+  } catch (err) {
+    // Throw Error To Controller
     throw err;
-  };
+  }
 };
+
 
 /**
  * @desc Get All Exams Service
