@@ -61,6 +61,7 @@ const AuditLogSchema = new mongoose.Schema({
       'WALLET_CHARGE',
       'BUY_MONTH',
 
+      'EXAM.SUBMIT',
       // AUTH
       'AUTH.LOGIN.CREDENTIALS.SUCCESS',
       'AUTH.LOGIN.CREDENTIALS.FAIL',
