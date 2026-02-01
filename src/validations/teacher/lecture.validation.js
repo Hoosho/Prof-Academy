@@ -201,9 +201,8 @@ export const updateLectureValidation = celebrate({
 
     durationMinutes: Joi.number()
       .min(1)
-      .required()
+      .optional()
       .messages({
-        'any.required': '❌ مدة الحصة مطلوبة',
         'number.base': '❌ مدة الحصة يجب أن تكون رقم',
         'number.min': '❌ مدة الحصة غير صحيحة',
       }),
