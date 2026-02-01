@@ -48,9 +48,9 @@ export const submitExam = async ( req, res, next ) => {
     const studentId = req.student.id;
 
     // Take Exam Id From Req Params 
-    const { examId } = req.params.examId;
-    if( !examId ) throw new ErrorResponse( 'testetsetsetsetse', 404 );
-    
+    const examId = req.params.examId;
+    if( !examId ) throw new ErrorResponse( '❌ معرف الاختبار غير موجود!', 404 );
+
     // Call Submit Exam Service 
     const { exam } = await submitExamService( req, studentId, examId, answers );
 
