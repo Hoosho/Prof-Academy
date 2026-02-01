@@ -213,7 +213,7 @@ export const getExamsService = async ( teacherId, {
   try{
     // Sanitize Pagination
     page = Math.max( Number( page ), 1 );
-    limit = Math.min( Math.min( Number( limit ), 1 ), 50 );
+    limit = Math.min( Math.max( Number( limit ), 1 ), 50 );
     const skip = ( page - 1 ) * limit;
 
     // Build Filter 
