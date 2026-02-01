@@ -3,10 +3,11 @@ const router = express.Router();
 
 // Import Middlewares
 import { contextMiddleware } from '../../middlewares/context.middleware.js';
+import { authTeacher } from '../../middlewares/auth.middleware.js'
 
 // Import Controllers
 import {
-  teacherLogin
+  teacherLogin, authMe
 } from '../../controllers/teacher/auth.controller.js'
 
 // Import Validations
@@ -22,6 +23,16 @@ router.post(
   contextMiddleware,
   teacherLoginValidation,
   teacherLogin
+);
+
+/**
+ * @desc Teacher Auth Me Route
+ * @route GET /api/auth/me/teacher
+*/
+router.get(
+  '/api/auth/me/teacher',
+  authTeacher,
+  authMe
 );
 
 export default router;

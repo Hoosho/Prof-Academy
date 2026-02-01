@@ -32,7 +32,7 @@ export const createTeacherValidation = celebrate({
       "string.max": "❌ المادة طويلة جدًا",
       "any.required": "❌ المادة مطلوبة",
     }),
-    bio: Joi.string().max(500).messages({
+    bio: Joi.string().max(250).messages({
       "string.base": "❌ السيرة الذاتية يجب أن يكون نص",
       "string.max": "❌ السيرة الذاتية طويلة جدًا"
     }),
@@ -113,7 +113,7 @@ export const updateTeacherValidation = celebrate({
       "string.max": "❌ المادة طويلة جدًا",
       "any.required": "❌ المادة مطلوبة",
     }),
-    bio: Joi.string().max(500).messages({
+    bio: Joi.string().max(250).messages({
       "string.base": "❌ السيرة الذاتية يجب أن يكون نص",
       "string.max": "❌ السيرة الذاتية طويلة جدًا"
     }),

@@ -2,7 +2,7 @@
 import Student from '../../models/Student.model.js';
 import { ErrorResponse } from '../../utils/errorResponse.util.js';
 import { generateToken } from '../../utils/generateToken.util.js';
-import { createAuditLog } from '../../services/system/auditLog.service.js';
+import { createAuditLog } from '../system/auditLog.service.js';
 
 /**
  * @desc Student Login
@@ -15,7 +15,6 @@ export const studentLoginService = async ( req, { code, deviceId } ) => {
     // Check If Student Exists With Code
     const student = await Student.findOne({ isDeleted : false, code });
     if( !student ){
-      throw new ErrorResponse('❌ البيانات غير صحيحة!', 401);
     };
 
     // Check Status 
@@ -106,6 +105,33 @@ export const studentLoginService = async ( req, { code, deviceId } ) => {
       studentName: student.name
     };
   }catch(err){
+    throw err;
+  };
+};
+
+/**
+ * @desc Auth Me Service
+ * @param { string } studentId
+ * @returns { object } { student }
+*/
+export const authMeService = async ( studentId ) => {
+  try{
+    // Check IF Student Exists
+    const student = await Student.findOne({
+      _id: studentId,
+      status: 'active',
+      isDeleted: false
+    }).select(' _id name avatar').lean();
+    if( !student ) throw new ErrorResponse( '❌ الطالب غير موجود!', 404 );
+
+    // Return Student Data 
+    return {
+      student: {
+        name: student.name,
+        avatar: student.avatar,
+      }
+    };
+  }catch( err ){
     throw err;
   };
 };

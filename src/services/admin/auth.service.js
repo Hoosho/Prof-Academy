@@ -208,3 +208,29 @@ export const verifyAdminOtpService = async ( username, otp, req ) => {
   // Return Token
   return { token };
 };
+
+/**
+ * @desc Auth Me Service
+ * @param { string } adminId
+ * @returns { object } { admin }
+*/
+export const authMeService = async ( adminId ) => {
+  try{
+    // Check IF Student Exists
+    const admin = await Admin.findOne({
+      _id: adminId,
+      status: 'active',
+      isDeleted: false
+    }).select(' _id username').lean();
+    if( !admin ) throw new ErrorResponse( '❌ المستخدم غير موجود!', 404 );
+
+    // Return Student Data 
+    return {
+      admin: {
+        name: admin.username,
+      }
+    };
+  }catch( err ){
+    throw err;
+  };
+};

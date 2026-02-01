@@ -1,8 +1,11 @@
   // services/admin/teacher.service.js
   import mongoose from 'mongoose'; 
   import Teacher from '../../models/Teacher.model.js';
+  import Month from '../../models/Month.model.js';
+  import Student from '../../models/Student.model.js';
   import { createAuditLog } from '../system/auditLog.service.js';
   import { ErrorResponse } from '../../utils/errorResponse.util.js';
+import MonthModel from '../../models/Month.model.js';
 
 /**
  * @desc Create Teacher Service 
@@ -151,7 +154,7 @@ export const getTeachersService = async ({
     // Parallel Queries 
     const [ teachers, totalResults ] = await Promise.all([
       Teacher.find( filter )
-        .select( '_id name email phone subject bio studentsCount rating status deviceId' )
+        .select( '_id name email phone subject bio deviceId' )
         .sort({ createdAt: -1 })
         .skip( skip )
         .limit( limit ) 
@@ -160,9 +163,32 @@ export const getTeachersService = async ({
         Teacher.countDocuments( filter )
       ]);
 
+      // Normalize Teacher Data
+      const normalizeTeachers = await Promise.all(
+        teachers.map( async ( t ) => {
+          return {
+            id: t._id.toString(),
+            name: t.name,
+            email: t.email,
+            phone: t.phone,
+            subject: t.subject,
+            bio: t.bio,
+            studentsCount: await Student.countDocuments({
+              assignedTeacher: t._id,
+              isDeleted: false
+            }),
+            monthsCount: await Month.countDocuments({
+              teacher: t._id, isDeleted: false
+            }),
+            deviceId: t.deviceId
+          };
+        })
+      );
+
+
       // Return Teacher Data Paginated
       return {
-        teachers,
+        teachers: normalizeTeachers,
         pagination: {
           page,
           limit,

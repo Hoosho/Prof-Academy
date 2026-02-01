@@ -52,41 +52,8 @@ const TeacherSchema = new mongoose.Schema({
   },
   bio: {
     type: String,
-    maxlength: [ 500, 'السيرة الذاتية طويلة جدا!' ],
+    maxlength: [ 250, 'السيرة الذاتية طويلة جدا!' ],
     default: ''
-  },
-  stats: {
-    monthsCount: {
-      type: Number,
-      default: 0
-    },
-    lectureCount: {
-      type: Number,
-      default: 0
-    },
-
-    // Earnings & History & Stats 
-    studentsCount: {
-      type: Number,
-      default: 0
-    },
-    earnings: [
-      {
-        amount:{
-          type: Number,
-          required: true,
-          min: 0,
-        },
-        createdAt: {
-          type: Date,
-          default: Date.now
-        },
-      }
-    ],
-    rating: {
-      type: Number,
-      default: 0
-    },
   },
 
   // Roles & Status

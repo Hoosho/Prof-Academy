@@ -1,6 +1,6 @@
 // /src/controllers/student/auth.controller.js
 import {
-  studentLoginService
+  studentLoginService, authMeService
 } from '../../services/student/auth.service.js';
 import { ErrorResponse } from '../../utils/errorResponse.util.js';
 
@@ -38,6 +38,32 @@ export const studentLogin = async ( req, res, next ) => {
       success: true,
       msg: `مرحبا بعودتك, ${ studentName || ''}.`
     });
+  }catch( err ){
+    console.log( err );
+    next( err );
+  };
+};
+
+/**
+ * @desc Student Auth Me 
+ * @route GET /api/auth/me/student
+ * @access Private ( Only Student )
+*/
+export const authMe = async ( req, res, next ) => {
+  try{
+    // Get Student Id From Cookies 
+    const studentId = req.student.id;
+    
+    // Call Auth Me Service
+    const { student } = await authMeService( studentId );
+
+    // Return Success Response 
+    return res.status(200).json({
+      success: true,
+      data: {
+        student
+      }
+    })
   }catch( err ){
     console.log( err );
     next( err );

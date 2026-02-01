@@ -346,31 +346,3 @@ export const updateStudentService = async ( req, studentId, {
     throw err;
   };
 };
-
-
-/**
- * @desc Auth Me Service
- * @param { string } studentId
- * @returns { object } { student }
-*/
-export const authMeService = async ( studentId ) => {
-  try{
-    // Check IF Student Exists
-    const student = await Student.findOne({
-      _id: studentId,
-      status: 'active',
-      isDeleted: false
-    });
-    if( !student ) throw new ErrorResponse( '❌ الطالب غير موجود!', 404 );
-
-    // Return Student Data 
-    return {
-      student: {
-        name: student.name,
-        avatar: student.avatar,
-      }
-    };
-  }catch( err ){
-    throw err;
-  };
-};

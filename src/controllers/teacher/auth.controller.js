@@ -1,5 +1,7 @@
 // /src/services/teacher/auth.service.js
-import { teacherLoginService } from '../../services/teacher/auth.service.js';
+import {
+  teacherLoginService, authMeService
+} from '../../services/teacher/auth.service.js';
 import { ErrorResponse } from '../../utils/errorResponse.util.js';
 /**
  * @desc Teacher Login
@@ -47,5 +49,31 @@ export const teacherLogin = async ( req, res, next ) => {
   }catch(err){
     console.log(err);
     next(err);
+  };
+};
+
+/**
+ * @desc teacher Auth Me 
+ * @route GET /api/auth/me/teacher
+ * @access Private ( Only teacher )
+*/
+export const authMe = async ( req, res, next ) => {
+  try{
+    // Get Student Id From Cookies 
+    const teacherId = req.teacher.id;
+    
+    // Call Auth Me Service
+    const { teacher } = await authMeService( teacherId );
+
+    // Return Success Response 
+    return res.status(200).json({
+      success: true,
+      data: {
+        teacher
+      }
+    })
+  }catch( err ){
+    console.log( err );
+    next( err );
   };
 };

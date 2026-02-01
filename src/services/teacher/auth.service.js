@@ -224,3 +224,30 @@ export const teacherLoginService = async ( req, email, password, deviceId ) => {
     otpSent: false
   };
 };
+
+/**
+ * @desc Auth Me Service
+ * @param { string } teacherId
+ * @returns { object } { teacher }
+*/
+export const authMeService = async ( adminId ) => {
+  try{
+    // Check IF Student Exists
+    const teacher = await Teacher.findOne({
+      _id: teacherId,
+      status: 'active',
+      isDeleted: false
+    });
+    if( !teacher ) throw new ErrorResponse( '❌ المستخدم غير موجود!', 404 );
+
+    // Return Student Data 
+    return {
+      teacher: {
+        name: teacher.name,
+        avatar: teacher.avatar
+      }
+    };
+  }catch( err ){
+    throw err;
+  };
+};

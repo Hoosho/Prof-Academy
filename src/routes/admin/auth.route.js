@@ -4,10 +4,11 @@ const router = express.Router();
 
 // Import Middlewares
 import { contextMiddleware } from '../../middlewares/context.middleware.js';
+import { authAdmin } from '../../middlewares/auth.middleware.js'
 
 // Import Controllers
 import {
-  adminLogin, getOtpStatus, verifyAdminOtp
+  adminLogin, getOtpStatus, verifyAdminOtp, authMe
 } from '../../controllers/admin/auth.controller.js'
 
 // Import Validations
@@ -47,4 +48,14 @@ router.post(
   verifyAdminOtp
 );
   
+/**
+ * @desc Admin Auth Me Route
+ * @route GET /api/auth/me/admin
+*/
+router.get(
+  '/api/auth/me/admin',
+  authAdmin,
+  authMe
+);
+
 export default router;

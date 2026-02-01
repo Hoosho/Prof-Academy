@@ -1,7 +1,7 @@
 // /src/controllers/student/student.controller.js
 import {
   getStudentMonthsService, chargeWalletService, buyMonthService,
-  getProfileService, updateStudentService, authMeService
+  getProfileService, updateStudentService
 } from '../../services/student/student.service.js';
 import { ErrorResponse } from '../../utils/errorResponse.util.js';
 import cloudinary from '../../config/cloudinary.config.js';
@@ -149,28 +149,3 @@ export const updateStudent = async ( req, res, next ) => {
 };
 
 
-/**
- * @desc Auth Me 
- * @route GET /api/auth/me
- * @access Private ( Only Student )
-*/
-export const authMe = async ( req, res, next ) => {
-  try{
-    // Get Student Id From Cookies 
-    const studentId = req.student.id;
-    
-    // Call Auth Me Service
-    const { student } = await authMeService( studentId );
-
-    // Return Success Response 
-    return res.status(200).json({
-      success: true,
-      data: {
-        student
-      }
-    })
-  }catch( err ){
-    console.log( err );
-    next( err );
-  };
-};
