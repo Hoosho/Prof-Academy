@@ -133,14 +133,11 @@ export const submitExamService = async ( req, studentId, examId, answers ) => {
     const status = score >= passingScore ? 'passed' : 'failed';
 
     // Recored Exam In Student Model 
-    student.examsTaken.push({
-      title: exam.title,
-      correctAnswers,
-      totalMarks: exam.totalMarks,
-      submittedAt: new Date(),
-      score,
-      status
-    });
+    enteredExam.correctAnswers = correctAnswers;
+    enteredExam.totalMarks = exam.totalMarks;
+    enteredExam.submittedAt = new Date();
+    enteredExam.score = score;
+    enteredExam.status = status;
     await student.save({ session });
 
     // Create Autid Log - Exam Has Been Submitted Successfully 
