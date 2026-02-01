@@ -91,15 +91,25 @@ export const submitExamService = async ( req, studentId, examId, answers ) => {
     });
     if( !exam ) throw new ErrorResponse( '❌ الاختبار غير موجود!', 400 );
 
-    // Check IF Student Entered Exam 
-    const alreadyEntered = student?.examsTaken?.some(
-      ( e ) => e.exam.toString() === examId.toString(), 
+    // Check IF Student Entered Exam
+    const enteredExam = student?.examsTaken?.find(
+      ( e ) => e.exam.toString() === examId.toString()
     );
-    if( !alreadyEntered ) throw new ErrorResponse( '❌ لا يمكن تسليم الاختبار بدون الدخول اليه من قبل!', 400 );
-    
-    // Check IF Student Submit Exam Before 
-    throw new ErrorResponse( `test1: ${alreadyEntered}, test: ${alreadyEntered.status}`)
-    if ( alreadyEntered.status !== 'inProgress' ) throw new ErrorResponse( '❌ لا يمكن تسليم الاختبار مرتين!', 400 );
+
+    if( !enteredExam ){
+      throw new ErrorResponse(
+        '❌ لا يمكن تسليم الاختبار بدون الدخول اليه من قبل!',
+        400
+      );
+    };
+
+    // Check IF Student Submit Exam Before
+    if ( enteredExam.status !== 'inProgress' ){
+      throw new ErrorResponse(
+        '❌ لا يمكن تسليم الاختبار مرتين!',
+        400
+      );
+    };
 
     // Student Before Changes
     const studentBeforeChanges = student.toObject();
