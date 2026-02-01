@@ -113,8 +113,10 @@ export const submitExamService = async ( req, studentId, examId, answers ) => {
 
     // Student Before Changes
     const studentBeforeChanges = student.toObject();
+
     // Correct Answers 
     let correctAnswers = 0;
+
     exam.questions.forEach( ( q ) => {
       const studentAnswer = answers.find(
         ( a ) => a.questionId.toString() === q._id.toString()
@@ -125,15 +127,26 @@ export const submitExamService = async ( req, studentId, examId, answers ) => {
       };
     });
 
+    // Total Questons 
+    const totalQuestions = exam.questions.length;
+
+    // Total In Correct Answers
+    const inCorrectAnswers = totalQuestions - correctAnswers;
+
+    // 
+    const markPerQuestion = exam.totalMarks / totalQuestions;
+    const degree = +( correctAnswers * markPerQuestion ).toFixed()
     // Counting
     const score = ( ( correctAnswers / exam.questions.length ) * 100 ).toFixed( 2 );
 
     // Select Status 
-    const passingScore = 50;
-    const status = score >= passingScore ? 'passed' : 'failed';
+    const passingScore = exam.totalMarks * 0.5;
+    const status = degree >= passingScore ? 'passed' : 'failed';
 
     // Recored Exam In Student Model 
     enteredExam.correctAnswers = correctAnswers;
+    enteredExam.inCorrectAnswers = inCorrectAnswers;
+    enteredExam.degree = degree;
     enteredExam.totalMarks = exam.totalMarks;
     enteredExam.submittedAt = new Date();
     enteredExam.score = score;
@@ -164,6 +177,8 @@ export const submitExamService = async ( req, studentId, examId, answers ) => {
         id: exam._id,
         title: exam.title,
         correctAnswers,
+        inCorrectAnswers,
+        degree,
         totalMarks: exam.totalMarks,
         submittedAt: new Date(),
         score,
