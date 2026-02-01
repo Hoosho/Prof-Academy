@@ -189,7 +189,7 @@ const StudentSchema = new mongoose.Schema(
       status: {
         type: String,
         enum: [ 'passed', 'inProgress', 'failed' ],
-        default: 'failed'
+        default: 'inProgress'
       },
 
       submittedAt: {

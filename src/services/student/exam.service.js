@@ -85,6 +85,7 @@ export const submitExamService = async ( req, studentId, examId, answers ) => {
     const exam = await Exam.findOne({
       _id: examId,
       teacher: student.assignedTeacher,
+      grade: student.grade,
       status: 'active',
       isDeleted: false
     });
