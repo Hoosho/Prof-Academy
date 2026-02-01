@@ -95,7 +95,8 @@ export const submitExamService = async ( req, studentId, examId, answers ) => {
     const alreadyEntered = student?.examsTaken?.some(
       ( e ) => e.exam.toString === examId.toString(), 
     );
-    if( !alreadyEntered ) throw new ErrorResponse( '❌ لا يمكن تسليم الاختبار بدون الدخول اليه من قبل!', 400 );
+    if( !alreadyEntered ) throw new ErrorResponse( `${ alreadyEntered }`, 400 );
+    // if( !alreadyEntered ) throw new ErrorResponse( '❌ لا يمكن تسليم الاختبار بدون الدخول اليه من قبل!', 400 );
     
     // Check IF Student Submit Exam Before 
     if ( alreadyEntered.status !== 'inProgress' ) throw new ErrorReponse( '❌ لا يمكن تسليم الاختبار مرتين!', 400 );
