@@ -69,3 +69,21 @@ export const authMe = async ( req, res, next ) => {
     next( err );
   };
 };
+
+/**
+ * @desc Student Logout
+ * @route POST /api/student/logout
+ * @access Private ( Only Student )
+*/
+export const studentLogout = async ( req, res, next ) => {
+  res.clearCookie('studentToken', {
+    httpOnly: true,
+    secure: false,
+    sameSite: 'Lax'
+  });
+  
+  return res.status(200).json({
+    success: true,
+    msg: '✅ تم تسجيل الخروج بنجاح!'
+  });
+};

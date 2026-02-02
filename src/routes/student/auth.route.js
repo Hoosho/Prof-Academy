@@ -8,7 +8,7 @@ import { authStudent } from '../../middlewares/auth.middleware.js'
 
 // Import Controllers
 import {
-  studentLogin, authMe
+  studentLogin, authMe, studentLogout 
 } from '../../controllers/student/auth.controller.js'
 
 // Import Validations
@@ -35,6 +35,16 @@ router.get(
   '/api/auth/me/student',
   authStudent,
   authMe
+);
+
+/**
+ * @desc Student Logout Route
+ * @route GET /api/student/logout
+*/
+router.post(
+  '/api/student/logout',
+  authStudent,
+  studentLogout
 );
 
 export default router;
