@@ -5,6 +5,7 @@ const router = express.Router();
 // Import Middlewares
 import { contextMiddleware } from '../../middlewares/context.middleware.js';
 import { authStudent } from '../../middlewares/auth.middleware.js'
+import { uploadProfile } from '../../middlewares/uploadImages.middleware.js';
 
 // Import Controllers
 import {
@@ -68,6 +69,7 @@ router.get(
 router.put(
   '/api/student/student',
   authStudent,
+  uploadProfile,
   updateStudent
 );
 

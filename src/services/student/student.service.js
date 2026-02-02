@@ -7,7 +7,7 @@ import Teacher from '../../models/Teacher.model.js';
 import ProfCode from '../../models/ProfCode.model.js';
 import { ErrorResponse } from '../../utils/errorResponse.util.js';
 import { createAuditLog } from '../system/auditLog.service.js';
-``
+
 /**
  * @desc Get Student Months Service
  * @param { string } studentId
