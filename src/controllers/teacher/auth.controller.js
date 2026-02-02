@@ -83,7 +83,7 @@ export const authMe = async ( req, res, next ) => {
  * @route POST /api/teacher/logout
  * @access Private ( Only Teacher )
 */
-export const TeacherLogout = async ( req, res, next ) => {
+export const teacherLogout = async ( req, res, next ) => {
   res.clearCookie('teacherToken', {
     httpOnly: true,
     secure: false,

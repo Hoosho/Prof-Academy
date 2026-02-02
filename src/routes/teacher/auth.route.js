@@ -8,7 +8,7 @@ import { authTeacher } from '../../middlewares/auth.middleware.js'
 // Import Controllers
 import {
   teacherLogin, authMe, teacherLogout
-} from '../../controllers/teacher/auth.controller.js'
+} from '../../controllers/teacher/auth.controller.js';
 
 // Import Validations
 import {
