@@ -154,7 +154,7 @@ export const getTeachersService = async ({
     // Parallel Queries 
     const [ teachers, totalResults ] = await Promise.all([
       Teacher.find( filter )
-        .select( '_id name email phone subject bio deviceId' )
+        .select( '_id name email phone status subject bio deviceId' )
         .sort({ createdAt: -1 })
         .skip( skip )
         .limit( limit ) 
@@ -173,6 +173,7 @@ export const getTeachersService = async ({
             phone: t.phone,
             subject: t.subject,
             bio: t.bio,
+            status: t.status,
             studentsCount: await Student.countDocuments({
               assignedTeacher: t._id,
               isDeleted: false
