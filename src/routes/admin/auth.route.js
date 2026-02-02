@@ -8,7 +8,7 @@ import { authAdmin } from '../../middlewares/auth.middleware.js'
 
 // Import Controllers
 import {
-  adminLogin, getOtpStatus, verifyAdminOtp, authMe
+  adminLogin, getOtpStatus, verifyAdminOtp, authMe, adminLogout
 } from '../../controllers/admin/auth.controller.js'
 
 // Import Validations
@@ -56,6 +56,16 @@ router.get(
   '/api/auth/me/admin',
   authAdmin,
   authMe
+);
+
+/**
+ * @desc Admin Logout Route
+ * @route GET /api/admin/logout
+*/
+router.post(
+  '/api/admin/logout',
+  authAdmin,
+  adminLogout
 );
 
 export default router;

@@ -7,7 +7,7 @@ import { authTeacher } from '../../middlewares/auth.middleware.js'
 
 // Import Controllers
 import {
-  teacherLogin, authMe
+  teacherLogin, authMe, teacherLogout
 } from '../../controllers/teacher/auth.controller.js'
 
 // Import Validations
@@ -33,6 +33,16 @@ router.get(
   '/api/auth/me/teacher',
   authTeacher,
   authMe
+);
+
+/**
+ * @desc Teacher Logout Route
+ * @route GET /api/teacher/logout
+*/
+router.post(
+  '/api/teacher/logout',
+  authTeacher,
+  teacherLogout
 );
 
 export default router;

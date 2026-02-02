@@ -77,3 +77,21 @@ export const authMe = async ( req, res, next ) => {
     next( err );
   };
 };
+
+/**
+ * @desc Teacher Logout
+ * @route POST /api/teacher/logout
+ * @access Private ( Only Teacher )
+*/
+export const TeacherLogout = async ( req, res, next ) => {
+  res.clearCookie('teacherToken', {
+    httpOnly: true,
+    secure: false,
+    sameSite: 'Lax'
+  });
+  
+  return res.status(200).json({
+    success: true,
+    msg: '✅ تم تسجيل الخروج بنجاح!'
+  });
+};

@@ -149,3 +149,21 @@ export const authMe = async ( req, res, next ) => {
     next( err );
   };
 };
+
+/**
+ * @desc Admin Logout
+ * @route POST /api/admin/logout
+ * @access Private ( Only Admin )
+*/
+export const adminLogout = async ( req, res, next ) => {
+  res.clearCookie('adminToken', {
+    httpOnly: true,
+    secure: false,
+    sameSite: 'Lax'
+  });
+  
+  return res.status(200).json({
+    success: true,
+    msg: '✅ تم تسجيل الخروج بنجاح!'
+  });
+};
