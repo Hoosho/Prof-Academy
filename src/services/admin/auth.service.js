@@ -217,10 +217,10 @@ export const verifyAdminOtpService = async ( username, otp, req ) => {
 export const authMeService = async ( adminId ) => {
   try{
     // Check IF Student Exists
+    // isDeleted: false
     const admin = await Admin.findOne({
       _id: adminId,
       status: 'active',
-      isDeleted: false
     }).select(' _id username').lean();
     if( !admin ) throw new ErrorResponse( '❌ المستخدم غير موجود!', 404 );
 
