@@ -209,7 +209,7 @@ export const getTeachersService = async ({
  * @retunrs { string } teacherName
 */ 
 export const updateTeacherService = async ( req, teacherId, {
-  name, email, phone, password, subject, status, bio
+  name, email, phone, password, subject, status, deviceId, bio
 }) => {
   // Open Session In DB
   const session = await mongoose.startSession();
@@ -240,7 +240,7 @@ export const updateTeacherService = async ( req, teacherId, {
     const updatedTeacher = await Teacher.findByIdAndUpdate(
       teacherId,
       { $set: {
-        name, email, phone, subject, status, bio
+        name, email, phone, subject, status, deviceId, bio
       }},
       { new: true, session, runValidators: true, context: 'query' }
     );

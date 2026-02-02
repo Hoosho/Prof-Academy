@@ -83,21 +83,16 @@ export const updateTeacher = async ( req, res, next ) => {
   try{
     // Take Data From Req Body
     const {
-      name, email, phone, password, subject, status, bio
+      name, email, phone, password, subject, status, deviceId, bio
     } = req.body || {};
 
     // Take Teacher Id From Params
     const teacherId = req.params.id || {};
-    
-    // Validate Required Fields
-    if( !name || !email || !phone || !subject  ){
-      throw new ErrorResponse( '❌ يرجي إدخال جميع الحقول المطلوبة كاملةَ!', 400 )
-    };
 
     // Call Update Teacher Service
     const { teacherName } = await updateTeacherService(
       req, teacherId, {
-        name, email, phone, password, subject, status, bio
+        name, email, phone, password, subject, status, deviceId, bio
       }
     );
     
