@@ -174,14 +174,9 @@ const StudentSchema = new mongoose.Schema(
       },
 
       inCorrectAnswers: {
-        type: Number,
-        min: 0,
-        validate: {
-          validator: function (v) {
-            return v + this.correctAnswers === this.totalQuestions;
-          },
-          message: '❌ عدد الإجابات غير متطابق مع عدد الأسئلة'
-        }
+      type: Number,
+        // required: true,
+        min: 0
       },
 
       correctAnswers: {
@@ -192,13 +187,8 @@ const StudentSchema = new mongoose.Schema(
 
       degree: {
         type: Number,
-        min: 0,
-        validate: {
-          validator: function (v) {
-            return v <= this.totalMarks;
-          },
-          message: '❌ الدرجة لا يمكن أن تتجاوز الدرجة النهائية'
-        }
+        // required: true,
+        min: 0
       },
 
 
@@ -212,7 +202,6 @@ const StudentSchema = new mongoose.Schema(
         type: Number,
         min: 0,
         max: 100,
-        set: v => Math.round(v * 100) / 100
       },
 
 

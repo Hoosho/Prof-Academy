@@ -33,17 +33,17 @@ const ProfCodeSchema = new mongoose.Schema({
 });
 
 // Auto Expire 
-// ProfCodeSchema.pre(/^find/, async function(next){
-//   const docs = await this.model.find(this.getQuery());
-//   const now = new Date();
-//   for (let doc of docs) {
-//     if (doc.status === 'active' && doc.expiresAt < now) {
-//       doc.status = 'expired';
-//       await doc.save(); // تحديث تلقائي
-//     }
-//   }
-//   next();
-// });
+ProfCodeSchema.pre(/^find/, async function(next){
+  const docs = await this.model.find(this.getQuery());
+  const now = new Date();
+  for (let doc of docs) {
+    if (doc.status === 'active' && doc.expiresAt < now) {
+      doc.status = 'expired';
+      await doc.save(); // تحديث تلقائي
+    }
+  }
+  next();
+});
 
 // Export Prof Code Model
 export default mongoose.model( 'ProfCode', ProfCodeSchema );

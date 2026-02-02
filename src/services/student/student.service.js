@@ -77,6 +77,13 @@ export const chargeWalletService = async ( req, studentId, code ) => {
   try{
     // Start Transaction
     await session.startTransaction();
+    
+    // If Code Will Expires, Update It In DB
+    const now = Date.now();
+    await ProfCode.updateMany(
+      { status: 'active', expiresAt: { $lt: now } },
+      { $set: { status: 'expired' } }
+    ).session( session );
 
     // check IF Student Exists
     const student = await Student.findOne({

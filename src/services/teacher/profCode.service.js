@@ -53,6 +53,13 @@ export const createProfCodesService = async ( req, teacherId, { count, value, ex
 */
 export const getProfCodesStatsService = async ( teacherId ) => {
   try{
+    // If Code Will Expires, Update It In DB
+    const now = Date.now();
+    await ProfCode.updateMany(
+      { status: 'active', expiresAt: { $lt: now } },
+      { $set: { status: 'expired' } }
+    ).session( session );
+
     // Total Prof Codes
     const totalProfCodes = await ProfCode.countDocuments({ teacher: teacherId });
     
@@ -111,6 +118,14 @@ export const getProfCodesService = async ( teacherId, {
       filter.status = status;
     };
 
+    // If Code Will Expires, Update It In DB
+    const now = Date.now();
+    await ProfCode.updateMany(
+      { status: 'active', expiresAt: { $lt: now } },
+      { $set: { status: 'expired' } }
+    );
+
+
     // Parallel Queries
     const [ profCodes, totalResults ] = await Promise.all([
       ProfCode.find( filter )
@@ -156,6 +171,13 @@ export const deleteProfCodeService = async ( req, teacherId, profCodeIds = [] ) 
     if (!Array.isArray(profCodeIds) || profCodeIds.length === 0){
       throw new ErrorResponse( '❌ لم يتم تحديد اي كود!', 400 );
     };
+
+    // If Code Will Expires, Update It In DB
+    const now = Date.now();
+    await ProfCode.updateMany(
+      { status: 'active', expiresAt: { $lt: now } },
+      { $set: { status: 'expired' } }
+    ).session( session );
 
     const existingProfCodes = await ProfCode.find({
       _id: profCodeIds,
