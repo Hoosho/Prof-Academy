@@ -323,13 +323,12 @@ export const updateStudentService = async ( req, studentId, {
     if( req.file ){      
       const result = await cloudinary.uploader.upload(
         req.file.path, {
-          folder: `students/profiles/${ studentId }`,
+          folder: `students/avatars/${ studentId }`,
           public_id: student.name,
           transformation: [{ width: 300, height: 300, crop: fill }]
         }
       );
       student.avatar = result.secure_url;
-      await student.save();
     };
     
     // Update Student
