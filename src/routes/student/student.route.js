@@ -69,7 +69,7 @@ router.get(
 router.put(
   '/api/student/student',
   authStudent,
-  uploadProfile,
+  uploadProfile.single('profileImage'),
   updateStudent
 );
 

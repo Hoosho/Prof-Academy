@@ -1,12 +1,13 @@
 // /src/middlewares/uploadImages.middleware.js
 import multer from "multer";
+
 const storage = multer.diskStorage({});
 
-const fileFilter = ( req, file, cb ) => {
-  if( !file.mimetype.startWith('image/' )){
-    return cb(new Error('Only image files are allowed! '), false ); 
-  };
-  cb( null, true );
+const fileFilter = (req, file, cb) => {
+  if (!file.mimetype.startsWith('image/')) {
+    return cb(new Error('Only image files are allowed!'), false);
+  }
+  cb(null, true);
 };
 
 export const uploadProfile = multer({

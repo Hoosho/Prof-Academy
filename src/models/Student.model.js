@@ -137,6 +137,11 @@ const StudentSchema = new mongoose.Schema(
       default: 0,
       max: [ 2000, "الرصيد لا يمكن أن يزيد عن 2000!" ],
     },
+    avatar: {
+      type: String,
+      default: '',
+    },
+
     assignedTeacher: {
       type: mongoose.Schema.Types.ObjectId,
       ref: 'Teacher',
