@@ -326,7 +326,7 @@ export const updateStudentService = async ( req, studentId, {
         req.file.path, {
           folder: `students/avatars/${ studentId }`,
           public_id: student.name,
-          transformation: [{ width: 300, height: 300, crop: fill }]
+          transformation: [{ width: 300, height: 300, crop: 'fill' }]
         }
       );
       student.avatar = result.secure_url;
