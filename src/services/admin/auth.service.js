@@ -227,7 +227,7 @@ export const authMeService = async ( adminId ) => {
     // Return Student Data 
     return {
       admin: {
-        name: admin.username,
+        username: admin.username,
       }
     };
   }catch( err ){
