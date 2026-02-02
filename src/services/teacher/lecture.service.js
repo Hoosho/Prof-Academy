@@ -282,8 +282,9 @@ export const getLecturesService = async ( teacherId, monthId, {
       viewsCount: l.stats?.viewsCount || 0,
       rating: l.stats?.rating || 0,
       ratingsCount: l.stats?.ratingsCount || 0,
-
-    attachmentsCount: l.attachments?.length || 0
+      
+      attachmentsCount: l.attachments?.length || 0,
+      examCount: l.exam?.length || 0,
     }));
 
     // Return Paginated Data
