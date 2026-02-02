@@ -103,9 +103,8 @@ export const updateTeacherValidation = celebrate({
       "string.pattern.base": "❌ رقم الهاتف يجب أن يكون 11 رقم",
       "any.required": "❌ رقم الهاتف مطلوب"
     }),
-    password: Joi.string().min(6).required().messages({
+    password: Joi.string().min(6).messages({
       "string.min": "❌ كلمة المرور قصيرة جدًا",
-      "any.required": "❌ كلمة المرور مطلوبة"
     }),
     subject: Joi.string().min(3).max(35).trim().required().messages({
       "string.base": "❌ المادة يجب أن يكون نص",

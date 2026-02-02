@@ -186,7 +186,6 @@ export const getTeachersService = async ({
         })
       );
 
-
       // Return Teacher Data Paginated
       return {
         teachers: normalizeTeachers,
@@ -348,6 +347,6 @@ export const deleteTeacherService = async ( req, teacherId ) => {
     await session.abortTransaction();
     session.endSession();
 
-    throw err
+    throw err;
   };
 };
