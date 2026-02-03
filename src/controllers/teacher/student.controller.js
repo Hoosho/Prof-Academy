@@ -129,12 +129,12 @@ export const deleteStudent = async ( req, res, next ) => {
     };
 
     // Call Delete Student Service
-    const { studentPhone } = await deleteStudentService( req, teacherId, studentId );
+    const { studentName } = await deleteStudentService( req, teacherId, studentId );
 
     // Return Success Response 
     return res.status(200).json({
       success: true,
-      msg: `✅ تم مسح بينات الطالب ${ studentPhone }, بنجاح`
+      msg: `✅ تم مسح بينات الطالب ${ studentName }, بنجاح`
     });
   }catch(err){
     console.log(err);

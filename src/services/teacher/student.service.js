@@ -218,7 +218,7 @@ export const updateStudentService = async (
   const session = await mongoose.startSession();
   try{
     // Start Transaction
-    session.startTransaction();
+    await session.startTransaction();
 
     // Fetch Student Id & teacherId
     const student = await Student.findOne({
@@ -257,7 +257,7 @@ export const updateStudentService = async (
 
     // Commit Transaction & End Session
     await session.commitTransaction();
-    session.endSession();
+    await session.endSession();
     
 
     // Return Student Name
@@ -286,7 +286,7 @@ export const deleteStudentService = async ( req, teacherId, studentId ) => {
   const session = await mongoose.startSession();
   try{
     // Start DB Transaction
-    session.startTransaction();
+    await session.startTransaction();
 
     // Check If Student Exists
     const student = await Student.findOne({
@@ -316,8 +316,8 @@ export const deleteStudentService = async ( req, teacherId, studentId ) => {
     });
 
     // Commit Transaction & End Session
-    session.commitTransaction();
-    session.endSession();
+    await session.commitTransaction();
+    await session.endSession();
 
     // Return Student Name
     return {
@@ -325,8 +325,8 @@ export const deleteStudentService = async ( req, teacherId, studentId ) => {
     };
   }catch( err ){
     // Abort Transaction & End Session
-    session.abortTransaction();
-    session.endSession();
+    await session.abortTransaction();
+    await session.endSession();
 
     throw err;
   };
