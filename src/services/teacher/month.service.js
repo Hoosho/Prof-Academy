@@ -28,7 +28,7 @@ export const createMonthService = async ( req, teacherId, {
     if( !teacher ) throw new ErrorResponse( '❌ المدرس غير موجود', 404 );
 
     // Check If Month Created Before Or No
-    const existingMonth = await Month.findOne({ title, grade }).session(session);
+    const existingMonth = await Month.findOne({ teacher: teacherId, title, grade }).session(session);
     if( existingMonth ) throw new ErrorResponse( '❌ تمت إضافة هذا الشهر من قبل!', 400 );
 
     // Create Month 
