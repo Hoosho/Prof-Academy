@@ -58,7 +58,7 @@ export const getProfCodesStatsService = async ( teacherId ) => {
     await ProfCode.updateMany(
       { status: 'active', expiresAt: { $lt: now } },
       { $set: { status: 'expired' } }
-    ).session( session );
+    );
 
     // Total Prof Codes
     const totalProfCodes = await ProfCode.countDocuments({ teacher: teacherId });
