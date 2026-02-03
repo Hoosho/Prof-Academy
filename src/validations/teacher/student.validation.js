@@ -181,7 +181,7 @@ export const updateStudentValidation = celebrate({
         "any.required": "❌ الرصيد مطلوب",
       }),
     status: Joi.string()
-      .valid( 'active', 'hidden', 'active' )
+      .valid( 'active', 'hidden', 'inactive' )
       .optional()
       .messages({
         "any.only": "❌ حالة الطالب غير صحيحة",
