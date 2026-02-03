@@ -48,7 +48,7 @@ export const getAllTeachersWithStats = async ( req, res, next ) => {
     const {
       page, limit, search, status  
     } = req.query || {};
-      
+
     // Call Teachers Stats Service
     const { stats } = await getTeachersStatsService();
 

@@ -118,14 +118,6 @@ export const getProfCodesService = async ( teacherId, {
       filter.status = status;
     };
 
-    // If Code Will Expires, Update It In DB
-    const now = Date.now();
-    await ProfCode.updateMany(
-      { status: 'active', expiresAt: { $lt: now } },
-      { $set: { status: 'expired' } }
-    );
-
-
     // Parallel Queries
     const [ profCodes, totalResults ] = await Promise.all([
       ProfCode.find( filter )

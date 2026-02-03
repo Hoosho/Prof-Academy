@@ -13,7 +13,6 @@ import { createAuditLog } from '../system/auditLog.service.js';
  * @param { object } req
 */
 export const teacherLoginService = async ( req, email, password, deviceId ) => {
-  console.log('test')
   // Fetch Teacher
   const teacher = await Teacher.findOne({ email })
     .select('+password +otpCode +otpExpires');

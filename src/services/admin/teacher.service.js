@@ -129,7 +129,7 @@ export const getTeachersService = async ({
   status = 'all'
 }) => {
   try{
-    // Sanitize Pagination
+    // Sanatize Pagination
     page = Math.max( Number( page ), 1 );
     limit = Math.min( Math.max( Number( limit ), 1 ), 50 );
     const skip = ( page - 1 ) * limit;
